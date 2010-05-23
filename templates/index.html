@@ -1,0 +1,53 @@
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<title>Gallery Test</title>
+<link rel="stylesheet" type="text/css" href="css/local.css" />
+<link rel="stylesheet" type="text/css" href="css/blueprint/screen.css" media="screen,projection" />
+<link rel="stylesheet" type="text/css" href="css/blueprint/print.css" media="print" />
+<!--[if lt IE 8]>
+    <link rel="stylesheet" href="css/blueprint/ie.css" type="text/css" media="screen,projection" />
+<![endif]-->
+<script src="js/galleria/plugins/galleria.flickr.js"></script>
+<!--<script src="js/jquery.js"></script>-->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<script src="js/galleria.js"></script>
+</head>
+<body>
+<!--<div class="container">
+	<span class="span-5 colborder"><h1>Welcome to the Image Gallery.</h1></span>
+	<div class="span-18 last">-->
+		<div id="gallery"></div>
+		<!--	<li><img src="img/pic1.jpg" alt="My description" title="My title"></li>
+			<li><img src="img/pic2.jpg" alt="Another text" title="Another title"></li>
+	</div>
+</div>-->
+<script>
+    // Load theme
+    Galleria.loadTheme('js/galleria/themes/fullscreen/galleria.fullscreen.js');
+    
+    // initialize flickr plugin
+    var flickr = new Galleria.Flickr('fddd7bc223fe37295faace93a4f2d8fc');
+    
+    // search for photos tagged 'lomo', edit options and apply galleria
+    flickr.setOptions({
+        max: 20,
+        sort: 'relevance'
+    }).getTags('hacker', function(data) {
+        $('#gallery').galleria({
+            data_source: data,
+            image_crop: false,
+            frame_color: '#000',
+            transition: 'slide',
+            hide_dock: false,
+            extend: function() {
+                this.$('info,counter').hide();
+            }
+        });
+    });
+</script>
+</body>
+
+</html>
