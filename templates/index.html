@@ -4,50 +4,64 @@
 <html>
 <head>
 <title>Gallery Test</title>
-<link rel="stylesheet" type="text/css" href="css/local.css" />
-<link rel="stylesheet" type="text/css" href="css/blueprint/screen.css" media="screen,projection" />
-<link rel="stylesheet" type="text/css" href="css/blueprint/print.css" media="print" />
+<script src="static/js/jquery.js"></script>
+<script src="static/js/galleria.js"></script>
+<link rel="stylesheet" type="text/css" href="static/css/local.css" media="screen, projection" />
+<link rel="stylesheet" type="text/css" href="static/css/blueprint/screen.css" media="screen,projection" />
+<link rel="stylesheet" type="text/css" href="static/css/blueprint/print.css" media="print" />
 <!--[if lt IE 8]>
     <link rel="stylesheet" href="css/blueprint/ie.css" type="text/css" media="screen,projection" />
 <![endif]-->
-<script src="js/galleria/plugins/galleria.flickr.js"></script>
-<!--<script src="js/jquery.js"></script>-->
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-<script src="js/galleria.js"></script>
+<script src="static/js/galleria/plugins/galleria.flickr.js"></script>
 </head>
 <body>
-<!--<div class="container">
-	<span class="span-5 colborder"><h1>Welcome to the Image Gallery.</h1></span>
-	<div class="span-18 last">-->
-		<div id="gallery"></div>
-		<!--	<li><img src="img/pic1.jpg" alt="My description" title="My title"></li>
-			<li><img src="img/pic2.jpg" alt="Another text" title="Another title"></li>
+<div class='container'>
+        {% for category, msg in get_flashed_messages(with_categories=true) %}
+        <p class='flash-{{ category }}'>{{ msg }}</p>
+        {% endfor %}
+	<div class='span-20'>
+	    <div id="galleria"></div>
 	</div>
-</div>-->
-<script>
-    // Load theme
-    Galleria.loadTheme('js/galleria/themes/fullscreen/galleria.fullscreen.js');
-    
-    // initialize flickr plugin
-    var flickr = new Galleria.Flickr('fddd7bc223fe37295faace93a4f2d8fc');
-    
-    // search for photos tagged 'lomo', edit options and apply galleria
-    flickr.setOptions({
-        max: 20,
-        sort: 'relevance'
-    }).getTags('hacker', function(data) {
-        $('#gallery').galleria({
-            data_source: data,
-            image_crop: false,
-            frame_color: '#000',
-            transition: 'slide',
-            hide_dock: false,
-            extend: function() {
-                this.$('info,counter').hide();
-            }
-        });
-    });
-</script>
-</body>
-
+	<div class='span-4 last'>
+                <h1>{{ user }}</h1>
+                <h2>{{ url }}</h2>
+		<p>What a work of art</p>
+	</div>
+        <div class="span-12">
+            <p>ALPHA</p>
+            <ul id="gallery">
+                {% for image in images: %}
+                <li><img src='{{ image.src }}' /></li>
+                {% endfor %}
+            </ul>
+	</div>
+</div>
+    <script>    
+        //$(document).ready(function){
+            // Load theme
+            Galleria.loadTheme('static/js/galleria/themes/classic/galleria.classic.js');
+            $('#gallery').galleria();
+            
+            // initialize flickr plugin
+            var flickr = new Galleria.Flickr('fddd7bc223fe37295faace93a4f2d8fc');
+            
+            // search for photos tagged 'lomo', edit options and apply galleria
+            flickr.setOptions({
+                max: 50,
+                sort: 'relevancy'
+            }).getTags('simon fraser university', function(data) {
+                $('#galleria').galleria({
+                    data_source: data,
+                    image_crop: false,
+                    frame_color: '#000',
+                    transition: 'fade',
+                    hide_dock: false,
+                    extend: function() {
+                        this.$('info,counter').hide();
+                    }
+                });
+            });
+        //}
+    </script>
+    </body>
 </html>
