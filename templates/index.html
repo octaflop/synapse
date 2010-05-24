@@ -17,7 +17,7 @@
 <body>
 <div class='container'>
         {% for category, msg in get_flashed_messages(with_categories=true) %}
-        <p class='flash-{{ category }}'>{{ msg }}</p>
+        <h2 class='flash-{{ category }}'>{{ msg }}</h2>
         {% endfor %}
 	<div class='span-20'>
 	    <div id="galleria"></div>
@@ -31,20 +31,18 @@
             <p>ALPHA</p>
             <ul id="gallery">
                 {% for image in images: %}
-                <li><img src='{{ image.src }}' /></li>
+                <li><a href="#"><img src='{{ image.src }}' /></a></li>
                 {% endfor %}
             </ul>
 	</div>
 </div>
-    <script>    
+    <script>
         //$(document).ready(function){
             // Load theme
             Galleria.loadTheme('static/js/galleria/themes/classic/galleria.classic.js');
             $('#gallery').galleria();
-            
             // initialize flickr plugin
             var flickr = new Galleria.Flickr('fddd7bc223fe37295faace93a4f2d8fc');
-            
             // search for photos tagged 'lomo', edit options and apply galleria
             flickr.setOptions({
                 max: 50,
