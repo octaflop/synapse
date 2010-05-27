@@ -183,7 +183,8 @@ for url in artist1._photo_urls():
 for url in photo3._artist_urls():
     print url
 
-print artist1._Photos()
+for path in artist1._photo_paths():
+    print path
 
 photo1.delete()
 photo2.delete()
