@@ -3,12 +3,13 @@ import re
 import hashlib
 import uuid as ui
 import datetime
-from settings import REDIS_SERVER, REDIS_PASSWD, DEV, SALT
+#from settings import REDIS_SERVER, REDIS_PASSWD, DEV, SALT
+SALT = "FAkeSa8r3y2qwi"
 
-if DEV:
-        R = redis.Redis()
-elif not DEV:
-	R = redis.Redis(host=REDIS_SERVER, password=REDIS_PASSWD)
+#if DEV:
+R = redis.Redis()
+#elif not DEV:
+#	R = redis.Redis(host=REDIS_SERVER, password=REDIS_PASSWD)
 
 def slugfy(text, separator='-'):
   ret = ""
@@ -215,7 +216,7 @@ class User(Thing):
             return False
 
 class Photo(Thing):
-    def __init__(self, title_en, title_fr, kind='photo', artists=None):
+    def __init__(self, title_en, title_fr, kind='photo', artists=None, filetype=None):
         self.title_en = title_en
         self.title_fr = title_fr
         self.kind = kind
@@ -229,6 +230,12 @@ class Photo(Thing):
         self.status_fr = ""
         self.price = None
         self.artists = []
+	if isinstance(filetype, str):
+	    self.filetype = filetype
+	    self.path = "%s/raw/%s.%s" % (self.kind, self.slug, self.filetype)
+	else:
+	    self.filetype = ''
+            self.path = ''
         if isinstance(artists, list):
             for artist in artists:
                 if isinstance(artist, Artist):
@@ -248,6 +255,7 @@ class Photo(Thing):
             'status_en' : self.status_en,
             'status_fr' : self.status_fr,
             'artists' : self.artists,
+            'path' : self.path,
             'price' : self.price
         }
 
@@ -270,7 +278,10 @@ class Photo(Thing):
 
     def _artist_urls(self):
         """
+	A generating function
         """
+	for artist_uuid in self._artists():
+		yield build_url('artist', artist_uuid)
 
 class Artist(User):
     def __init__(self, name, kind='artist', photos=None):
@@ -282,11 +293,14 @@ class Artist(User):
         self.bio_en = u""
         self.bio_fr = u""
         self.photos = []
+	self.photo_paths = []
         if isinstance(photos, list):
             for photo in photos:
                 if isinstance(photo, Photo):
                     self.photos.append(photo.attrs['uuid'])
+                    self.photo_paths.append(photo.attrs['path'])
                     R.sadd("%s:%s:photos" % (self.kind, self.uuid), photo)
+                    R.sadd("%s:%s:photo_paths" % (self.kind, self.uuid), photo)
         elif isinstance(photos, Photo):
             self.photos.append(photos.attrs['uuid'])
             R.sadd("%s:%s:photos" % (self.kind, self.uuid), photos)
@@ -317,3 +331,15 @@ class Artist(User):
         Thing.put(self, self.attrs)
         return self.photos
 
+    def _photo_urls(self):
+        """
+	A generating function
+        """
+	for photo_uuid in self._photos():
+	    yield build_url('photo', photo_uuid)
+
+    def _photo_paths(self):
+	attrs = Thing.get(self)
+	for path in self.attrs['photo_paths']:
+	    yield path
+	    
