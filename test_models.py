@@ -124,5 +124,60 @@ ret = a._exists(a.kind, a.uuid)
 print "Exists? Should be false: %s" % ret
 
 print "ONWARDS WITH THE RELATIONAL STUFF..."
-print "First, all the members"
+print "creating test classes"
 
+photo1 = Photo(u'Photo Title', u"Photö Title")
+photo2 = Photo(u'Photo 2 Title', u"Photö duex Title")
+photo1_attrs = {
+        u"description_en" : u"description english",
+        u"description_fr" : u"description français",
+        u"status_en" : u"For sale",
+        u"status_fr" : u"à vendre",
+        u"price" : 99.46
+        }
+
+photo2_attrs = {
+        u"description_en" : u"description 2 english",
+        u"description_fr" : u"description 2 français",
+        u"status_en" : u"For sale 2",
+        u"status_fr" : u"à 2 vendre",
+        u"price" : 87.88
+        }
+
+artist1 = Artist("Bob", photos=[photo1])
+artist2 = Artist("Joe", photos=[photo1, photo2])
+
+photo3 = Photo(u"Bob's second photo", u"Bob's duex photo!?", artists=[artist1])
+
+photo1.post()
+photo1.put(photo1_attrs)
+photo2.post()
+photo2.put(photo2_attrs)
+artist1.post()
+artist2.post()
+photo3.post()
+
+pprint(photo1.get())
+pprint(photo2.get())
+pprint(photo3.get())
+pprint(artist1.get())
+pprint(artist2.get())
+
+print "Checking those relational methods"
+pprint(photo1._artists())
+pprint(photo2._artists())
+pprint(photo3._artists())
+pprint(artist1._photos())
+pprint(artist2._photos())
+
+print "grabbing an url from a relational method"
+# TODO
+art1 = artist1._photos()
+pprint("url %s" % art1[0])
+pprint(artist1._full_url())
+
+photo1.delete()
+photo2.delete()
+photo3.delete()
+artist1.delete()
+artist2.delete()
