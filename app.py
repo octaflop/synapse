@@ -122,7 +122,7 @@ def upload():
     '''
 
 if __name__ == "__main__":
-	app.debug = True
-        csrf(app)
-	app.run()
+	app.debug = False
+        #csrf(app)
+	app.run(host="0.0.0.0", port=5002)
 

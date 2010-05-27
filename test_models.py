@@ -176,6 +176,15 @@ art1 = artist1._photos()
 pprint("url %s" % art1[0])
 pprint(artist1._full_url())
 
+print "Generate the urls"
+for url in artist1._photo_urls():
+    print url
+
+for url in photo3._artist_urls():
+    print url
+
+print artist1._Photos()
+
 photo1.delete()
 photo2.delete()
 photo3.delete()
