@@ -1,4 +1,4 @@
-from wtforms import Form, BooleanField, TextField, validators, PasswordField
+from wtforms import Form, BooleanField, TextField, validators, PasswordField, FileField, TextAreaField
 
 class RegistrationForm(Form):
     username = TextField('Username', [validators.Required(), validators.Length(min=4, max=25)])
@@ -22,7 +22,7 @@ class UploadPhoto(Form):
 
 class ArtistForm(Form):
     name = TextField(u"The full author's name", [validators.Length(min=3,
-    max=65)]))
+    max=65)])
     bio_en = TextAreaField(u"Artist's biography in English")
     bio_fr = TextAreaField(u"Artist's biography in French")
 
