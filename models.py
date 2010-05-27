@@ -31,12 +31,15 @@ def hash_it(username, password):
     ret = m.digest()
     return ret
 
-def add_uurl(kind, slug, tid):
+def add_uurl(kind, slug, tid, uuid):
     if not R.sadd("%s:slug" % kind, slug):
         slug += "_"
-        return add_uurl(kind, slug, tid)
+        return add_uurl(kind, slug, tid, uuid)
     else:
         R.set("%s:%s" % (kind, slug), tid)
+        R.set("%s:%s" % (kind, uuid), slug)
+        R.set("%s" % uuid, slug)
+        R.set("%s:%s:uuid" % (kind, slug), uuid)
         R.set("%s:%s:uurl" % (kind, tid), slug)
         return slug
 
@@ -52,7 +55,20 @@ def tid2uurl(kind, tid):
 
 def slug2uurl(kind, slug):
     tid = slug2tid(kind, slug)
-    url = R.get("%s:%s:uurl" % (kind, tid))
+    uurl = R.get("%s:%s:uurl" % (kind, tid))
+    return uurl
+
+def uuid2uurl(uuid):
+    uurl = R.get("%s" % uuid)
+    return uurl
+
+def uurl2uuid(kind, uurl):
+    uuid = R.get("%s:%s:uuid" % (kind, uurl))
+    return uuid
+
+def build_url(kind, uuid):
+    uurl = uuid2uurl(uuid)
+    url = "%s/%s" % (kind, uurl)
     return url
 
 class Thing():
@@ -121,7 +137,7 @@ class Thing():
             return False
         self.tid = R.zincrby("global:%s:tid" % self.kind, 1) # tid = "thing id"
         R.set("%s:%s:tid" % (self.kind, self.uuid), self.tid)
-        self.uurl = add_uurl(self.kind, self.slug, self.tid)
+        self.uurl = add_uurl(self.kind, self.slug, self.tid, self.uuid)
         redkey = "%s:%s" % (self.kind, self.tid)
         if attrs and self.attrs is None:
             self.attrs = {}
@@ -164,6 +180,15 @@ class Thing():
         R.delete(redkey)
         return True
 
+    def _url(self):
+        uurl = uuid2uurl(self.uuid)
+        return uurl
+
+    def _full_url(self):
+        uurl = build_url(self.kind, self.uuid)
+        return uurl
+
+
 class User(Thing):
     def __init__(self, username, email, password, kind='user'):
         self.username = username
@@ -190,18 +215,28 @@ class User(Thing):
             return False
 
 class Photo(Thing):
-    def __init__(self, title_en, title_fr, kind='photo'):
+    def __init__(self, title_en, title_fr, kind='photo', artists=None):
         self.title_en = title_en
         self.title_fr = title_fr
         self.kind = kind
         self.slug = slugfy(self.title_en)
         self.creation = str(datetime.datetime.now())
         self.uuid = str(ui.uuid1())
+        self.redkey = "%s:%s" % (self.kind, self.uuid)
         self.description_en = u""
         self.description_fr = u""
         self.status_en = ""
         self.status_fr = ""
         self.price = None
+        self.artists = []
+        if isinstance(artists, list):
+            for artist in artists:
+                if isinstance(artist, Artist):
+                    self.artists.append(artist.attrs['uuid'])
+                    R.sadd("%s:%s:artists" % (self.kind, self.uuid), artist)
+        elif isinstance(artists, Artist):
+            self.artists.append(artists.attrs['uuid'])
+            R.sadd("%s:%s:photos" % (self.kind, self.uuid), artists)
         self.attrs = {
             'title_en' : self.title_en,
             'slug' : slugfy(self.title_en),
@@ -212,11 +247,33 @@ class Photo(Thing):
             'uuid' : self.uuid,
             'status_en' : self.status_en,
             'status_fr' : self.status_fr,
+            'artists' : self.artists,
             'price' : self.price
         }
 
-class Artist(Thing):
-    def __init__(self, name, kind='artist'):
+    def _artists(self):
+        """
+        A simple method for getting all the artists. Returns a list of uuids.
+        """
+        #self.artists = R.smembers("%s:%s:artists" % (self.kind, self.uuid))
+        attrs = Thing.get(self)
+        self.attrs['artists'] = attrs['artists']
+        return self.artists
+
+    def _add_artists(self, artists):
+        assert isinstance(artists, list) or isinstance(artists, str)
+        attrs = Thing.get(self)
+        artists.append(attrs['artists'])
+        self.attrs['artists'] = artists
+        Thing.put(self, self.attrs)
+        return self.artists
+
+    def _artist_urls(self):
+        """
+        """
+
+class Artist(User):
+    def __init__(self, name, kind='artist', photos=None):
         self.name = name
         self.slug = slugfy(self.name)
         self.kind = kind
@@ -224,6 +281,15 @@ class Artist(Thing):
         self.uuid = str(ui.uuid1())
         self.bio_en = u""
         self.bio_fr = u""
+        self.photos = []
+        if isinstance(photos, list):
+            for photo in photos:
+                if isinstance(photo, Photo):
+                    self.photos.append(photo.attrs['uuid'])
+                    R.sadd("%s:%s:photos" % (self.kind, self.uuid), photo)
+        elif isinstance(photos, Photo):
+            self.photos.append(photos.attrs['uuid'])
+            R.sadd("%s:%s:photos" % (self.kind, self.uuid), photos)
         self.attrs = {
             'name' : self.name,
             'slug' : self.slug,
@@ -231,5 +297,23 @@ class Artist(Thing):
             'bio_fr' : self.bio_fr,
             'creation' : self.creation,
             'uuid' : self.uuid,
+            'photos' : self.photos,
         }
+
+    def _photos(self):
+        """
+        A simple method for getting all the photos. Returns a list of kinds:uuids.
+        """
+        #self.photos = R.hgetall("%s:%s:photos" % (self.kind, self.uuid))
+        attrs = Thing.get(self)
+        self.attrs['photos'] = attrs['photos']
+        return self.photos
+
+    def _add_photos(self, photos):
+        assert isinstance(photos, list) or isinstance(photos, str)
+        attrs = Thing.get(self)
+        photos.append(attrs['photos'])
+        self.attrs['photos'] = photos
+        Thing.put(self, self.attrs)
+        return self.photos
 

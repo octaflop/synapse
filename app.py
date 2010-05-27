@@ -26,6 +26,7 @@ from settings import *
 from forms import *
 from decorators import template, login_required
 from werkzeug import SharedDataMiddleware, secure_filename
+from flaskext.csrf import csrf
 import os
 
 app = Flask(__name__)
@@ -122,5 +123,6 @@ def upload():
 
 if __name__ == "__main__":
 	app.debug = True
+        csrf(app)
 	app.run()
 
