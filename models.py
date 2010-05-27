@@ -231,11 +231,11 @@ class Photo(Thing):
         self.price = None
         self.artists = []
 	if isinstance(filetype, str):
-	    self.filetype = filetype
-	    self.path = "%s/raw/%s.%s" % (self.kind, self.slug, self.filetype)
+            self.filetype = filetype
+            self.path = "%s/raw/%s.%s" % (self.kind, self.slug, self.filetype)
 	else:
-	    self.filetype = ''
-            self.path = ''
+            self.filetype = 'jpg'
+            self.path = "%s/raw/%s.%s" % (self.kind, self.slug, self.filetype)
         if isinstance(artists, list):
             for artist in artists:
                 if isinstance(artist, Artist):
@@ -281,7 +281,7 @@ class Photo(Thing):
 	A generating function
         """
 	for artist_uuid in self._artists():
-		yield build_url('artist', artist_uuid)
+            yield build_url('artist', artist_uuid)
 
 class Artist(User):
     def __init__(self, name, kind='artist', photos=None):
@@ -312,6 +312,7 @@ class Artist(User):
             'creation' : self.creation,
             'uuid' : self.uuid,
             'photos' : self.photos,
+            'photo_paths' : self.photo_paths
         }
 
     def _photos(self):
@@ -336,10 +337,9 @@ class Artist(User):
 	A generating function
         """
 	for photo_uuid in self._photos():
-	    yield build_url('photo', photo_uuid)
+            yield build_url('photo', photo_uuid)
 
     def _photo_paths(self):
 	attrs = Thing.get(self)
 	for path in self.attrs['photo_paths']:
-	    yield path
-	    
+            yield path
