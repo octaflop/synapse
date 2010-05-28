@@ -1,6 +1,5 @@
 #! /usr/bin/env python
-# -*- coding: utf8 -*-
-# -*- coding: utf-8 -*-
+# -*- encoding: utf-8 -*-
 # Copyright © 2010 Faris Chebib
 #
 # This file is part of aliendog.
@@ -24,16 +23,19 @@ from models import R
 from flask import Flask, url_for, flash, escape, request, redirect, session, render_template
 from settings import *
 from forms import *
+from strings import uurl2uuid
+import hashlib
 from decorators import template, login_required
 from werkzeug import SharedDataMiddleware, secure_filename
 from flaskext.csrf import csrf
+from models import User, Artist, Photo
 import os
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
 app.add_url_rule('/uploads/<filename>', 'uploaded_file', build_only=True)
 app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
-    '/uploads': UPLOAD_FOLDER
+    '/uploads': UPLOAD_FOLDER,
     })
 
 def allowed_file(filename):
@@ -56,24 +58,46 @@ def index():
     flash('test')
     return ret
 
+@app.route('/user/<uurl>')
+def userpage(uurl):
+    uuid = uurl2uuid('user', uurl)
+    if uuid is None:
+        return "uuid not found"
+    user = User(unicode(uurl))
+    user.kind = 'user'
+    user.uuid = str(uuid)
+    user.get(user.kind, user.uuid)
+    username = user.attrs['username']
+    uuid = user.attrs['uuid']
+    # FIRST TODO
+    #if session['username'] == username:
+    #    return "Why hello there, %s. id:%s" % (username, uuid)
+    #else:
+    return "This is %s's page. id:%s" % (username, uuid)
+
 @app.route('/register', methods=['GET', 'POST'])
-def register():
+def register_user():
     form = RegistrationForm(request.form)
     if request.method == 'POST' and form.validate():
-        passhash = hash(form.username.data) * hash(form.password.data)
-        uid = R.zincr("global.uid", 1)
-        username = R.set("user:%s:username" % uid, form.username.data)
-        passhash = R.set("user:%s:passhash" % uid, passhash)
-        email = R.set("user:%s:email" % uid, form.email.data)
-        if not R.sadd('users', 'user:%s' % uid):
-            return "username taken"
+        user = User(form.username.data, form.email.data, form.password.data)
+        if user.post():
+            if user.get():
+                return redirect(url_for('index'))#, user.uurl))
+            else:
+                return "could not find user after adding"
         else:
-            R.set('user:%s' % passhash, uid)
-            session['username'] = username
-            flash("Thanks for registering")
-            return redirect(url_for('index'))
+            return "could not add user to server"
+    #elif request.method == 'POST':
+    #    return "Try that again..."
     return render_template('register.html', form=form)
 
+#TODO
+"""
+make "user", "photo"; etc in a tuple which is called by both the models and the view.
+perhaps make a metafile to this effect.
+or maybe put them in seperate apps.
+~foenix
+"""
 @app.route('/logout')
 def logout():
     user = session['username']
@@ -90,16 +114,20 @@ def login():
     if request.method == "POST":
         username = request.form['username']
         password = request.form['password']
-        passhash = hash(unicode(username)) * hash(unicode(password))
-        if R.exists("user:%s" % passhash):
-            session['passhash'] = passhash
-            uid = R.get('user:%s' % passhash)
-            session['username'] = R.get("user:%s:username" % uid)
-            flash("logged in successfully as: %s" % session['username'])
-            return redirect(url_for('index'))
-        else:
-            flash("Wrong username or password")
-            return redirect('login')
+        given_passhash = hash_it(username, password)
+        # pseudouser = an unverified user
+        pseudouser = User(username)
+        if psuedouser._check_credentials(username, password):
+            # TODO: THIS MAY NOT WORK
+            # (naming conflicts may happen with the same username;
+            # going to resolve with intersecting sets)
+            psuedouser.kind = 'user'
+            psuedouser.uuid = uurl2uuid('user', username)
+            psuedouser.get()
+            # user => the server's gotten and verified user
+            user = psuedouser
+            session['username'] = user.username
+            return url_for('userpage', uurl=user.uurl)
     return render_template('login.html', ret=ret)
 
 @app.route('/upload/', methods=['GET', 'POST'])
@@ -122,7 +150,7 @@ def upload():
     '''
 
 if __name__ == "__main__":
-	app.debug = False
+	app.debug = True
         #csrf(app)
 	app.run(host="0.0.0.0", port=5002)
 
