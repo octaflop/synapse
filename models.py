@@ -1,76 +1,16 @@
 import redis
-import re
 import hashlib
 import uuid as ui
 import datetime
+
+from strings import *
 #from settings import REDIS_SERVER, REDIS_PASSWD, DEV, SALT
-SALT = "FAkeSa8r3y2qwi"
+SALT = "FAkeSa8r3y2qwi" # still devving it up, so this is here.
 
 #if DEV:
-R = redis.Redis()
+R = redis.Redis() #This is where we link up to good ol' redis
 #elif not DEV:
 #	R = redis.Redis(host=REDIS_SERVER, password=REDIS_PASSWD)
-
-def slugfy(text, separator='-'):
-  ret = ""
-  for c in text.lower():
-    try:
-      ret += htmlentitydefs.codepoint2name[ord(c)]
-    except:
-      ret += c
-  ret = re.sub("([a-zA-Z])(uml|acute|grave|circ|tilde|cedil)", r"\1", ret)
-  ret = re.sub("\W", " ", ret)
-  ret = re.sub(" +", separator, ret)
-  return ret.strip()
-
-def hash_it(username, password):
-    ret = ""
-    m = hashlib.sha1()
-    m.update(username)
-    m.update(SALT)
-    m.update(password)
-    ret = m.digest()
-    return ret
-
-def add_uurl(kind, slug, tid, uuid):
-    if not R.sadd("%s:slug" % kind, slug):
-        slug += "_"
-        return add_uurl(kind, slug, tid, uuid)
-    else:
-        R.set("%s:%s" % (kind, slug), tid)
-        R.set("%s:%s" % (kind, uuid), slug)
-        R.set("%s" % uuid, slug)
-        R.set("%s:%s:uuid" % (kind, slug), uuid)
-        R.set("%s:%s:uurl" % (kind, tid), slug)
-        return slug
-
-def slug2tid(kind, slug):
-    tid = R.get("%s:%s" % (kind, slug))
-    return tid
-
-def tid2uurl(kind, tid):
-    url = ""
-    tid = slug2tid(kind, slug)
-    url = R.get("%s:%s:uurl" % (kind, tid))
-    return url
-
-def slug2uurl(kind, slug):
-    tid = slug2tid(kind, slug)
-    uurl = R.get("%s:%s:uurl" % (kind, tid))
-    return uurl
-
-def uuid2uurl(uuid):
-    uurl = R.get("%s" % uuid)
-    return uurl
-
-def uurl2uuid(kind, uurl):
-    uuid = R.get("%s:%s:uuid" % (kind, uurl))
-    return uuid
-
-def build_url(kind, uuid):
-    uurl = uuid2uurl(uuid)
-    url = "%s/%s" % (kind, uurl)
-    return url
 
 class Thing():
     def __init__(self, kind=None):
@@ -130,6 +70,7 @@ class Thing():
         self.tid = self.get_tid(self.kind, self.uuid)
         redkey = "%s:%s" % (self.kind, self.tid)
         ret = R.hgetall(redkey)
+        self.attrs = ret
         return ret
 
     def post(self, attrs=None):
@@ -191,15 +132,25 @@ class Thing():
 
 
 class User(Thing):
-    def __init__(self, username, email, password, kind='user'):
+    def __init__(self, username, email=None, password=None, kind='user'):
+        assert isinstance(username, unicode)
         self.username = username
-        self.email = email
+        if password is not None:
+            assert isinstance(password, unicode)
+            self.password = password
+        else:
+            self.password = ""
+        if email is not None:
+            assert isinstance(email, unicode)
+            self.email = email
+        else:
+            self.email = ""
         self.kind = kind
         self.slug = slugfy(username)
         self.creation = str(datetime.datetime.now())
         self.uuid = str(ui.uuid1())
         m = hashlib.sha1()
-        self.shapassword = hash_it(self.username, password)
+        self.shapassword = hash_it(self.username, self.password)
         self.attrs = {
                 'username' : self.username,
                 'slug' : self.slug,
@@ -303,7 +254,9 @@ class Artist(User):
                     R.sadd("%s:%s:photo_paths" % (self.kind, self.uuid), photo)
         elif isinstance(photos, Photo):
             self.photos.append(photos.attrs['uuid'])
+            self.photo_paths.append(photos.attrs['path'])
             R.sadd("%s:%s:photos" % (self.kind, self.uuid), photos)
+            R.sadd("%s:%s:photo_paths" % (self.kind, self.uuid), photos)
         self.attrs = {
             'name' : self.name,
             'slug' : self.slug,
@@ -312,7 +265,7 @@ class Artist(User):
             'creation' : self.creation,
             'uuid' : self.uuid,
             'photos' : self.photos,
-            'photo_paths' : self.photo_paths
+            'photo_paths' : self.photo_paths,
         }
 
     def _photos(self):
@@ -325,7 +278,7 @@ class Artist(User):
         return self.photos
 
     def _add_photos(self, photos):
-        assert isinstance(photos, list) or isinstance(photos, str)
+        assert isinstance(photos, list)
         attrs = Thing.get(self)
         photos.append(attrs['photos'])
         self.attrs['photos'] = photos
@@ -341,5 +294,4 @@ class Artist(User):
 
     def _photo_paths(self):
 	attrs = Thing.get(self)
-	for path in self.attrs['photo_paths']:
-            yield path
+        yield attrs['photo_paths']
