@@ -1,5 +1,4 @@
 import redis
-<<<<<<< HEAD
 import hashlib
 import uuid as ui
 import datetime
@@ -296,8 +295,4 @@ class Artist(User):
     def _photo_paths(self):
 	attrs = Thing.get(self)
         yield attrs['photo_paths']
-=======
-#from settings import REDIS_SERVER, REDIS_PASSWD, DEV
 
-R = redis.Redis()
->>>>>>> 2a190cf527a74634ed64c24765d4b6c1f6ba9bf7
