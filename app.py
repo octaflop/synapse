@@ -150,12 +150,7 @@ def upload():
     '''
 
 if __name__ == "__main__":
-<<<<<<< HEAD
 	app.debug = True
         #csrf(app)
 	app.run(host="0.0.0.0", port=5002)
-=======
-	app.debug = False
-	app.run(host='0.0.0.0', port=5001)
->>>>>>> 2a190cf527a74634ed64c24765d4b6c1f6ba9bf7
 
