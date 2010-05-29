@@ -16,8 +16,8 @@
 </head>
 <body>
 <div class='container'>
-        {% for category, msg in get_flashed_messages(with_categories=true) %}
-        <h2 class='flash-{{ category }}'>{{ msg }}</h2>
+        {% for msg in get_flashed_messages() %}
+        <h2>{{ msg }}</h2>
         {% endfor %}
 	<div class='span-20'>
 	    <div id="galleria"></div>

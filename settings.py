@@ -1,4 +1,4 @@
-from passwd import *
+#from passwd import *
 DEV = True
 SECRET_KEY = 'vba937ei38mq2'
 SALT = 'vba937ei38mq2'
