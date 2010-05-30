@@ -1,0 +1,16 @@
+{% from "_formhelpers.html" import render_field %}
+<form method="post" action="/upload">
+    <input type="hidden" value="{{ csrf_token }}" />
+  <dl>
+    {{ render_field(form.photo) }}
+    {{ render_field(form.title_en) }}
+    {{ render_field(form.title_fr) }}
+    {{ render_field(form.description_en) }}
+    {{ render_field(form.description_fr) }}
+    {{ render_field(form.status_en) }}
+    {{ render_field(form.status_fr) }}
+    {{ render_field(form.price) }}
+  </dl>
+  <p><input type=submit value=Register></p>
+</form>
+
