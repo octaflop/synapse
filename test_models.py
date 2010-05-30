@@ -37,7 +37,7 @@ ret = t._exists(t.kind, t.uuid)
 print ret
 
 print "USER MODEL TESTS"
-q = User('faris', 'test@example.com', 'password')
+q = User(u'faris', u'test@example.com', u'password')
 ret = q
 pprint("User object is: %s" % ret)
 
@@ -186,7 +186,7 @@ for url in photo3._artist_urls():
 for path in artist1._photo_paths():
     print path
 
-print artist1._photo_paths()
+print "This should be a generator object: %s " % artist1._photo_paths()
 
 photo1.delete()
 photo2.delete()

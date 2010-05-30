@@ -130,27 +130,41 @@ def login():
             return url_for('userpage', uurl=user.uurl)
     return render_template('login.html', ret=ret)
 
-@app.route('/upload/', methods=['GET', 'POST'])
+@app.route('/photo/raw/<title>')
+def raw_photo():
+    """
+    The method to get photos refered by the database and stored unto the
+    machine
+    """
+
+@app.route('/add/artist', methods=['GET', 'POST'])
+def add_artist():
+    kwargs = {}
+    return render_template('add_artist.html', kwargs)
+
+@app.route('/add/photo', methods=['GET', 'POST'])
 @login_required
-def upload():
+def add_photo():
+    form = UploadPhoto(request.form)
+    photo = Photo(form.title_en.data, form.title_fr.data)
     if request.method == "POST":
-        file = request.files['file']
+        file = request.files['photo']
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
+            photo.attrs = {
+                    'description_en' : form.description_en.data,
+                    'description_fr' : form.description_fr.data,
+                    'status_en' : form.status_en.data,
+                    'status_fr' : form.status_fr.data,
+                    'price' : form.price.data
+                    }
             file.save(os.path.join(UPLOAD_FOLDER, filename))
-            return redirect(url_for('upload', filename=filename))
-    return '''
-    <!doctype html>
-    <title>Upload new file</title>
-    <h1>Upload a new file</h1>
-    <form action="" method=post enctype='multipart/form-data'>
-      <p><input type=file name='file'></p>
-      <p><input type=submit value='Upload'></p>
-    </form>
-    '''
+            photo.post()
+            return redirect(url_for('raw_photo', filename=filename))
+    return render_template('add_photo.html')
 
 if __name__ == "__main__":
-	app.debug = True
-        #csrf(app)
-	app.run(host="0.0.0.0", port=5002)
+    app.debug = True
+    #csrf(app)
+    app.run(host="0.0.0.0", port=5002)
 

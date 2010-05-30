@@ -1,3 +1,4 @@
+from flask import g
 #from passwd import *
 DEV = True
 SECRET_KEY = 'vba937ei38mq2'
@@ -9,3 +10,5 @@ g['user'] = None
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 TIME_ZONE = 'America/Vancouver' # Doesn't do anything, yet
+
+g.R = redis.Redis()
