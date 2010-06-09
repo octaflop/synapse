@@ -42,6 +42,7 @@ def allowed_file(filename):
     return '.' in filename and \
        filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
+# HOME PAGE
 @app.route('/')
 @template('index.html')
 def index():
@@ -58,6 +59,7 @@ def index():
     flash('test')
     return ret
 
+# GETTERS
 @app.route('/user/<uurl>')
 def userpage(uurl):
     uuid = uurl2uuid('user', uurl)
@@ -69,35 +71,38 @@ def userpage(uurl):
     user.get(user.kind, user.uuid)
     username = user.attrs['username']
     uuid = user.attrs['uuid']
-    # FIRST TODO
-    #if session['username'] == username:
-    #    return "Why hello there, %s. id:%s" % (username, uuid)
-    #else:
-    return "This is %s's page. id:%s" % (username, uuid)
+    if session['username'] == username:
+        return "Why hello there, %s. id:%s" % (username, uuid)
+    else:
+        return "This is %s's page. id:%s" % (username, uuid)
 
-@app.route('/register', methods=['GET', 'POST'])
+# Photo Getter
+@app.route('/photo/raw/<uuid>')
+def raw_photo(uuid):
+    """
+    The method to get photos referred by the database and stored unto the
+    machine
+    """
+    photo = Photo()
+    photo.get(kind='photo', uuid=uuid)
+    return photo._full_url()
+
+# User Functions
+@app.route('/admin/add/user', methods=['GET', 'POST'])
 def register_user():
     form = RegistrationForm(request.form)
     if request.method == 'POST' and form.validate():
         user = User(form.username.data, form.email.data, form.password.data)
         if user.post():
             if user.get():
-                return redirect(url_for('index'))#, user.uurl))
+                session['username'] = user.username
+                return redirect(url_for('userpage', uurl=user.uurl))
             else:
                 return "could not find user after adding"
         else:
             return "could not add user to server"
-    #elif request.method == 'POST':
-    #    return "Try that again..."
     return render_template('register.html', form=form)
 
-#TODO
-"""
-make "user", "photo"; etc in a tuple which is called by both the models and the view.
-perhaps make a metafile to this effect.
-or maybe put them in seperate apps.
-~foenix
-"""
 @app.route('/logout')
 def logout():
     user = session['username']
@@ -130,20 +135,30 @@ def login():
             return url_for('userpage', uurl=user.uurl)
     return render_template('login.html', ret=ret)
 
-@app.route('/photo/raw/<title>')
-def raw_photo():
-    """
-    The method to get photos refered by the database and stored unto the
-    machine
-    """
 
-@app.route('/add/artist', methods=['GET', 'POST'])
+#TODO
+"""
+make "user", "photo"; etc in a tuple which is called by both the models and the view.
+perhaps make a metafile to this effect.
+or maybe put them in separate apps.
+~foenix
+"""
+@app.route('/admin')
+@template('admin.html')
+def admin():
+    artist_form = ArtistForm(request.form)
+    photo_form = UploadPhoto(request.form)
+    user_form = RegistrationForm(request.form)
+
+    return dict(artist_form=artist_form, photo_form=photo_form,\
+            user_form=user_form)
+
+@app.route('/admin/add/artist', methods=['POST'])
 def add_artist():
     kwargs = {}
     return render_template('add_artist.html', kwargs)
 
-@app.route('/add/photo', methods=['GET', 'POST'])
-@login_required
+@app.route('/admin/add/photo', methods=['POST'])
 def add_photo():
     form = UploadPhoto(request.form)
     photo = Photo(form.title_en.data, form.title_fr.data)
@@ -160,11 +175,11 @@ def add_photo():
                     }
             file.save(os.path.join(UPLOAD_FOLDER, filename))
             photo.post()
-            return redirect(url_for('raw_photo', filename=filename))
+            return redirect(url_for('raw_photo', uuid=photo.uuid))
     return render_template('add_photo.html')
 
 if __name__ == "__main__":
     app.debug = True
-    #csrf(app)
+    ## csrf(app) TODO
     app.run(host="0.0.0.0", port=5002)
 
