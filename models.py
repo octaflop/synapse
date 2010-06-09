@@ -40,10 +40,14 @@ class Thing():
                 self.kind = 'thing'
             elif type(kind) is str:
                 self.kind = kind
+            elif type(kind) is unicode:
+                self.kind = kind
             else:
                 print "input a proper kind"
                 return False
         elif type(self.kind) is str:
+            kind = self.kind
+        elif type(self.kind) is unicode:
             kind = self.kind
         if self.uuid is None:
             if uuid is None:
@@ -52,7 +56,13 @@ class Thing():
             elif isinstance(uuid, str):
                 self.uuid = uuid
                 return True
-        elif isinstance(self.uuid,  str):
+            elif isinstance(uuid, unicode):
+                self.uuid = uuid
+                return True
+        elif isinstance(self.uuid, str):
+            uuid = self.uuid
+            return True
+        elif isinstance(self.uuid, unicode):
             uuid = self.uuid
             return True
         else:
@@ -66,7 +76,9 @@ class Thing():
 
     def get(self, kind=None, uuid=None):
         assert self._checkid(kind, uuid)
-        assert self._exists(self.kind, self.uuid)
+        assert self._exists(kind, uuid)
+        self.kind = kind
+        self.uuid = uuid
         self.tid = self.get_tid(self.kind, self.uuid)
         redkey = "%s:%s" % (self.kind, self.tid)
         ret = R.hgetall(redkey)
@@ -167,9 +179,15 @@ class User(Thing):
             return False
 
 class Photo(Thing):
-    def __init__(self, title_en, title_fr, kind='photo', artists=None, filetype=None):
-        self.title_en = title_en
-        self.title_fr = title_fr
+    def __init__(self, title_en=None, title_fr=None, kind='photo', artists=None, filetype=None):
+        if isinstance(title_en, unicode):
+            self.title_en = title_en
+        else:
+            self.title_en = u""
+        if isinstance(title_fr, unicode):
+            self.title_fr = title_fr
+        else:
+            self.title_fr = u""
         self.kind = kind
         self.slug = slugfy(self.title_en)
         self.creation = str(datetime.datetime.now())

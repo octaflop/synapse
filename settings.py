@@ -11,4 +11,3 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 TIME_ZONE = 'America/Vancouver' # Doesn't do anything, yet
 
-g.R = redis.Redis()
