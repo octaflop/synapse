@@ -1,0 +1,15 @@
+# TODO.txt
+
+Milestone I: get pictures to list themselves into the main dynamic gallery.
+
+Milestone II: get thumbnails to follow on a per-index basis.
+
+I:
+-> use templating and ensure that the linking matches the "page type" (Which should be implicit to the view/model).
+
+II:
+-> Use technique from I and change the gallery setting.
+
+Afterwards, I still need to implement csrf.
+
+I would also like to finish some more testing, and to fix the deletes on the testing db.
