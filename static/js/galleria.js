@@ -1,8 +1,8 @@
 /*!
- * Galleria v 1.1.2
+ * Galleria v 1.1.5 2010-06-05
  * http://galleria.aino.se
  *
- * Copyright 2010, Aino
+ * Copyright (c) 2010, Aino
  * Licensed under the MIT license.
  */
 
@@ -91,12 +91,13 @@ var Base = Class.extend({
         link.media = 'all';
         link.rel = 'stylesheet';
         link.href = src;
-        this.getElements('head')[0].appendChild(link);
+        document.getElementsByTagName('head')[0].appendChild(link);
     },
     moveOut : function( elem ) {
         return this.setStyle(elem, {
             position: 'absolute',
-            left: '-10000px'
+            left: '-10000px',
+            display: 'block'
         });
     },
     moveIn : function( elem ) {
@@ -211,9 +212,9 @@ var Base = Class.extend({
         return this;
     },
     getScript: function(url, callback) {
-       var head = document.getElementsByTagName("head")[0];
-       var script = document.createElement("script");
+       var script = document.createElement('script');
        script.src = url;
+       script.async = true; // HTML5
        callback = this.proxy(callback);
 
        // Handle Script loading
@@ -232,7 +233,10 @@ var Base = Class.extend({
              }
           };
        }
-       head.appendChild(script);
+       
+       var ex = document.getElementsByTagName('script');
+       ex = ex[ex.length-1];
+       ex.parentNode.insertBefore(script, ex.nextSibling);
        return this;
     }
 });
@@ -322,8 +326,8 @@ var Picture = Base.extend({
             this.image.height = Math.ceil(this.orig.h * ratio) - margin*2;
             this.setStyle(this.image, {
                 position : 'relative',
-                top :  Math.round(this.image.height * -1 / 2 + (height / 2)) - margin,
-                left : Math.round(this.image.width * -1 / 2 + (width / 2)) - margin
+                top :  Math.floor(this.image.height * -1 / 2 + (height / 2)) - margin,
+                left : Math.floor(this.image.width * -1 / 2 + (width / 2)) - margin
             });
             complete.call(this);
         });
@@ -359,29 +363,33 @@ var G = window.Galleria = Base.extend({
         };
         this.thumbnails = {};
         this.options = this.mix({
-            preload: 2,
-            image_crop: false,
-            thumb_crop: true,
-            thumb_quality: 'auto',
-            image_margin: 0,
-            thumb_margin: 0,
-            transition: G.transitions.fade,
-            transition_speed: 400,
+            autoplay: false,
             carousel: true,
+            carousel_follow: true,
             carousel_speed: 200,
             carousel_steps: 'auto',
-            carousel_follow: true,
-            keep_source: false,
-            popup_links: false,
-            max_scale_ratio: undefined,
-            thumbnails: true,
-            link_source_images: true,
-            data_type: 'auto',
+            data_config : function( elem ) { return {}; },
             data_image_selector: 'img',
             data_source: options.target,
-            data_config : function( elem ) { return {}; },
+            data_type: 'auto',
+            debug: false,
+            extend: function(options) {},
+            height: undefined,
+            image_crop: false,
+            image_margin: 0,
+            keep_source: false,
+            link_source_images: true,
+            max_scale_ratio: undefined,
+            popup_links: false,
+            preload: 2,
             queue: true,
-            remove_original: true
+            show: 0,
+            thumb_crop: true,
+            thumb_margin: 0,
+            thumb_quality: 'auto',
+            thumbnails: true,
+            transition: G.transitions.fade,
+            transition_speed: 400
         }, options);
         
         this.target = this.dom.target = this.getElements(this.options.target)[0];
@@ -416,12 +424,11 @@ var G = window.Galleria = Base.extend({
         return this;
     },
     run : function() {
-        
         var o = this.options;
         if (!this.data.length) {
             G.raise('Data is empty.');
         }
-        if (!o.keep_source) {
+        if (!o.keep_source && !Galleria.IE) {
             this.target.innerHTML = '';
         }
         this.loop(2, function() {
@@ -498,6 +505,12 @@ var G = window.Galleria = Base.extend({
         this.wait(function() {
             this.stageWidth = this.width(this.get( 'stage' ));
             this.stageHeight = this.height( this.get( 'stage' ));
+            if (!this.stageHeight && this.stageWidth) { // no height in css, set reasonable ratio (16/9)
+                this.setStyle( this.get( 'container' ),  { 
+                    height: this.options.height || Math.round( this.stageWidth*9/16 ) 
+                } );
+                this.stageHeight = this.height( this.get( 'stage' ));
+            }
             return this.stageHeight && this.stageWidth;
         }, function() {
             var thumbWidth = this.thumbnails[0] ? this.width(this.thumbnails[0].elem, true) : 0;
@@ -670,11 +683,17 @@ var G = window.Galleria = Base.extend({
         
     },
     
-    show : function(index, rewind) {
+    show : function(index, rewind, history) {
         if (!this.options.queue && this.queue.stalled) {
             return;
         }
         rewind = typeof rewind != 'undefined' ? !!rewind : index < this.active;
+        history = history || false;
+        index = parseInt(index);
+        if (!history && G.History) {
+            G.History.value(index.toString());
+            return;
+        }
         this.active = index;
         this.push([index,rewind], this.queue);
         if (!this.queue.stalled) {
@@ -704,16 +723,13 @@ var G = window.Galleria = Base.extend({
         var active = this.controls.getActive();
         var next = this.controls.getNext();
         var cached = next.isCached(src);
-        if (active.image) {
-            this.toggleQuality(active.image, false);
-        }
         var complete = this.proxy(function() {
             this.queue.stalled = false;
             this.toggleQuality(next.image, o.image_quality);
             this.setStyle( active.elem, { zIndex : 0 } );
             this.setStyle( next.elem, { zIndex : 1 } );
-            this.moveOut( active.image );
             this.controls.swap();
+            this.moveOut( active.image );
             if (this.getData( index ).link) {
                 this.setStyle( next.image, { cursor: 'pointer' } );
                 this.listen( next.image, 'click', this.proxy(function() {
@@ -748,6 +764,9 @@ var G = window.Galleria = Base.extend({
         } );
         next.load( src, this.proxy(function(e) {
             next.scale(this.stageWidth, this.stageHeight, o.image_crop, o.max_scale_ratio, o.image_margin, this.proxy(function(e) {
+                if (active.image) {
+                    this.toggleQuality(active.image, false);
+                }
                 this.toggleQuality(next.image, false);
                 this.trigger({
                     type: G.LOADFINISH,
@@ -850,8 +869,13 @@ var G = window.Galleria = Base.extend({
     
     hasInfo : function(index) {
         var d = this.getData(index);
-        var l = d.title + d.description + d.author;
-        return !!l.length;
+        var check = 'title description author'.split(' ');
+        for ( var i=0; check[i]; i++ ) {
+            if ( d[ check[i] ] && d[ check[i] ].length ) {
+                return true;
+            }
+        }
+        return false;
     },
     
     getDataObject : function(o) {
@@ -934,7 +958,7 @@ var G = window.Galleria = Base.extend({
             this.loop(images, function( elem ) {
                 loaded++;
                 this.push( getData( elem ), this.data );
-                if (!o.keep_source) {
+                if (!o.keep_source && !Galleria.IE) {
                     elem.parentNode.removeChild(elem);
                 }
                 if ( loaded == images.length ) {
@@ -978,6 +1002,7 @@ var tempPath = ''; // we need to save this in a global private variable later
 var tempName = ''; // the last loaded theme
 var tempLoading = false; // we need to manually check if script has loaded
 var tempFile = ''; // the theme file
+var hash = window.location.hash.replace(/#\//,'');
 
 G.themes = {
     create: function(obj) {
@@ -995,7 +1020,7 @@ G.themes = {
             }
         });
         if (obj.css) {
-            if (!tempPath.length) { // try to find the script in the head tag to determine tempPath
+            if (!tempPath.length) { // try to find the script tag to determine tempPath
                 var theme_src = proto.getElements('script');
                 proto.loop(theme_src, function(el) {
                     var reg = new RegExp('galleria.'+obj.name+'.js');
@@ -1017,8 +1042,14 @@ G.themes = {
                     link = proto.create('link');
                     link.id = 'galleria-styles';
                     link.rel = 'stylesheet';
-                    link.media = 'screen';
-                    proto.getElements('head')[0].appendChild(link);
+                    link.media = 'all';
+                    var li = document.getElementsByTagName('link').length ?
+                        document.getElementsByTagName('link') : document.getElementsByTagName('style');
+                    if (li[0]) {
+                        li[0].parentNode.insertBefore(link, li[0]);
+                    } else {
+                        document.getElementsByTagName('head')[0].appendChild(link);
+                    }
                 }
                 link.href = obj.cssPath;
             }
@@ -1027,13 +1058,34 @@ G.themes = {
             }
             o = proto.mix( G.themes[obj.name].defaults, o );
             var gallery = new G( o );
+            o = gallery.options;
             gallery.bind(G.DATA, function() {
                 gallery.run();
             });
             gallery.bind(G.READY, function() {
+                if (G.History) {
+                    G.History.change(function(e) {
+                        var val = parseInt(e.value.replace(/\//,''));
+                        if (isNaN(val)) {
+                            window.history.go(-1);
+                        } else {
+                            gallery.show(val, undefined, true);
+                        }
+                    });
+                }
                 obj.init.call(gallery, o);
-                if (typeof o.extend == 'function') {
-                    o.extend.call(gallery, o);
+                o.extend.call(gallery, o);
+                if (/^[0-9]{1,4}$/.test(hash) && G.History) {
+                    gallery.show(hash, undefined, true);
+                } else if (typeof o.show == 'number') {
+                    gallery.show(o.show);
+                }
+                if (o.autoplay) {
+                    if (typeof o.autoplay == 'number') {
+                        gallery.play(o.autoplay);
+                    } else {
+                        gallery.play();
+                    }
                 }
             });
             gallery.load();
@@ -1044,7 +1096,7 @@ G.themes = {
 
 G.raise = function(msg) {
     if ( G.debug ) {
-        throw Error( msg );
+        throw new Error( msg );
     }
 },
 
@@ -1148,78 +1200,20 @@ G.transitions = {
     }
 };
 
-/* The flickr method is deprecated. Use Flickr plugin instead. */
-
-
-
-G.flickr = {
-    key: null,
-    options: {
-        max: 30,
-        use_original: false,
-        data_config: function() {}
-    },
-    setOptions: function(o) {
-        this.options = Galleria.prototype.mix(this.options, o);
-        return this;
-    },
-    search: function(key, params, callback) {
-        this.key = key;
-        var obj = {};
-        var proto = Galleria.prototype;
-        
-        params = proto.mix({
-            method: 'flickr.photos.search',
-            extras: 'o_dims, url_t, url_m, url_o',
-            sort: 'interestingness-desc'
-        }, params);
-        
-        this.load(key, params, function(data) {
-            var photos = data.photos.photo;
-            var len = Math.min(this.options.max, photos.length);
-            for (var i=0; i<len; i++) {
-                var item = proto.getDataObject({
-                    thumb: photos[i].url_t,
-                    image: (photos[i].url_o && this.options.use_original) ? photos[i].url_o : photos[i].url_m,
-                    title: photos[i].title
-                });
-                proto.push( proto.mix( item, this.options.data_config( photos[i] ) ), obj );
-            }
-            callback(obj);
-        });
-        return this;
-    },
-    load: function(key, params, callback) {
-        var url = 'http://api.flickr.com/services/rest/?';
-        var scope = this;
-        params = $.extend({
-            format : 'json',
-            jsoncallback : '?',
-            api_key : key || this.key
-        }, params);
-        jQuery.each(params, function(key, value) {
-            url += '&'+ key + '=' +value;
-        });
-        jQuery.getJSON(url, function(data) {
-            if (data.stat == 'ok') {
-                callback.call(scope, data);
-            } else {
-                G.raise('Flickr data failed. Check API Key.');
-            }
-        });
-        return this;
-    }
-};
-
 jQuery.fn.galleria = function() {
     var selector = this.selector;
     var a = arguments;
+    var hasTheme = typeof a[0] == 'string';
+    var options = hasTheme ? a[1] || {} : a[0] || {};
+
+    if ( !options.keep_source ) {
+        jQuery(this).find('*').hide();
+    }
+
     G.prototype.wait(function() {
         return !tempLoading;
     }, function() {
-        var hasTheme = typeof a[0] == 'string';
         var theme = hasTheme ? a[0] : tempName;
-        var options = hasTheme ? a[1] || {} : a[0] || {};
         options = G.prototype.mix(options, { target: selector } );
         G.debug = !!options.debug; 
         if (typeof G.themes[theme] == 'undefined') {
