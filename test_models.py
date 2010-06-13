@@ -6,6 +6,7 @@ from pprint import pprint
 
 print "testing objects"
 t = Thing(kind='guy')
+t.name = 'dude'
 ret = t
 print ret
 

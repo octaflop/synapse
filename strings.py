@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 # strings.py
 # all of the fiddly bits.
 import redis
@@ -20,13 +21,20 @@ def slugfy(text, separator='-'):
   return ret.strip()
 
 def hash_it(username, password):
-    ret = ""
-    m = hashlib.sha1()
-    m.update(username)
-    m.update(SALT)
-    m.update(password)
-    ret = m.digest()
-    return ret
+    try:
+        assert isinstance(username, unicode)
+    except TypeError:
+        raise TypeError
+    try:
+        assert isinstance(password, unicode)
+        m = hashlib.sha1()
+        m.update(username.encode('utf-8'))
+        m.update(SALT)
+        m.update(password.encode('utf-8'))
+        ret = m.hexdigest()
+        return ret
+    except TypeError:
+        return False
 
 def add_uurl(kind, slug, tid, uuid):
     if not R.sadd("%s:slug" % kind, slug):

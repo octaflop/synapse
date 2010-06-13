@@ -20,10 +20,11 @@
 # USA
 
 from models import R
-from flask import Flask, url_for, flash, escape, request, redirect, session, render_template
+from flask import Flask, url_for, flash, escape, request, redirect,\
+    render_template, session
 from settings import *
 from forms import *
-from strings import uurl2uuid
+from strings import uurl2uuid, hash_it
 import hashlib
 from decorators import template, login_required
 from werkzeug import SharedDataMiddleware, secure_filename
@@ -76,6 +77,16 @@ def userpage(uurl):
     else:
         return "This is %s's page. id:%s" % (username, uuid)
 
+#@template('home.html')
+@app.route('/home')
+def home():
+    username = "anon"
+    if 'username' in session:
+        username = escape(session(username))
+        return "Why hello there, %s." % (username)
+    else:
+        return "This is %s's page." % (username)
+
 # Photo Getter
 @app.route('/photo/raw/<uuid>')
 def raw_photo(uuid):
@@ -96,7 +107,8 @@ def register_user():
         if user.post():
             if user.get():
                 session['username'] = user.username
-                return redirect(url_for('userpage', uurl=user.uurl))
+                session['uuid'] = user.uuid
+                return redirect(url_for('user'), uurl=user.uurl)
             else:
                 return "could not find user after adding"
         else:
@@ -105,13 +117,12 @@ def register_user():
 
 @app.route('/logout')
 def logout():
-    user = session['username']
-    if session['username'] == None:
-        return "you are not logged in"
+    if 'username' in session:
+        user = escape(session['username'])
     else:
-        session['username'] = None
-        flash("logged out: %s" % user)
-        return redirect(url_for('index'))
+        session['username'] = 'anon'
+    flash("logged out: %s" % user)
+    return redirect(url_for('index'))
 
 @app.route('/login', methods=['GET','POST'])
 def login():
@@ -122,17 +133,19 @@ def login():
         given_passhash = hash_it(username, password)
         # pseudouser = an unverified user
         pseudouser = User(username)
-        if psuedouser._check_credentials(username, password):
+        pseudouser.kind = 'user'
+        pseudouser.password = password
+        pseudouser.uuid = uurl2uuid('user', pseudouser.username)
+        if pseudouser._check_credentials():
             # TODO: THIS MAY NOT WORK
             # (naming conflicts may happen with the same username;
             # going to resolve with intersecting sets)
-            psuedouser.kind = 'user'
-            psuedouser.uuid = uurl2uuid('user', username)
-            psuedouser.get()
+            pseudouser.get()
             # user => the server's gotten and verified user
-            user = psuedouser
+            user = pseudouser
             session['username'] = user.username
-            return url_for('userpage', uurl=user.uurl)
+            session['uuid'] = user.uuid
+            return redirect(url_for('user'), uurl=user.uurl)
     return render_template('login.html', ret=ret)
 
 

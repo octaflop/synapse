@@ -1,5 +1,5 @@
 {% from "_formhelpers.html" import render_field %}
-<form method="post" action="/register">
+<form method="post" action="/admin/add/user">
     <input type="hidden" value="{{ csrf_token }}" />
   <dl>
     {{ render_field(form.username) }}
