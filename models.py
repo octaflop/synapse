@@ -24,7 +24,6 @@ class Thing():
         self.creation = str(datetime.datetime.now())
         self.name = u""
         self.uuid = str(ui.uuid1())
-        self.slug = slugfy(self.name)
         self.attrs = {}
 
     def _exists(self, kind, uuid):
@@ -75,10 +74,16 @@ class Thing():
         return self.tid
 
     def get(self, kind=None, uuid=None):
-        assert self._checkid(kind, uuid)
-        assert self._exists(kind, uuid)
-        self.kind = kind
-        self.uuid = uuid
+        """
+        if kind is None and uuid is None:
+            self.kind = kind
+            self.uuid = uuid
+        else:
+            kind = self.kind
+            uuid = self.uuid
+            """
+        assert self._checkid(self.kind, self.uuid)
+        assert self._exists(self.kind, self.uuid)
         self.tid = self.get_tid(self.kind, self.uuid)
         redkey = "%s:%s" % (self.kind, self.tid)
         ret = R.hgetall(redkey)
@@ -86,11 +91,20 @@ class Thing():
         return ret
 
     def post(self, attrs=None):
-        if not R.sadd("%s" % self.kind, self.uuid):
+        try:
+            R.sadd("%s" % self.kind, self.uuid)
+            print "woot!"
+        except:
             print "already in database"
             return False
+        print R.sismember("%s" % self.kind, self.uuid)
         self.tid = R.zincrby("global:%s:tid" % self.kind, 1) # tid = "thing id"
+        self.tid = int(self.tid)
         R.set("%s:%s:tid" % (self.kind, self.uuid), self.tid)
+        try:
+            self.slug = slugfy(self.name)
+        except:
+            self.slug = slugfy('anon')
         self.uurl = add_uurl(self.kind, self.slug, self.tid, self.uuid)
         redkey = "%s:%s" % (self.kind, self.tid)
         if attrs and self.attrs is None:
@@ -171,8 +185,8 @@ class User(Thing):
                 'uuid' : self.uuid,
                 'shapassword' : self.shapassword,
                 }
-    def _check_credentials(self, username, password):
-        if hash_it(username, password) ==\
+    def _check_credentials(self):
+        if hash_it(self.username, self.password) ==\
             self.get(self.kind, self.uuid)['shapassword']:
             return True
         else:
