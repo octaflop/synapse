@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 # Copyright © 2010 Faris Chebib
 #
@@ -103,16 +103,17 @@ def raw_photo(uuid):
 def register_user():
     form = RegistrationForm(request.form)
     if request.method == 'POST' and form.validate():
-        user = User(form.username.data, form.email.data, form.password.data)
-        if user.post():
-            if user.get():
-                session['username'] = user.username
-                session['uuid'] = user.uuid
-                return redirect(url_for('user'), uurl=user.uurl)
-            else:
-                return "could not find user after adding"
+        user = User(username=form.username.data, email=form.email.data)
+        password = form.password.data
+        hashpass = hash_it(form.username.data, form.password.data)
+        if user.save():
+            user = User.objects(hashpassword=password,username=form.username.data).first()
+            session['username'] = user.username
+            return redirect(url_for('user'), uurl=user.uurl)
         else:
-            return "could not add user to server"
+            return "could not find user after adding"
+    else:
+        return "could not add user to server"
     return render_template('register.html', form=form)
 
 @app.route('/logout')
