@@ -29,7 +29,7 @@ import hashlib
 from decorators import template, login_required
 from werkzeug import SharedDataMiddleware, secure_filename
 from flaskext.csrf import csrf
-from models import User, Artist, Photo
+from mongomodels import User, Photo, Artist
 import os
 
 app = Flask(__name__)
@@ -50,8 +50,6 @@ def index():
     ret = {}
     ret['user'] = 'test'
     ret['name'] = 'another test'
-    #ret['images'] = [{'src': 'static/img/pic1.jpg'}, \
-    #        {'src': 'static/img/pic2.jpg'}]
     files = os.listdir(UPLOAD_FOLDER)
     ret['images'] = []
     for f in files:
@@ -61,42 +59,50 @@ def index():
     return ret
 
 # GETTERS
-@app.route('/user/<uurl>')
-def userpage(uurl):
-    uuid = uurl2uuid('user', uurl)
-    if uuid is None:
-        return "uuid not found"
-    user = User(unicode(uurl))
-    user.kind = 'user'
-    user.uuid = str(uuid)
-    user.get(user.kind, user.uuid)
-    username = user.attrs['username']
-    uuid = user.attrs['uuid']
-    if session['username'] == username:
-        return "Why hello there, %s. id:%s" % (username, uuid)
+@app.route('/user/<username>')
+def userpage(username):
+    try:
+        user = User.objects(username=username).get()
+    except:
+        return error("404")
+
+    if 'username' in session:
+        return "Why hello there, %s. id:%s" % (user.username, user.id)
     else:
-        return "This is %s's page. id:%s" % (username, uuid)
+        return "This is %s's page. id:%s" % (user.username, user.id)
 
 #@template('home.html')
 @app.route('/home')
 def home():
     username = "anon"
     if 'username' in session:
-        username = escape(session(username))
+        username = escape(session['username'])
         return "Why hello there, %s." % (username)
     else:
         return "This is %s's page." % (username)
 
 # Photo Getter
-@app.route('/photo/raw/<uuid>')
-def raw_photo(uuid):
+@app.route('/photo/<title>')
+def photopage(title):
+    try:
+        photo = Photo.objects(title=title).first()
+    except:
+        return error("404")
+    return "Filename: %s, title: %s, id: %s" % (photo.filename, photo.title,\
+            photo.id)
+
+
+@app.route('/photo/raw/<title>')
+def raw_photo(title):
     """
     The method to get photos referred by the database and stored unto the
     machine
     """
-    photo = Photo()
-    photo.get(kind='photo', uuid=uuid)
-    return photo._full_url()
+    try:
+        photo = Photo.objects(title=title).first()
+    except:
+        return "not found"
+    return url_for('static', filename=photo.filename)
 
 # User Functions
 @app.route('/admin/add/user', methods=['GET', 'POST'])
@@ -105,23 +111,23 @@ def register_user():
     if request.method == 'POST' and form.validate():
         user = User(username=form.username.data, email=form.email.data)
         password = form.password.data
-        hashpass = hash_it(form.username.data, form.password.data)
+        user.hashedpassword = hash_it(form.username.data, form.password.data)
         if user.save():
-            user = User.objects(hashpassword=password,username=form.username.data).first()
             session['username'] = user.username
-            return redirect(url_for('user'), uurl=user.uurl)
+            flash("user: %s was added successfully" % user.username)
+            return redirect(url_for('userpage', username=user.username))
         else:
             return "could not find user after adding"
     else:
-        return "could not add user to server"
-    return render_template('register.html', form=form)
+        return render_template('register.html', form=form)
 
 @app.route('/logout')
 def logout():
     if 'username' in session:
         user = escape(session['username'])
+        session.pop('username', None)
     else:
-        session['username'] = 'anon'
+        return "Not logged in"
     flash("logged out: %s" % user)
     return redirect(url_for('index'))
 
@@ -132,21 +138,13 @@ def login():
         username = request.form['username']
         password = request.form['password']
         given_passhash = hash_it(username, password)
-        # pseudouser = an unverified user
-        pseudouser = User(username)
-        pseudouser.kind = 'user'
-        pseudouser.password = password
-        pseudouser.uuid = uurl2uuid('user', pseudouser.username)
-        if pseudouser._check_credentials():
-            # TODO: THIS MAY NOT WORK
-            # (naming conflicts may happen with the same username;
-            # going to resolve with intersecting sets)
-            pseudouser.get()
-            # user => the server's gotten and verified user
-            user = pseudouser
-            session['username'] = user.username
-            session['uuid'] = user.uuid
-            return redirect(url_for('user'), uurl=user.uurl)
+        try:
+            user = User.objects(username=username, hashedpassword=given_passhash).first()
+        except:
+            flash("Not found")
+            return redirect('login')
+        session['username'] = user.username
+        return redirect(url_for('userpage', username=user.username))
     return render_template('login.html', ret=ret)
 
 
@@ -167,29 +165,46 @@ def admin():
     return dict(artist_form=artist_form, photo_form=photo_form,\
             user_form=user_form)
 
-@app.route('/admin/add/artist', methods=['POST'])
+@app.route('/admin/add/artist', methods=['POST', 'GET'])
 def add_artist():
-    kwargs = {}
-    return render_template('add_artist.html', kwargs)
+    form = ArtistForm(request.form)
+    if request.method == 'POST' and form.validate():
+        artist = Artist(unique_name=form.unique_name.data)
+        artist.unique_name = form.unique_name.data
+        artist.first_name = form.first_name.data
+        artist.last_name = form.last_name.data
+        artist.bio_en = form.bio_en.data
+        artist.bio_fr = form.bio_fr.data
+        if artist.save():
+            flash("%s was saved successfully to id: %s" % (artist.unique_name,\
+                artist.id))
+            return redirect(url_for('artistpage', unique_name=artist.unique_name))
+        else:
+            flash("username not unique")
+            return redirect(url_for('add_artist'))
+    return render_template('add_artist.html', form=form)
+
+@app.route('/artist/<unique_name>')
+def artistpage(unique_name):
+    try:
+        artist = Artist.objects(unique_name=unique_name).first()
+    except:
+        return error("404")
+    return "first name: %s" % artist.first_name
 
 @app.route('/admin/add/photo', methods=['POST'])
 def add_photo():
     form = UploadPhoto(request.form)
-    photo = Photo(form.title_en.data, form.title_fr.data)
     if request.method == "POST":
         file = request.files['photo']
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            photo.attrs = {
-                    'description_en' : form.description_en.data,
-                    'description_fr' : form.description_fr.data,
-                    'status_en' : form.status_en.data,
-                    'status_fr' : form.status_fr.data,
-                    'price' : form.price.data
-                    }
-            file.save(os.path.join(UPLOAD_FOLDER, filename))
-            photo.post()
-            return redirect(url_for('raw_photo', uuid=photo.uuid))
+            photo = Photo(title=form.title_en.data,\
+                    title_en=form.title_en.data, title_fr=form.title_fr.data,\
+                    filename=filename)
+            if photo.save():
+                file.save(os.path.join(UPLOAD_FOLDER, filename))
+            return redirect(url_for('photopage', title=photo.title))
     return render_template('add_photo.html')
 
 if __name__ == "__main__":

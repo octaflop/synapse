@@ -1,8 +1,17 @@
 <!doctype html>
-<title>Upload new file</title>
-<h1>Upload a new file</h1>
-<form action="" method=post enctype='multipart/form-data'>
-  <p><input type=file name='file'></p>
-  <p><input type=submit value='Upload'></p>
+{% from "_formhelpers.html" import render_field %}
+<title>Upload new photo</title>
+<h1>Upload new photo</h1>
+<form action="/admin/add/photo" method='post' enctype='multipart/form-data'>
+    <input type="hidden" value="{{ csrf_token }}" />
+    {{ render_field(photo_form.photo) }}
+    {{ render_field(photo_form.title_en) }}
+    {{ render_field(photo_form.title_fr) }}
+    {{ render_field(photo_form.description_en) }}
+    {{ render_field(photo_form.description_fr) }}
+    {{ render_field(photo_form.status_en) }}
+    {{ render_field(photo_form.status_fr) }}
+    {{ render_field(photo_form.price) }}
+    <p><input type=submit value='Upload Photo' /></p>
 </form>
 

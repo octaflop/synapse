@@ -18,16 +18,17 @@ class User(Document):
     hashedpassword = StringField()
 
 class Photo(Document):
-    title = StringField(max_length=120, required=True)
+    title = StringField(max_length=120, required=True, unique=True)
     title_en = StringField(max_length=120)
     title_fr = StringField(max_length=120)
+    filename = StringField(unique=True)
     artist = ReferenceField('Artist')
 
 class Artist(Document):
+    unique_name = StringField(max_length=120, unique=True, required=True)
     first_name = StringField(max_length=120)
     last_name = StringField(max_length=120)
     bio_en = StringField()
     bio_fr = StringField()
     photos = ListField(ReferenceField(Photo))
-
 
