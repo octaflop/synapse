@@ -3,7 +3,9 @@ from flask import g
 DEV = True
 SECRET_KEY = 'vba937ei38mq2'
 SALT = 'vba937ei38mq2'
-UPLOAD_FOLDER = '/tmp/uploads/'
+#UPLOAD_FOLDER = '/tmp/uploads/'
+UPLOAD_FOLDER = '/home/faris/workspace/projects/aliendog/static/photos/'
+STATIC_PATH = '/static/photos/'
 g = {}
 g['user'] = None
 #ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])

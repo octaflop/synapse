@@ -3,15 +3,15 @@
 <title>Upload new photo</title>
 <h1>Upload new photo</h1>
 <form action="/admin/add/photo" method='post' enctype='multipart/form-data'>
-    <input type="hidden" value="{{ csrf_token }}" />
-    {{ render_field(photo_form.photo) }}
-    {{ render_field(photo_form.title_en) }}
-    {{ render_field(photo_form.title_fr) }}
-    {{ render_field(photo_form.description_en) }}
-    {{ render_field(photo_form.description_fr) }}
-    {{ render_field(photo_form.status_en) }}
-    {{ render_field(photo_form.status_fr) }}
-    {{ render_field(photo_form.price) }}
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+    {{ render_field(form.photo) }}
+    {{ render_field(form.title_en) }}
+    {{ render_field(form.title_fr) }}
+    {{ render_field(form.description_en) }}
+    {{ render_field(form.description_fr) }}
+    {{ render_field(form.status_en) }}
+    {{ render_field(form.status_fr) }}
+    {{ render_field(form.price) }}
     <p><input type=submit value='Upload Photo' /></p>
 </form>
 
