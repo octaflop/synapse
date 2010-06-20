@@ -19,9 +19,9 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301
 # USA
 
-from models import R
 from flask import Flask, url_for, flash, escape, request, redirect,\
-    render_template, session
+    render_template, session, abort
+from flaskext.csrf import csrf
 from settings import *
 from forms import *
 from strings import uurl2uuid, hash_it
@@ -48,14 +48,17 @@ def allowed_file(filename):
 @template('index.html')
 def index():
     ret = {}
-    ret['user'] = 'test'
-    ret['name'] = 'another test'
-    files = os.listdir(UPLOAD_FOLDER)
+    if 'username' in session:
+        username = escape(session['username'])
+        user = User.objects(username=username).first()
+        ret['user'] = user.username
+        ret['name'] = user.first_name
     ret['images'] = []
-    for f in files:
-        ret['images'].append({'src':'/uploads/%s' % f})
+    ret['paths'] = []
+    for photo in Photo.objects():
+        ret['images'].append({'src':'%s' % photo.path})
+        ret['paths'].append(photo.path)
     ret['url'] = url_for('index')
-    flash('test')
     return ret
 
 # GETTERS
@@ -64,7 +67,7 @@ def userpage(username):
     try:
         user = User.objects(username=username).get()
     except:
-        return error("404")
+        return abort(404)
 
     if 'username' in session:
         return "Why hello there, %s. id:%s" % (user.username, user.id)
@@ -84,12 +87,12 @@ def home():
 # Photo Getter
 @app.route('/photo/<title>')
 def photopage(title):
-    try:
-        photo = Photo.objects(title=title).first()
-    except:
-        return error("404")
-    return "Filename: %s, title: %s, id: %s" % (photo.filename, photo.title,\
+    photo = Photo.objects(title=title).first()
+    if photo is not None:
+        return "Filename: %s, title: %s, id: %s" % (photo.filename, photo.title,\
             photo.id)
+    else:
+        return abort(404)
 
 
 @app.route('/photo/raw/<title>')
@@ -106,6 +109,7 @@ def raw_photo(title):
 
 # User Functions
 @app.route('/admin/add/user', methods=['GET', 'POST'])
+@login_required
 def register_user():
     form = RegistrationForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -189,10 +193,10 @@ def artistpage(unique_name):
     try:
         artist = Artist.objects(unique_name=unique_name).first()
     except:
-        return error("404")
+        return abort(404)
     return "first name: %s" % artist.first_name
 
-@app.route('/admin/add/photo', methods=['POST'])
+@app.route('/admin/add/photo', methods=['POST', 'GET'])
 def add_photo():
     form = UploadPhoto(request.form)
     if request.method == "POST":
@@ -202,13 +206,17 @@ def add_photo():
             photo = Photo(title=form.title_en.data,\
                     title_en=form.title_en.data, title_fr=form.title_fr.data,\
                     filename=filename)
-            if photo.save():
+            try:
                 file.save(os.path.join(UPLOAD_FOLDER, filename))
-            return redirect(url_for('photopage', title=photo.title))
-    return render_template('add_photo.html')
+                photo.path = unicode(STATIC_PATH) + unicode(filename)
+                photo.save()
+                return redirect(url_for('photopage', title=photo.title))
+            except:
+                return "Error of some sort"
+    return render_template('add_photo.html', form=form)
 
 if __name__ == "__main__":
     app.debug = True
-    ## csrf(app) TODO
+    csrf(app) #TODO
     app.run(host="0.0.0.0", port=5002)
 

@@ -20,7 +20,14 @@
         <h2>{{ msg }}</h2>
         {% endfor %}
 	<div class='span-20'>
-	    <div id="galleria"></div>
+            <ul id="gallery">
+                {% for image in images: %}
+                <li><a href="#"><img src='{{ image.src }}' /></a></li>
+                {% endfor %}
+            </ul>
+            {% for path in paths: %}
+            <p>{{ path }}</p>
+            {% endfor %}
 	</div>
 	<div class='span-4 last'>
                 <h1>{{ user }}</h1>
@@ -29,12 +36,8 @@
 	</div>
         <div class="span-12">
             <p>ALPHA</p>
-            <ul id="gallery">
-                {% for image in images: %}
-                <li><a href="#"><img src='{{ image.src }}' /></a></li>
-                {% endfor %}
-            </ul>
-	</div>
+	    <div id="galleria"></div>
+        </div>
 </div>
     <script>
         //$(document).ready(function){
