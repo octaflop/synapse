@@ -21,8 +21,12 @@ class UploadPhoto(Form):
     price = TextField(u'Current price of work (leave blank if unknown)')
 
 class ArtistForm(Form):
-    name = TextField(u"The full author's name", [validators.Length(min=3,
-    max=65)])
+    unique_name = TextField(u"The unique artist's name",\
+            [validators.Length(min=3, max=65)])
+    first_name = TextField(u"The artist's first name",\
+            [validators.Length(min=3, max=65)])
+    last_name = TextField(u"The artist's last name",\
+            [validators.Length(min=3, max=65)])
     bio_en = TextAreaField(u"Artist's biography in English")
     bio_fr = TextAreaField(u"Artist's biography in French")
 
