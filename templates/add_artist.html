@@ -3,7 +3,7 @@
 <title>Upload new file</title>
 <h1>Upload a new file</h1>
 <form method="post" action="/admin/add/artist">
-    <input type="hidden" value="{{ csrf_token }}" />
+  <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
   <dl>
     {{ render_field(form.unique_name) }}
     {{ render_field(form.first_name) }}

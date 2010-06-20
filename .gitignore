@@ -3,3 +3,4 @@
 *.log
 *.tmp.*
 passwd.py
+static/photos/*

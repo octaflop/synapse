@@ -5,7 +5,7 @@
 
 <h3>Upload new photo</h3>
 <form action="/admin/add/photo" method='post' enctype='multipart/form-data'>
-    <input type="hidden" value="{{ csrf_token }}" />
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
     {{ render_field(photo_form.photo) }}
     {{ render_field(photo_form.title_en) }}
     {{ render_field(photo_form.title_fr) }}
@@ -19,7 +19,7 @@
 
 <h3>Add a user (for admin purposes)</h3>
 <form method="post" action="/admin/add/user">
-    <input type="hidden" value="{{ csrf_token }}" />
+    <input type="hidden" value="{{ csrf_token() }}" />
     <dl>
     {{ render_field(user_form.username) }}
     {{ render_field(user_form.email) }}
@@ -33,9 +33,11 @@
 <h3>Add Artist</h3>
 <p>Artists will have their own pages linked from the index</p>
 <form method="post" action="/admin/add/artist">
-    <input type="hidden" value="{{ csrf_token }}" />
+    <input type="hidden" value="{{ csrf_token() }}" />
     <dl>
-        {{ render_field(artist_form.name) }}
+        {{ render_field(artist_form.unique_name) }}
+        {{ render_field(artist_form.first_name) }}
+        {{ render_field(artist_form.last_name) }}
         {{ render_field(artist_form.bio_en) }}
         {{ render_field(artist_form.bio_fr) }}
     </dl>

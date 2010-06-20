@@ -22,6 +22,7 @@ class Photo(Document):
     title_en = StringField(max_length=120)
     title_fr = StringField(max_length=120)
     filename = StringField(unique=True)
+    path = StringField()
     artist = ReferenceField('Artist')
 
 class Artist(Document):
