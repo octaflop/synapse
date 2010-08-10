@@ -29,7 +29,7 @@ import hashlib
 from decorators import template, login_required
 from werkzeug import SharedDataMiddleware, secure_filename
 from flaskext.csrf import csrf
-from mongomodels import User, Photo, Artist
+from models import Site, User, Post, TextPost, AudioPost, ImagePost
 import os
 
 app = Flask(__name__)
@@ -47,19 +47,15 @@ def allowed_file(filename):
 @app.route('/')
 @template('index.html')
 def index():
-    ret = {}
     if 'username' in session:
         username = escape(session['username'])
         user = User.objects(username=username).first()
-        ret['user'] = user.username
-        ret['name'] = user.first_name
-    ret['images'] = []
-    ret['paths'] = []
-    for photo in Photo.objects():
-        ret['images'].append({'src':'%s' % photo.path})
-        ret['paths'].append(photo.path)
-    ret['url'] = url_for('index')
-    return ret
+    else:
+        user = "anonymous"
+    posts = Post.objects()
+    selfurl = url_for('index')
+    site = Site.objects().first()
+    return dict(user=user, posts=posts, site=site, selfurl=selfurl)
 
 # GETTERS
 @app.route('/user/<username>')
