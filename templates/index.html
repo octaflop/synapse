@@ -3,7 +3,7 @@
      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
-<title>Gallery Test</title>
+    <title>{{ site.title }}</title>
 <script src="static/js/jquery.js"></script>
 <script src="static/js/galleria.js"></script>
 <link rel="stylesheet" type="text/css" href="static/css/local.css" media="screen, projection" />
@@ -25,14 +25,15 @@
                 <li><a href="#"><img src='{{ image.src }}' /></a></li>
                 {% endfor %}
             </ul>
-            {% for path in paths: %}
-            <p>{{ path }}</p>
-            {% endfor %}
 	</div>
 	<div class='span-4 last'>
-                <h1>{{ user }}</h1>
+            {% if user.first_name %}
+                <h1>hello there {{ user.first_name }}</h1>
                 <h2>{{ url }}</h2>
 		<p>What a work of art</p>
+            {% else %}
+                <h1>Who are you?</h1>
+            {% endif %}
 	</div>
         <div class="span-12">
             <p>ALPHA</p>
