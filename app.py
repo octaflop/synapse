@@ -80,28 +80,28 @@ def home():
     else:
         return "This is %s's page." % (username)
 
-# Photo Getter
-@app.route('/photo/<title>')
-def photopage(title):
-    photo = Photo.objects(title=title).first()
-    if photo is not None:
-        return "Filename: %s, title: %s, id: %s" % (photo.filename, photo.title,\
-            photo.id)
+# Image Getter
+@app.route('/image/<title>')
+def imagepage(title):
+    image = Image.objects(title=title).first()
+    if image is not None:
+        return "Filename: %s, title: %s, id: %s" % (image.filename, photo.title,\
+            image.id)
     else:
         return abort(404)
 
 
-@app.route('/photo/raw/<title>')
-def raw_photo(title):
+@app.route('/image/raw/<title>')
+def raw_image(title):
     """
-    The method to get photos referred by the database and stored unto the
+    The method to get images referred by the database and stored unto the
     machine
     """
     try:
-        photo = Photo.objects(title=title).first()
+        image = Image.objects(title=title).first()
     except:
         return "not found"
-    return url_for('static', filename=photo.filename)
+    return url_for('static', filename=image.filename)
 
 # User Functions
 @app.route('/admin/add/user', methods=['GET', 'POST'])
@@ -150,7 +150,7 @@ def login():
 
 #TODO
 """
-make "user", "photo"; etc in a tuple which is called by both the models and the view.
+make "user", "image"; etc in a tuple which is called by both the models and the view.
 perhaps make a metafile to this effect.
 or maybe put them in separate apps.
 ~foenix
@@ -158,12 +158,12 @@ or maybe put them in separate apps.
 @app.route('/admin')
 @template('admin.html')
 def admin():
-    artist_form = ArtistForm(request.form)
-    photo_form = UploadPhoto(request.form)
     user_form = RegistrationForm(request.form)
-
-    return dict(artist_form=artist_form, photo_form=photo_form,\
-            user_form=user_form)
+    text_post_form = TextPostForm(request.form)
+    audio_post_form = AudioPostForm(request.form)
+    image_post_form = ImagePostForm(request.form)
+    return dict(user_form=user_form, text_post_form=text_post_form,\
+            audio_post_form=audio_post_form, image_post_form=image_post_form)
 
 @app.route('/admin/add/artist', methods=['POST', 'GET'])
 def add_artist():
@@ -192,24 +192,24 @@ def artistpage(unique_name):
         return abort(404)
     return "first name: %s" % artist.first_name
 
-@app.route('/admin/add/photo', methods=['POST', 'GET'])
-def add_photo():
-    form = UploadPhoto(request.form)
+@app.route('/admin/add/image', methods=['POST', 'GET'])
+def add_image():
+    form = UploadImage(request.form)
     if request.method == "POST":
-        file = request.files['photo']
+        file = request.files['image']
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            photo = Photo(title=form.title_en.data,\
+            image = Image(title=form.title_en.data,\
                     title_en=form.title_en.data, title_fr=form.title_fr.data,\
                     filename=filename)
             try:
                 file.save(os.path.join(UPLOAD_FOLDER, filename))
-                photo.path = unicode(STATIC_PATH) + unicode(filename)
-                photo.save()
-                return redirect(url_for('photopage', title=photo.title))
+                image.path = unicode(STATIC_PATH) + unicode(filename)
+                image.save()
+                return redirect(url_for('imagepage', title=photo.title))
             except:
                 return "Error of some sort"
-    return render_template('add_photo.html', form=form)
+    return render_template('add_image.html', form=form)
 
 if __name__ == "__main__":
     app.debug = True

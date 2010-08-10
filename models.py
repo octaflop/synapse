@@ -35,7 +35,6 @@ class Post(Document):
     date_created = DateTimeField()
 
 class TextPost(Post):
-    author = ReferenceField(User)
     content = StringField()
 
 class ImagePost(Post):
