@@ -1,15 +1,23 @@
 # TODO.txt
 
-Milestone I: get pictures to list themselves into the main dynamic gallery.
+Model outline:
+Abstract:
+    -uuid (included in mongo-mapper implementation
 
-Milestone II: get thumbnails to follow on a per-index basis.
+Site:
+    title
+    domain
 
-I:
--> use templating and ensure that the linking matches the "page type" (Which should be implicit to the view/model).
+Blog:
+    *Archive/Frontpage -> year -> month -> day -> entry -> section
+    -Author
+    -Date published
+    -Entry
+    -slug
 
-II:
--> Use technique from I and change the gallery setting.
+Comment:
+    -Author
+    -Date published
+    -Entry
 
-Afterwards, I still need to implement csrf.
 
-I would also like to finish some more testing, and to fix the deletes on the testing db.
