@@ -1,5 +1,7 @@
-<!doctype html>
+{% extends "base.html" %}
 {% from "_formhelpers.html" import render_field %}
+{% block title %}ADMIN{% endblock %}
+{% block content %}
 <title>Administer</title>
 <h1>Administration Panel</h1>
 
@@ -21,24 +23,9 @@
     <input type="hidden" value="{{ csrf_token() }}" />
     <dl>
         {{ render_field(text_post_form.title) }}
-        {{ render_field(text_post_form.content) }}
-        {{ render_field(text_post_form.tags) }}
-        {{ render_field(text_post_form.date_created) }}
-    </dl>
-  <p><input type=submit value='save' /></p>
-</form>
-
-<h3>Add Text Entry</h3>
-<form method="post" action="/admin/add/text">
-    <input type="hidden" value="{{ csrf_token() }}" />
-    <dl>
-        {{ render_field(text_post_form.title) }}
         {{ render_field(text_post_form.author) }}
-        {{ render_field(text_post_form.slug) }}
-        {{ render_field(text_post_form.tags) }}
-        {{ render_field(text_post_form.date_created) }}
-	<!-- Specifically TextPost -->
         {{ render_field(text_post_form.content) }}
     </dl>
   <p><input type=submit value='save' /></p>
 </form>
+{% endblock %}
