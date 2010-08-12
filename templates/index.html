@@ -1,21 +1,6 @@
-<!DOCTYPE html
-     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html>
-<head>
-    <title>{{ site.title }}</title>
-<script src="static/js/jquery.js"></script>
-<script src="static/js/galleria.js"></script>
-<link rel="stylesheet" type="text/css" href="static/css/local.css" media="screen, projection" />
-<link rel="stylesheet" type="text/css" href="static/css/blueprint/screen.css" media="screen,projection" />
-<link rel="stylesheet" type="text/css" href="static/css/blueprint/print.css" media="print" />
-<!--[if lt IE 8]>
-    <link rel="stylesheet" href="css/blueprint/ie.css" type="text/css" media="screen,projection" />
-<![endif]-->
-<script src="static/js/galleria/plugins/galleria.flickr.js"></script>
-</head>
-<body>
-<div class='container'>
+{% extends "base.html" %}
+{% block title %}Welcome: Index{% endblock %}
+{% block content %}
         {% for msg in get_flashed_messages() %}
         <h2>{{ msg }}</h2>
         {% endfor %}
@@ -39,7 +24,8 @@
             <p>ALPHA</p>
 	    <div id="galleria"></div>
         </div>
-</div>
+	{% endblock %}
+{% block footer %}
     <script>
         //$(document).ready(function){
             // Load theme
@@ -65,5 +51,6 @@
             });
         //}
     </script>
+    {% endblock %}
     </body>
 </html>

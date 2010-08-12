@@ -12,7 +12,8 @@ class RegistrationForm(Form):
 
 class TextPostForm(Form):
     title = TextField('Entitle your work', [validators.required()])
-    content = TextField('Make your mark')
+    content = TextAreaField('Make your mark')
+    author = TextField('Author')
 
 class AudioPostForm(Form):
     title = TextField('Entitle your work', [validators.required(),\
