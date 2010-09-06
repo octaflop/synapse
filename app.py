@@ -2,20 +2,20 @@
 # -*- encoding: utf-8 -*-
 # Copyright © 2010 Faris Chebib
 #
-# This file is part of aliendog.
+# This file is part of synapse.
 #
-# aliendog is free software; you can redistribute it and/or modify
+# synapse is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
 # (at your option) any later version.
 #
-# aliendog is distributed in the hope that it will be useful,
+# synapse is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with aliendog; if not, write to the Free Software
+# along with synapse; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301
 # USA
 
@@ -24,11 +24,11 @@ from flask import Flask, url_for, flash, escape, request, redirect,\
 from flaskext.csrf import csrf
 from settings import *
 from forms import *
-from strings import uurl2uuid, hash_it
+from strings import uurl2uuid, hash_it, slugfy
 import hashlib
+import datetime
 from decorators import template, login_required
 from werkzeug import SharedDataMiddleware, secure_filename
-from flaskext.csrf import csrf
 from models import Site, User, Post, TextPost, AudioPost, ImagePost
 import os
 
@@ -55,7 +55,8 @@ def index():
     posts = Post.objects()
     selfurl = url_for('index')
     site = Site.objects().first()
-    return dict(user=user, posts=posts, site=site, selfurl=selfurl)
+    users = User.objects()
+    return dict(user=user, users=users, posts=posts, site=site, selfurl=selfurl)
 
 # GETTERS
 @app.route('/user/<username>')
@@ -64,11 +65,26 @@ def userpage(username):
         user = User.objects(username=username).get()
     except:
         return abort(404)
-
     if 'username' in session:
+        if session['username'] == username:
+            return "welcome home, %s" % username
         return "Why hello there, %s. id:%s" % (user.username, user.id)
     else:
         return "This is %s's page. id:%s" % (user.username, user.id)
+
+@app.route('/user/id/<id>')
+@template('home.html')
+def user_by_id(id):
+    user = {}
+    try:
+        user = User.objects(id=id).first()
+        ret = {
+                'username': user.username,
+                'id': user.id,
+                }
+    except:
+        return abort(404)
+    return dict(user=ret)
 
 #@template('home.html')
 @app.route('/home')
@@ -105,7 +121,7 @@ def raw_image(title):
 
 # User Functions
 @app.route('/admin/add/user', methods=['GET', 'POST'])
-@login_required
+#@login_required
 def register_user():
     form = RegistrationForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -138,12 +154,16 @@ def login():
         username = request.form['username']
         password = request.form['password']
         given_passhash = hash_it(username, password)
-        try:
-            user = User.objects(username=username, hashedpassword=given_passhash).first()
-        except:
+        user = User.objects(username=username, hashedpassword=given_passhash).first()
+        if user is not None:
+            flash("%s is logged in" % user.username)
+        else:
             flash("Not found")
             return redirect('login')
         session['username'] = user.username
+        return redirect(url_for('userpage', username=user.username))
+
+    if 'username' in session:
         return redirect(url_for('userpage', username=user.username))
     return render_template('login.html', ret=ret)
 
@@ -156,7 +176,7 @@ or maybe put them in separate apps.
 ~foenix
 """
 @app.route('/admin')
-@template('admin.html')
+@template('admin/admin.html')
 def admin():
     user_form = RegistrationForm(request.form)
     text_post_form = TextPostForm(request.form)
@@ -164,6 +184,35 @@ def admin():
     image_post_form = ImagePostForm(request.form)
     return dict(user_form=user_form, text_post_form=text_post_form,\
             audio_post_form=audio_post_form, image_post_form=image_post_form)
+
+@app.route('/admin/add/text', methods=['POST', 'GET'])
+def add_text_post():
+    form = TextPostForm(request.form)
+    if request.method == "POST":
+        if form.validate:
+            #text_post = TextPost(slug=slugfy(form.title.data))
+            text_post = TextPost(slug=escape(form.title.data))
+            text_post.date_created = datetime.datetime.now()
+            #text_post.author = escape(form.author.data)
+            text_post.title = escape(form.title.data)
+            text_post.content = escape(form.content.data)
+            if text_post.save():
+                flash("%s was successfully saved as id %s" % (text_post.title,\
+                    text_post.id))
+                return redirect(url_for('text_post', slug=text_post.slug))
+            else:
+                flash("DBG: slug not unique")
+                return redirect(url_for('add_text_post', form=form))
+        else:
+            flash("Error: Form did not validate")
+            return redirect(url_for('add_text_post'))
+    else:
+        return render_template('admin/admin_entry.html', form=form)
+
+@app.route('/text_post/<slug>')
+def text_post(slug):
+    text_post = TextPost.objects(slug=slug).first()
+    return render_template('text_post.html', text_post=text_post)
 
 @app.route('/admin/add/artist', methods=['POST', 'GET'])
 def add_artist():
@@ -213,6 +262,6 @@ def add_image():
 
 if __name__ == "__main__":
     app.debug = True
-    csrf(app) #TODO
+    #csrf(app) #TODO
     app.run(host="0.0.0.0", port=5002)
 
