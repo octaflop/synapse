@@ -1,6 +1,14 @@
 {% extends "base.html" %}
 {% block title %}Post: {{ text_post.title }}{% endblock %}
 {% block content %}
+<div class="span-19 colborder">
 title: <h2>{{ text_post.title }}</h2>
-content: {{ text_post.content }}
+date: {{ text_post.date_created }} 
+    <div class="span-16 prepend-1 append-2 last">
+        content: {{ text_post.html_content|safe }}
+    </div>
+</div>
+<div class="span-4 last">
+    <h5>Still under construction?</h5>
+</div>
 {% endblock %}

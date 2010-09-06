@@ -20,12 +20,13 @@
 # USA
 
 from flask import Flask, url_for, flash, escape, request, redirect,\
-    render_template, session, abort
+    render_template, session, abort, jsonify
 from settings import *
 from forms import *
 from strings import *
 import hashlib
 import datetime
+import markdown2
 from decorators import template, login_required
 from werkzeug import SharedDataMiddleware, secure_filename
 from models import Site, User, Post, TextPost, AudioPost, ImagePost
@@ -183,9 +184,11 @@ or maybe put them in separate apps.
 @template('text_post.html')
 def single_text_post(year, month, day, slug):
     text_post = TextPost.objects(slug=slug).first()
+    text_post.html_content = markdown2.markdown(text_post.content)
     ret = {
             'title': text_post.title,
             'content': text_post.content,
+            'html_content': text_post.html_content,
             }
     return dict(text_post=ret)
 
@@ -198,6 +201,52 @@ def admin():
     image_post_form = ImagePostForm(request.form)
     return dict(user_form=user_form, text_post_form=text_post_form,\
             audio_post_form=audio_post_form, image_post_form=image_post_form)
+
+@app.route('/admin/edit/<slug>/_title', methods=['POST', 'PUT', 'GET'])
+def add_text__title(slug):
+    """Ajax event to title"""
+    try:
+        text_post = TextPost.objects(slug=slug).first()
+    except:
+        return error(404)
+    if request.method == "PUT" or request.method == "POST":
+        title = request.values.get('title', type=str)
+        text_post.title = title
+        text_post.save()
+        #return jsonify(text_post.title)
+        return text_post.title
+    elif request.method == "GET":
+        return str(text_post.title)
+
+@app.route('/admin/edit/<slug>/_content', methods=['POST', 'PUT', 'GET'])
+def add_text__content(slug):
+    """Ajax event & markdown for content"""
+    try:
+        text_post = TextPost.objects(slug=slug).first()
+    except:
+        return error(404)
+    if request.method == "PUT" or request.method == 'POST':
+        content = request.values.get('content', type=str)
+        html_content = markdown2.markdown(content)
+        text_post.content = content
+        text_post.html_content = html_content
+        text_post.save()
+        return text_post.html_content
+    elif request.method == "GET":
+        try:
+            text_post.html_content = markdown2.markdown(text_post.content)
+            text_post.save()
+            return text_post.content
+        except:
+            return abort(500)
+
+@app.route('/admin/edit/<slug>')
+def add_text_ajax(slug):
+    try:
+        text_post = TextPost.objects(slug=slug).first()
+    except:
+        return error(404)
+    return render_template("add_text_post.html", text_post=text_post)
 
 @app.route('/admin/add/text', methods=['POST', 'GET'])
 def add_text_post():
@@ -221,6 +270,11 @@ def add_text_post():
 @app.route('/text_post/<slug>')
 def text_post(slug):
     text_post = TextPost.objects(slug=slug).first()
+    text_post.html_content = markdown2.markdown(text_post.content)
+    text_post.save()
+    text_post['date_created'] =\
+        datetime.datetime.strftime(text_post.date_created,\
+                                "%Y-%m-%d @ %H:%M:%S")
     return render_template('text_post.html', text_post=text_post)
 
 @app.route('/admin/add/artist', methods=['POST', 'GET'])
