@@ -4,18 +4,23 @@
 <head>
 	{% block head %}
 	<title>{% block title %}{{ site.title }}{% endblock %}</title>
-	<script src="static/js/jquery.js"></script>
-	<script src="static/js/galleria.js"></script>
-	<link rel="stylesheet" type="text/css" href="static/css/local.css" media="screen, projection" />
-	<link rel="stylesheet" type="text/css" href="static/css/blueprint/screen.css" media="screen,projection" />
-	<link rel="stylesheet" type="text/css" href="static/css/blueprint/print.css" media="print" />
+	<script src="/static/js/jquery.js"></script>
+	<script src="/static/js/galleria.js"></script>
+	<link rel="stylesheet" type="text/css" href="/static/css/local.css" media="screen, projection" />
+	<link rel="stylesheet" type="text/css" href="/static/css/blueprint/screen.css" media="screen,projection" />
+	<link rel="stylesheet" type="text/css" href="/static/css/blueprint/src/forms.css" media="screen,projection" />
+	<link rel="stylesheet" type="text/css" href="/static/css/blueprint/print.css" media="print" />
 	<!--[if lt IE 8]>
-	    <link rel="stylesheet" href="css/blueprint/ie.css" type="text/css" media="screen,projection" />
+	    <link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen,projection" />
 	<![endif]-->
-	<script src="static/js/galleria/plugins/galleria.flickr.js"></script>
+	<script src="/static/js/galleria/plugins/galleria.flickr.js"></script>
 	{% endblock %}
 </head>
 <body>
+    <div class="error">
+        {% block errors %}
+        {% endblock %}
+    </div>
     <div class="container">
     {% block content %}
     {% endblock %}

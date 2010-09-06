@@ -1,16 +1,18 @@
 {% extends "base.html" %}
 {% from "_formhelpers.html" import render_field %}
 {% block title %}ADMIN{% endblock %}
+{% block errors %}
+    {% for msg in get_flashed_messages() %}
+    <h2>{{ msg }}</h2>
+    {% endfor %}
+{% endblock %}
 {% block content %}
-        {% for msg in get_flashed_messages() %}
-        <h2>{{ msg }}</h2>
-        {% endfor %}
 <h1>Administration Panel</h1>
 
 <h3>Add a user (for admin purposes)</h3>
 <form method="POST" action="/admin/add/user">
-    <input type="hidden" value="{# csrf_token() #}" />
     <dl>
+    {{ user_form.hidden_tag() }}
     {{ render_field(user_form.username) }}
     {{ render_field(user_form.email) }}
     {{ render_field(user_form.password) }}
@@ -22,8 +24,8 @@
 
 <h3>Add Text Entry</h3>
 <form method="POST" action="/admin/add/text">
-    <input type="hidden" value="{# csrf_token() #}" />
     <dl>
+        {{ text_post_form.hidden_tag() }}
         {{ render_field(text_post_form.title) }}
         {{ render_field(text_post_form.author) }}
         {{ render_field(text_post_form.content) }}

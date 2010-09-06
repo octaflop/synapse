@@ -1,4 +1,4 @@
-from wtforms import Form, BooleanField, TextField, validators, PasswordField, FileField, TextAreaField
+from flaskext.wtf import Form, BooleanField, TextField, validators, PasswordField, FileField, TextAreaField
 
 class RegistrationForm(Form):
     username = TextField('Username', [validators.required(), validators.length(min=4, max=25)])
@@ -26,3 +26,6 @@ class ImagePostForm(Form):
     title = TextField(u"Title", [validators.required(), validators.length(min=3, max=50)])
     description = TextAreaField(u"English")
 
+class LoginForm(Form):
+    username = TextField(u'Username', [validators.required()])
+    password = PasswordField(u'Password')

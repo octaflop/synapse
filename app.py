@@ -21,10 +21,9 @@
 
 from flask import Flask, url_for, flash, escape, request, redirect,\
     render_template, session, abort
-from flaskext.csrf import csrf
 from settings import *
 from forms import *
-from strings import uurl2uuid, hash_it, slugfy
+from strings import *
 import hashlib
 import datetime
 from decorators import template, login_required
@@ -124,16 +123,19 @@ def raw_image(title):
 #@login_required
 def register_user():
     form = RegistrationForm(request.form)
-    if request.method == 'POST' and form.validate():
+    ##if request.method == 'POST' and form.validate():
+    if form.validate_on_submit():
         user = User(username=form.username.data, email=form.email.data)
         password = form.password.data
         user.hashedpassword = hash_it(form.username.data, form.password.data)
-        if user.save():
+        try:
+            user.save()
             session['username'] = user.username
             flash("user: %s was added successfully" % user.username)
             return redirect(url_for('userpage', username=user.username))
-        else:
-            return "could not find user after adding"
+        except:
+            flash("could not find user after adding")
+            return redirect(url_for('login'))
     else:
         return render_template('register.html', form=form)
 
@@ -149,24 +151,26 @@ def logout():
 
 @app.route('/login', methods=['GET','POST'])
 def login():
-    ret = {}
-    if request.method == "POST":
-        username = request.form['username']
-        password = request.form['password']
+    form = LoginForm(request.form)
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
         given_passhash = hash_it(username, password)
         user = User.objects(username=username, hashedpassword=given_passhash).first()
         if user is not None:
             flash("%s is logged in" % user.username)
+            session['username'] = user.username
+            return redirect(url_for('userpage', username=user.username))
         else:
             flash("Not found")
             return redirect('login')
-        session['username'] = user.username
-        return redirect(url_for('userpage', username=user.username))
-
     if 'username' in session:
-        return redirect(url_for('userpage', username=user.username))
-    return render_template('login.html', ret=ret)
-
+        user = User.objects(username=escape(session['username'])).first()
+        if user is not None:
+            return redirect(url_for('userpage', username=user.username))
+        else:
+            abort(500)
+    return render_template('login.html', form=form)
 
 #TODO
 """
@@ -188,26 +192,21 @@ def admin():
 @app.route('/admin/add/text', methods=['POST', 'GET'])
 def add_text_post():
     form = TextPostForm(request.form)
-    if request.method == "POST":
-        if form.validate:
-            #text_post = TextPost(slug=slugfy(form.title.data))
-            text_post = TextPost(slug=escape(form.title.data))
-            text_post.date_created = datetime.datetime.now()
-            #text_post.author = escape(form.author.data)
-            text_post.title = escape(form.title.data)
-            text_post.content = escape(form.content.data)
-            if text_post.save():
-                flash("%s was successfully saved as id %s" % (text_post.title,\
-                    text_post.id))
-                return redirect(url_for('text_post', slug=text_post.slug))
-            else:
-                flash("DBG: slug not unique")
-                return redirect(url_for('add_text_post', form=form))
+    if form.validate_on_submit():
+        #text_post = TextPost(slug=slugfy(form.title.data))
+        text_post = TextPost(slug=escape(form.title.data))
+        text_post.date_created = datetime.datetime.now()
+        #text_post.author = escape(form.author.data)
+        text_post.title = escape(form.title.data)
+        text_post.content = escape(form.content.data)
+        if text_post.save():
+            flash("%s was successfully saved as id %s" % (text_post.title,\
+                text_post.id))
+            return redirect(url_for('text_post', slug=text_post.slug))
         else:
-            flash("Error: Form did not validate")
-            return redirect(url_for('add_text_post'))
-    else:
-        return render_template('admin/admin_entry.html', form=form)
+            flash("DBG: slug not unique")
+            return redirect(url_for('add_text_post', form=form))
+    return render_template('admin/admin_entry.html', form=form)
 
 @app.route('/text_post/<slug>')
 def text_post(slug):
@@ -217,7 +216,7 @@ def text_post(slug):
 @app.route('/admin/add/artist', methods=['POST', 'GET'])
 def add_artist():
     form = ArtistForm(request.form)
-    if request.method == 'POST' and form.validate():
+    if form.validate_on_submit():
         artist = Artist(unique_name=form.unique_name.data)
         artist.unique_name = form.unique_name.data
         artist.first_name = form.first_name.data
@@ -262,6 +261,5 @@ def add_image():
 
 if __name__ == "__main__":
     app.debug = True
-    #csrf(app) #TODO
     app.run(host="0.0.0.0", port=5002)
 
