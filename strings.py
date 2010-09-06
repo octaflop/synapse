@@ -18,9 +18,9 @@ def slugfy(text, separator='-'):
   ret = re.sub(" +", separator, ret)
   return ret.strip()
 
-def format_datetime(timestamp):
+def stamp_time():
     """Format a timestamp for display."""
-    return datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d @ %H:%M')
+    return datetime.datetime.now().strftime('%Y-%m-%d @ %H:%M')
 
 def hash_it(username, password):
     try:
