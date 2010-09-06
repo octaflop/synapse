@@ -4,6 +4,22 @@
         {% for msg in get_flashed_messages() %}
         <h2>{{ msg }}</h2>
         {% endfor %}
+        <div class='span-17 colborder'>
+            <h1>Posts</h1>
+            <ul>
+                {% for post in posts %}
+                    <li>{{ post.title }} id:{{ post.id }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class='span-6 last'>
+            <h1>Users</h1>
+            <ul>
+                {% for user in users %}
+                <li><a href="user/{{user.username}}">{{ user.username }}</a> -- id:<a href="user/id/{{user.id}}">{{user.id }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
 	<div class='span-20'>
             <ul id="gallery">
                 {% for image in images: %}

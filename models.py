@@ -4,18 +4,18 @@ import uuid as ui
 import datetime
 
 from mongoengine import *
-connect('aliendog')
+connect('synapse')
 
 SALT = "FAkeSa8r3y2qwi"
-EMAILREG =\
-"/^([\w\!\#$\%\&\'\*\+\-\/\=\?\^\`{\|\}\~]+\.)*[\w\!\#$\%\&\'\*\+\-\/\=\?\^\`{\|\}\~]+@((((([a-z0-9]{1}[a-z0-9\-]{0,62}[a-z0-9]{1})|[a-z])\.)+[a-z]{2,6})|(\d{1,3}\.){3}\d{1,3}(\:\d{1,5})?)$/i"
+#EMAILREG =\
+#"/^([\w\!\#$\%\&\'\*\+\-\/\=\?\^\`{\|\}\~]+\.)*[\w\!\#$\%\&\'\*\+\-\/\=\?\^\`{\|\}\~]+@((((([a-z0-9]{1}[a-z0-9\-]{0,62}[a-z0-9]{1})|[a-z])\.)+[a-z]{2,6})|(\d{1,3}\.){3}\d{1,3}(\:\d{1,5})?)$/i"
 
 class Site(Document):
     title = StringField(required=True)
     domain = StringField(required=True)
 
 class User(Document):
-    email = StringField(required=True, regex=EMAILREG)
+    email = StringField(required=True)##, regex=EMAILREG)
     username = StringField(required=True, unique=True)
     first_name = StringField(max_length=50)
     last_name = StringField(max_length=50)
@@ -30,7 +30,7 @@ class Comment(EmbeddedDocument):
 class Post(Document):
     title = StringField(max_length=120)
     author = ReferenceField(User)
-    slug = StringField()
+    slug = StringField(required=True, unique=True)
     tags = ListField(StringField(max_length=45))
     date_created = DateTimeField()
 
