@@ -1,0 +1,10 @@
+{% extends "admin.html" %}
+{% block title %}File{% title %}
+{% block content %}
+<div class='span-24 last'>
+<form method="POST" action="/admin/add/file" enctype="multipart/form-data" >
+        {{ form.hidden_tag() }}
+        {{ form.title.label }} {{ form.title(size=50) }}<br />
+    <input type='submit' value="submit" />
+</form>
+</div>
