@@ -1,16 +1,13 @@
 {% extends "admin/admin.html" %}
 {% block title %}ADMIN --- entry{% endblock %}
-{% block content %}
-        {% for msg in get_flashed_messages() %}
-        <h2>{{ msg }}</h2>
-        {% endfor %}
 
+{% block content %}
 <h1>New Entry</h1>
 <h3>Add Text Entry</h3>
 <form method="POST" action="/admin/add/text">
-    <input type="hidden" value="{{ csrf_token() }}" />
     <dl>
-        {{ render_field(form.title) }}
+	{{ form.hidden_tag() }}
+	{{ render_field(form.title) }}
         {{ render_field(form.author) }}
         {{ render_field(form.content) }}
     </dl>

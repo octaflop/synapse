@@ -179,6 +179,16 @@ perhaps make a metafile to this effect.
 or maybe put them in separate apps.
 ~foenix
 """
+@app.route('/<year>/<month>/<day>/<slug>')
+@template('text_post.html')
+def single_text_post(year, month, day, slug):
+    text_post = TextPost.objects(slug=slug).first()
+    ret = {
+            'title': text_post.title,
+            'content': text_post.content,
+            }
+    return dict(text_post=ret)
+
 @app.route('/admin')
 @template('admin/admin.html')
 def admin():
@@ -193,17 +203,17 @@ def admin():
 def add_text_post():
     form = TextPostForm(request.form)
     if form.validate_on_submit():
-        #text_post = TextPost(slug=slugfy(form.title.data))
-        text_post = TextPost(slug=escape(form.title.data))
+        text_post = TextPost(slug=slugfy(form.title.data))
         text_post.date_created = datetime.datetime.now()
         #text_post.author = escape(form.author.data)
         text_post.title = escape(form.title.data)
         text_post.content = escape(form.content.data)
-        if text_post.save():
+        try:
+            text_post.save()
             flash("%s was successfully saved as id %s" % (text_post.title,\
                 text_post.id))
             return redirect(url_for('text_post', slug=text_post.slug))
-        else:
+        except:
             flash("DBG: slug not unique")
             return redirect(url_for('add_text_post', form=form))
     return render_template('admin/admin_entry.html', form=form)
