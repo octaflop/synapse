@@ -36,6 +36,7 @@ class Post(Document):
 
 class TextPost(Post):
     content = StringField()
+    html_content = StringField()
 
 class ImagePost(Post):
     image_path = StringField()
