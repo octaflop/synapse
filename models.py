@@ -14,7 +14,7 @@ class Site(Document):
     title = StringField(required=True)
     domain = StringField(required=True)
 
-class User(Document):
+class User(Document, object):
     email = StringField(required=True)##, regex=EMAILREG)
     username = StringField(required=True, unique=True)
     first_name = StringField(max_length=50)
@@ -27,7 +27,7 @@ class Comment(EmbeddedDocument):
     name = StringField(max_length=120)
     date_created = DateTimeField()
 
-class Post(Document):
+class Post(Document, object):
     title = StringField(max_length=120)
     author = ReferenceField(User)
     slug = StringField(required=True, unique=True)

@@ -1,14 +1,18 @@
 {% extends "base.html" %}
 {% block title %}Welcome: Index{% endblock %}
 {% block content %}
-        {% for msg in get_flashed_messages() %}
-        <h2>{{ msg }}</h2>
-        {% endfor %}
-        <div class='span-17 colborder'>
-            <h1>Posts</h1>
+       <div class='posts span-17 colborder'>
             <ul>
                 {% for post in posts %}
-                    <li>{{ post.title }} id:{{ post.id }}</li>
+                <li>id:{{ post.id }}
+                <div class="post_text span-10 colborder">
+                    <h1><a href="/post/{{ post.slug }}">{{ post.title }}</a></h1><p>{{ post.date_created }}</p>
+                    {{ post.html_content|safe }}
+                </div>
+                <div class="post_img span-6 last">
+                    <img src="{# post.image.path #}" alt={# post.image.alt #} />
+                </div>
+                </li>
                 {% endfor %}
             </ul>
         </div>
@@ -16,7 +20,8 @@
             <h1>Users</h1>
             <ul>
                 {% for user in users %}
-                <li><a href="user/{{user.username}}">{{ user.username }}</a> -- id:<a href="user/id/{{user.id}}">{{user.id }}</a></li>
+                <li><a href="/profile/{{user.username}}">{{ user.username
+                    }}</a> -- id:<a href="/profile/id/{{user.id}}">{{user.id }}</a></li>
                 {% endfor %}
             </ul>
         </div>
