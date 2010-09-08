@@ -1,3 +1,4 @@
+{% from "_formhelpers.html" import render_field %}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html lang="en">
@@ -21,14 +22,53 @@
 	<!--[if lt IE 8]>
 	    <link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen,projection" />
 	<![endif]-->
+    <script type='text/javascript'>
+            $('#login_show').click(function() {
+                    $('#login_hidden').show();
+            });
+        </script>
 	{% endblock %}
 </head>
 <body>
+    {% block errors %}
+    {% for msg in get_flashed_messages() %}
     <div class="error">
-        {% block errors %}
-        {% endblock %}
+        <h2>{{ msg }}</h2>
     </div>
+    {% endfor %}
+    {% endblock %}
     <div class="container">
+        <div class="span-24 last">
+        <div class="span-17 colborder" id="header">
+            {% block header %}
+            <div class="menu span-12">
+            <ul>
+                <li><a href="http://dendrite.local:5002/">home</a></li>
+                <li><a href="http://dendrite.local:5002/about">about</a></li>
+            </ul>
+            </div>
+            <div class="span-4 last">
+                <img src="{{ site.logo }}" />
+            </div>
+            {% endblock %}
+        </div>
+        <div class="span-3 last">
+            {% if logged_in %}
+            <p>Howdy, <a href="/profile/{{ user.username }}">{{
+                user.username}}</a><br /><a href="/logout">logout</a></p>
+            {% else %}
+            <p><a href="#login" id="login_show" >login</a></p>
+            <fieldset id="login_hidden" style="display: none">
+                <form action="/login" method="POST">
+                    {{ loginform.hidden_tag() }}
+                    {{ loginform.username.label }} {{ loginform.username(size=20) }}<br />
+                    {{ loginform.password.label }} {{ loginform.password(size=20) }}
+                    <input type='submit' value='login' />
+                </form>
+            </fieldset>
+            {% endif %}
+        </div>
+    </div>
     {% block content %}
     {% endblock %}
     </div>

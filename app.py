@@ -47,6 +47,7 @@ def allowed_file(filename):
 @app.route('/')
 @template('index.html')
 def index():
+    loginform = LoginForm(request.form)
     if 'username' in session:
         username = escape(session['username'])
         user = User.objects(username=username).first()
@@ -56,25 +57,33 @@ def index():
     selfurl = url_for('index')
     site = Site.objects().first()
     users = User.objects()
-    return dict(user=user, users=users, posts=posts, site=site, selfurl=selfurl)
+    return dict(loginform=loginform, user=user, users=users, posts=posts, site=site, selfurl=selfurl)
 
 # GETTERS
-@app.route('/user/<username>')
-def userpage(username):
+@app.route('/profile/<username>')
+def profile(username):
+    loginform = LoginForm(request.form)
+    user_is_logged_in = False
+    user_is_home = False
     try:
         user = User.objects(username=username).get()
     except:
         return abort(404)
     if 'username' in session:
-        if session['username'] == username:
-            return "welcome home, %s" % username
-        return "Why hello there, %s. id:%s" % (user.username, user.id)
-    else:
-        return "This is %s's page. id:%s" % (user.username, user.id)
+        user_is_logged_in = True
+        if session['username'] == user.username:
+            user_is_home = True
+    ret = {
+            'username' : user.username,
+            'logged_in' : user_is_logged_in,
+            'is_home' : user_is_home,
+            }
+    return render_template("home.html", user=ret, loginform=loginform)
 
-@app.route('/user/id/<id>')
+@app.route('/profile/id/<id>')
 @template('home.html')
 def user_by_id(id):
+    loginform = LoginForm(request.form)
     user = {}
     try:
         user = User.objects(id=id).first()
@@ -84,17 +93,7 @@ def user_by_id(id):
                 }
     except:
         return abort(404)
-    return dict(user=ret)
-
-#@template('home.html')
-@app.route('/home')
-def home():
-    username = "anon"
-    if 'username' in session:
-        username = escape(session['username'])
-        return "Why hello there, %s." % (username)
-    else:
-        return "This is %s's page." % (username)
+    return dict(user=ret, loginform=loginform)
 
 # Image Getter
 @app.route('/image/<title>')
@@ -105,7 +104,6 @@ def imagepage(title):
             image.id)
     else:
         return abort(404)
-
 
 @app.route('/image/raw/<title>')
 def raw_image(title):
@@ -124,7 +122,6 @@ def raw_image(title):
 #@login_required
 def register_user():
     form = RegistrationForm(request.form)
-    ##if request.method == 'POST' and form.validate():
     if form.validate_on_submit():
         user = User(username=form.username.data, email=form.email.data)
         password = form.password.data
@@ -133,7 +130,7 @@ def register_user():
             user.save()
             session['username'] = user.username
             flash("user: %s was added successfully" % user.username)
-            return redirect(url_for('userpage', username=user.username))
+            return redirect(url_for('profile', username=user.username))
         except:
             flash("could not find user after adding")
             return redirect(url_for('login'))
@@ -161,14 +158,14 @@ def login():
         if user is not None:
             flash("%s is logged in" % user.username)
             session['username'] = user.username
-            return redirect(url_for('userpage', username=user.username))
+            return redirect(url_for('profile', username=user.username))
         else:
             flash("Not found")
             return redirect('login')
     if 'username' in session:
         user = User.objects(username=escape(session['username'])).first()
         if user is not None:
-            return redirect(url_for('userpage', username=user.username))
+            return redirect(url_for('profile', username=user.username))
         else:
             abort(500)
     return render_template('login.html', form=form)
@@ -240,8 +237,8 @@ def add_text__content(slug):
         except:
             return abort(500)
 
-@app.route('/admin/edit/<slug>')
-def add_text_ajax(slug):
+@app.route('/post/<slug>/edit')
+def edit_text_ajax(slug):
     try:
         text_post = TextPost.objects(slug=slug).first()
     except:
@@ -267,8 +264,8 @@ def add_text_post():
             return redirect(url_for('add_text_post', form=form))
     return render_template('admin/admin_entry.html', form=form)
 
-@app.route('/text_post/<slug>')
-def text_post(slug):
+@app.route('/post/<slug>')
+def post(slug):
     text_post = TextPost.objects(slug=slug).first()
     text_post.html_content = markdown2.markdown(text_post.content)
     text_post.save()
