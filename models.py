@@ -1,6 +1,4 @@
 # -*- encoding: utf-8 -*-
-from strings import *
-import uuid as ui
 import datetime
 
 from mongoengine import *
@@ -12,7 +10,9 @@ SALT = "FAkeSa8r3y2qwi"
 
 class Site(Document):
     title = StringField(required=True)
+    motto = StringField()
     domain = StringField(required=True)
+    logo = StringField()
 
 class User(Document, object):
     email = StringField(required=True)##, regex=EMAILREG)
