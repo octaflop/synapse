@@ -87,7 +87,11 @@ h1, h2, h3, h4, h5, h6 {
     background-color: #111;
     margin: 3em 3em;
 }
+
 #userbox a {
     color: gray;
 }
 
+.ui-icon {
+	margin: 0px;
+	}
