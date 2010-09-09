@@ -1,13 +1,15 @@
+{% extends "admin/admin.html" %}
 {% from "_formhelpers.html" import render_field %}
+{% block content %}
 <form method="post" action="/admin/add/user">
-  <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
   <dl>
-    {{ render_field(form.username) }}
-    {{ render_field(form.email) }}
-    {{ render_field(form.password) }}
-    {{ render_field(form.confirm) }}
-    {{ render_field(form.accept_tos) }}
-  </dl>
+    {{ user_form.hidden_tag() }}
+    {{ render_field(user_form.username) }}
+    {{ render_field(user_form.email) }}
+    {{ render_field(user_form.password) }}
+    {{ render_field(user_form.confirm) }}
+    {{ render_field(user_form.accept_tos) }}  
+</dl>
   <p><input type=submit value=Register></p>
 </form>
-
+{% endblock %}

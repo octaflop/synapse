@@ -2,17 +2,16 @@
 {% block title %}Welcome: Index{% endblock %}
 {% block content %}
        <div class='posts span-17 colborder'>
-            <ul>
                 {% for post in posts %}
-                <li>id:{{ post.id }}
                 <div class="post_text span-10 colborder">
+                    id:{{ post.id }}<br />
                     <h1><a href="/post/{{ post.slug }}">{{ post.title }}</a></h1><p>{{ post.date_created }}</p>
                     {{ post.html_content|safe }}
                 </div>
                 <div class="post_img span-6 last">
                     <img src="{# post.image.path #}" alt={# post.image.alt #} />
+                    &nbsp;
                 </div>
-                </li>
                 {% endfor %}
             </ul>
         </div>
