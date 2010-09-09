@@ -1,31 +1,11 @@
 {% extends "base.html" %}
 {% block title %}New Text Post{% endblock %}
-	{% block head %}
-        <!-- JavaScript -->
-	<script src="/static/js/jquery.js"></script>
-        <script type='text/javascript'>
-            $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-        </script>
-        <!-- Galleria -->
-	<script src="/static/js/galleria.js"></script>
-	<script src="/static/js/galleria/plugins/galleria.flickr.js"></script>
-        <!-- jEditable -->
-        <script src="/static/js/plugins/jeditable/jquery.jeditable.js" type="text/javascript"></script> 
-        <script src="/static/js/plugins/jeditable/jquery.jeditable.autogrow.js" type="text/javascript"></script>
 
-        <!-- CSS -->
-	<link rel="stylesheet" type="text/css" href="/static/css/local.css" media="screen, projection" />
-	<link rel="stylesheet" type="text/css" href="/static/css/blueprint/screen.css" media="screen,projection" />
-	<link rel="stylesheet" type="text/css" href="/static/css/blueprint/src/forms.css" media="screen,projection" />
-	<link rel="stylesheet" type="text/css" href="/static/css/blueprint/print.css" media="print" />
-	<!--[if lt IE 8]>
-	    <link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen,projection" />
-	<![endif]-->
-
+{% block content %}
 <script type="text/javascript" charset="utf-8"> 
 // <![CDATA[
 $(document).ready(function() {
-        $(".title").editable("http://dendrite.local:5002/admin/edit/{{
+        $(".title").editable("http://{{ site.domain }}/admin/edit/{{
             text_post.slug|escape }}/_title",
             {
                 submit : 'OK',
@@ -33,17 +13,17 @@ $(document).ready(function() {
                 cancel : 'Cancel',
                 indicator : '<img src="/static/img/ajax-loader.gif">',
                 tooltip : 'click to edit',
-                loadurl : 'http://dendrite.local:5002/admin/edit/{{
+                loadurl : 'http://{{ site.domain }}/admin/edit/{{
                 text_post.slug|escape }}/_title',
                 name    : 'title',
             });
 
-        $(".autogrow").editable("http://dendrite.local:5002/admin/edit/{{
+        $(".autogrow").editable("http://{{ site.domain }}/admin/edit/{{
             text_post.slug|escape }}/_content", {
                 submit : 'OK',
                 method : 'PUT',
                 cancel : 'Cancel',
-                loadurl : 'http://dendrite.local:5002/admin/edit/{{
+                loadurl : 'http://{{ site.domain }}/admin/edit/{{
                 text_post.slug|escape
                 }}/_content',
                 //tooltip : 'click to edit...',
@@ -53,16 +33,15 @@ $(document).ready(function() {
     });
 //!>
 </script>
-{% endblock %}
-{% block content %}
 <div class="span-19 colborder">
     title: <h2 name="title" class="title">{{ text_post.title|escape }}</h2>
     content: 
     <div class="span-16 prepend-1 append-2 last">
-        <div name="content" class="autogrow">{{ text_post.html_content|safe
+        <div name="content" class="autogrow">{{ text_post.content|markdown
             }}</div>
     </div>
 </div>
 {% endblock %}
 {% block footer %}
+
 {% endblock %}
