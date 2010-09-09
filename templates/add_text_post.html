@@ -2,7 +2,7 @@
 {% block title %}New Text Post{% endblock %}
 
 {% block content %}
-<script type="text/javascript" charset="utf-8"> 
+<script type="text/javascript" charset="utf-8">
 // <![CDATA[
 $(document).ready(function() {
         $(".title").editable("http://{{ site.domain }}/admin/edit/{{
@@ -33,13 +33,13 @@ $(document).ready(function() {
     });
 //!>
 </script>
-<div class="span-19 colborder">
-    title: <h2 name="title" class="title">{{ text_post.title|escape }}</h2>
-    content: 
+<div class="span-18 colborder">
+    title: <h2 name="title" class="title">{{ text_post.title|escape }}<span class="ui-icon ui-icon-pencil editable"></span></h2>
+    content:
     <div class="span-16 prepend-1 append-2 last">
         <div name="content" class="autogrow">{{ text_post.content|markdown
-            }}</div>
-    </div>
+            }}<span class="ui-icon ui-icon-pencil editable"></span></div>
+        </div>
 </div>
 {% endblock %}
 {% block footer %}
