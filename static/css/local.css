@@ -38,24 +38,24 @@ h1, h2, h3, h4, h5, h6 {
    background-color: #222;
   }
 
-.posts ul {
+.posts div {
     margin: 0;
     padding: 0;
     float: left;
     }
 
-.posts ul li a {
+.posts div h1 a {
         float: left; text-decoration: none;
         color: white;
         padding: 10.5px 11px;
         background-color: #333; 
     }
 
-.menu ul li a:visited {
+.posts div h1 a:visited {
         color: white;
     }
 
-.menu ul li a:hover, .menu ul li .current {
+.posts div h1 a:hover, .menu ul li .current {
         color: #fff;
         background-color:#0b75b2; 
     }
