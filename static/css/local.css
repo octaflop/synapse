@@ -1,34 +1,36 @@
 // some styles local to this project
 body {
     background: #000;
-}
+    }
 
 h1, h2, h3, h4, h5, h6 {
     color: #F0F0F0 !important;
-}
+    }
 
 .menu {
     background: #333;
-}
+    }
 
 .menu ul {
     margin: 0;
     padding: 0;
-    float: left;
-}
+    float: right;
+    }
 
 .menu ul li {
     display: inline;
-}
+    }
 
 .menu ul li a{
-        float: left; text-decoration: none;
+        float: right; text-decoration: none;
         color: white;
         padding: 10.5px 11px;
-        background-color: #333; }
+        background-color: #333;
+    }
 
 .menu ul li a:visited{
-        color: white;}
+        color: white;
+    }
 
 .menu ul li a:hover, .menu ul li .current{
         color: #fff;
@@ -46,22 +48,46 @@ h1, h2, h3, h4, h5, h6 {
 
 .posts div h1 a {
         float: left; text-decoration: none;
-        color: white;
+        color: #FFF;
         padding: 10.5px 11px;
-        background-color: #333; 
+        background-color: #333;
     }
 
 .posts div h1 a:visited {
         color: white;
     }
 
-.posts div h1 a:hover, .menu ul li .current {
+.posts div h1 a:hover {
         color: #fff;
-        background-color:#0b75b2; 
+        background-color:#0b75b2;
     }
 
 .posts {
    background-color: #222;
     }
 
+.site-banner  {
+    background-color: #666;
+    }
+
+.site-banner h1 a {
+    color: #eee;
+    text-decoration: none;
+    }
+
+.site-banner h1 a:hover {
+    background-color: #0b75b2;
+    }
+
+#userbox {
+    background-color: #111;
+}
+
+#userbox p {
+    background-color: #111;
+    margin: 3em 3em;
+}
+#userbox a {
+    color: gray;
+}
 
