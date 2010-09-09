@@ -3,9 +3,9 @@
 {% block content %}
 <div class="span-19 colborder">
 title: <h2>{{ text_post.title }}</h2>
-date: {{ text_post.date_created }} 
+date: {{ text_post.date_created }}
     <div class="span-16 prepend-1 append-2 last">
-        content: {{ text_post.content|safe }}
+        content: {{ text_post.content|markdown }}
     </div>
 </div>
 <div class="span-4 last">
