@@ -6,15 +6,18 @@
 	{% block head %}
 	<title>{% block title %}{{ site.title }}{% endblock %}</title>
         <!-- JavaScript -->
-	<script src="/static/js/jquery.js"></script>
+	<!--<script type="text/javascript" src="/static/js/jquery.js"></script>-->
+	<script type="text/javascript" src="/static/js/jquery-1.4.2.min.js"></script>
+        <script type="text/javascript" src="/static/js/jquery-ui-1.8.4.custom.min.js"></script>
         <!-- Galleria -->
-	<script src="/static/js/galleria.js"></script>
-	<script src="/static/js/galleria/plugins/galleria.flickr.js"></script>
+	<script type="text/javascript" src="/static/js/galleria.js"></script>
+	<script type="text/javascript" src="/static/js/galleria/plugins/galleria.flickr.js"></script>
         <!-- jEditable -->
         <script src="/static/js/plugins/jeditable/jquery.jeditable.js" type="text/javascript"></script> 
         <script src="/static/js/plugins/jeditable/jquery.jeditable.autogrow.js" type="text/javascript"></script>
 
         <!-- CSS -->
+	<link type="text/css" href="/static/css/custom-theme/jquery-ui-1.8.4.custom.css" rel="stylesheet" />
 	<link rel="stylesheet" type="text/css" href="/static/css/local.css" media="screen, projection" />
 	<link rel="stylesheet" type="text/css" href="/static/css/blueprint/screen.css" media="screen,projection" />
 	<link rel="stylesheet" type="text/css" href="/static/css/blueprint/src/forms.css" media="screen,projection" />
@@ -23,9 +26,31 @@
 	    <link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen,projection" />
 	<![endif]-->
     <script type='text/javascript'>
-            $('#login_show').click(function() {
-                    $('#login_hidden').show();
-            });
+            $(document).ready(function () {
+		$(".login_button").button({
+			icons: {
+				primary: 'ui-icon-locked',
+			},
+		});
+		$('#login_show').toggle(
+			function() {
+		            $('#login_hidden').animate({
+				opacity: 'toggle',
+				width: ['toggle', 'swing'],
+				height: ['toggle', 'swing'],
+				visibility: 'show',
+				}, 1500, 'swing');
+			},
+			function () {
+			    	$('#login_hidden').animate({
+				opacity: 'toggle',
+				width: ['toggle', 'swing'],
+				height: ['toggle', 'swing'],
+				visibility: 'hide',
+				}, 1500, 'swing');
+			}
+            	);
+	});
         </script>
 	{% endblock %}
 </head>
@@ -39,31 +64,31 @@
     {% endblock %}
     <div class="container">
         <div class="span-24 last">
-        <div class="span-17 colborder" id="header">
-            {% block header %}
-            <div class="menu span-12">
-            <ul>
-                <li><a href="http://dendrite.local:5002/">home</a></li>
-                <li><a href="http://dendrite.local:5002/about">about</a></li>
-            </ul>
+            <div class="span-17 colborder" id="header">
+                {% block header %}
+                <div class="menu span-12">
+                    <ul>
+                        <li><a href="http://dendrite.local:5002/">home</a></li>
+                        <li><a href="http://dendrite.local:5002/about">about</a></li>
+                    </ul>
+                </div>
+                <div class="span-4 last">
+                    <img src="{{ site.logo }}" />
+                </div>
+                {% endblock %}
             </div>
-            <div class="span-4 last">
-                <img src="{{ site.logo }}" />
-            </div>
-            {% endblock %}
-        </div>
-        <div class="span-3 last">
+        <div class="span-4 last">
             {% if logged_in %}
             <p>Howdy, <a href="/profile/{{ user.username }}">{{
                 user.username}}</a><br /><a href="/logout">logout</a></p>
             {% else %}
-            <p><a href="#login" id="login_show" >login</a></p>
+            <p><button href="#login" class="login_button" id="login_show">login</button></p>
             <fieldset id="login_hidden" style="display: none">
                 <form action="/login" method="POST">
                     {{ loginform.hidden_tag() }}
                     {{ loginform.username.label }} {{ loginform.username(size=20) }}<br />
                     {{ loginform.password.label }} {{ loginform.password(size=20) }}
-                    <input type='submit' value='login' />
+                    <input class="login_button" type='submit' value='login' />
                 </form>
             </fieldset>
             {% endif %}

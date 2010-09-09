@@ -21,12 +21,12 @@
 
 from flask import Flask, url_for, flash, escape, request, redirect,\
     render_template, session, abort, jsonify
+from flaskext.markdown import Markdown
 from settings import *
 from forms import *
 from strings import *
 import hashlib
 import datetime
-import markdown2
 from decorators import template, login_required
 from werkzeug import SharedDataMiddleware, secure_filename
 from models import Site, User, Post, TextPost, AudioPost, ImagePost
@@ -38,6 +38,7 @@ app.add_url_rule('/uploads/<filename>', 'uploaded_file', build_only=True)
 app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
     '/uploads': UPLOAD_FOLDER,
     })
+
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -63,8 +64,7 @@ def index():
 @app.route('/profile/<username>')
 def profile(username):
     loginform = LoginForm(request.form)
-    user_is_logged_in = False
-    user_is_home = False
+    site = Site.objects.first()
     try:
         user = User.objects(username=username).get()
     except:
@@ -78,7 +78,8 @@ def profile(username):
             'logged_in' : user_is_logged_in,
             'is_home' : user_is_home,
             }
-    return render_template("home.html", user=ret, loginform=loginform)
+    return render_template("home.html", user=ret, loginform=loginform,
+            site=site)
 
 @app.route('/profile/id/<id>')
 @template('home.html')
@@ -181,11 +182,9 @@ or maybe put them in separate apps.
 @template('text_post.html')
 def single_text_post(year, month, day, slug):
     text_post = TextPost.objects(slug=slug).first()
-    text_post.html_content = markdown2.markdown(text_post.content)
     ret = {
             'title': text_post.title,
             'content': text_post.content,
-            'html_content': text_post.html_content,
             }
     return dict(text_post=ret)
 
@@ -224,26 +223,32 @@ def add_text__content(slug):
         return error(404)
     if request.method == "PUT" or request.method == 'POST':
         content = request.values.get('content', type=str)
-        html_content = markdown2.markdown(content)
         text_post.content = content
-        text_post.html_content = html_content
         text_post.save()
-        return text_post.html_content
+        return text_post.content
     elif request.method == "GET":
         try:
-            text_post.html_content = markdown2.markdown(text_post.content)
-            text_post.save()
             return text_post.content
         except:
             return abort(500)
 
 @app.route('/post/<slug>/edit')
 def edit_text_ajax(slug):
+    loginform = LoginForm()
+    siteo = Site.objects.first()
+    site = {
+            'title' : siteo.title,
+            'domain': siteo.domain,
+            'logo'  : siteo.logo,
+            'motto' : siteo.motto,
+            }
     try:
         text_post = TextPost.objects(slug=slug).first()
     except:
         return error(404)
-    return render_template("add_text_post.html", text_post=text_post)
+    return render_template("add_text_post.html", text_post=text_post,\
+            loginform=loginform, site=site)
+
 
 @app.route('/admin/add/text', methods=['POST', 'GET'])
 def add_text_post():
@@ -266,13 +271,17 @@ def add_text_post():
 
 @app.route('/post/<slug>')
 def post(slug):
+    loginform = LoginForm()
+    site = {}
+    site['title'] = u'synapse'
+    site['logo'] = '/'
     text_post = TextPost.objects(slug=slug).first()
-    text_post.html_content = markdown2.markdown(text_post.content)
     text_post.save()
     text_post['date_created'] =\
         datetime.datetime.strftime(text_post.date_created,\
                                 "%Y-%m-%d @ %H:%M:%S")
-    return render_template('text_post.html', text_post=text_post)
+    return render_template('text_post.html', text_post=text_post,\
+            loginform=loginform, site=site)
 
 @app.route('/admin/add/artist', methods=['POST', 'GET'])
 def add_artist():
@@ -322,5 +331,6 @@ def add_image():
 
 if __name__ == "__main__":
     app.debug = True
+    Markdown(app)
     app.run(host="0.0.0.0", port=5002)
 
