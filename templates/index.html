@@ -1,21 +1,21 @@
 {% extends "base.html" %}
 {% block title %}Welcome: Index{% endblock %}
 {% block content %}
-       <div class='posts span-17 colborder'>
+       <div class='prepend-1 posts span-17 colborder'>
                 {% for post in posts %}
                 <div class="post_text span-10 colborder">
                     id:{{ post.id }}<br />
                     <h1><a href="/post/{{ post.slug }}">{{ post.title }}</a></h1><p>{{ post.date_created }}</p>
                     {{ post.html_content|safe }}
                 </div>
-                <div class="post_img span-6 last">
+                <div class="post_img span-3 last">
                     <img src="{# post.image.path #}" alt={# post.image.alt #} />
                     &nbsp;
                 </div>
                 {% endfor %}
             </ul>
         </div>
-        <div class='span-6 last'>
+        <div class='span-5 last'>
             <h1>Users</h1>
             <ul>
                 {% for user in users %}
@@ -24,29 +24,16 @@
                 {% endfor %}
             </ul>
         </div>
-	<div class='span-20'>
+
+<!--	<div class='span-20'>
             <ul id="gallery">
                 {% for image in images: %}
                 <li><a href="#"><img src='{{ image.src }}' /></a></li>
                 {% endfor %}
             </ul>
-	</div>
-	<div class='span-4 last'>
-            {% if user.first_name %}
-                <h1>hello there {{ user.first_name }}</h1>
-                <h2>{{ url }}</h2>
-		<p>What a work of art</p>
-            {% else %}
-                <h1>Who are you?</h1>
-            {% endif %}
-	</div>
-        <div class="span-12">
-            <p>ALPHA</p>
-	    <div id="galleria"></div>
-        </div>
-	{% endblock %}
-{% block footer %}
-    <script>
+        </div>-->
+{% endblock %}
+<!--    <script>
         //$(document).ready(function){
             // Load theme
             Galleria.loadTheme('static/js/galleria/themes/classic/galleria.classic.js');
@@ -70,7 +57,6 @@
                 });
             });
         //}
-    </script>
-    {% endblock %}
+    </script>-->
     </body>
 </html>

@@ -32,6 +32,13 @@
 				primary: 'ui-icon-locked',
 			},
 		});
+                $(".unlock").button({
+			icons: {
+				primary: 'ui-icon-unlocked',
+                                type: 'submit',
+			},
+		});
+
 		$('#login_show').toggle(
 			function() {
 		            $('#login_hidden').animate({
@@ -56,17 +63,28 @@
 </head>
 <body>
     {% block errors %}
-    {% for msg in get_flashed_messages() %}
-    <div class="error">
-        <h2>{{ msg }}</h2>
-    </div>
-    {% endfor %}
+        {% for msg in get_flashed_messages() %}
+            <div class="ui-state-error">
+                <h2>{{ msg }}</h2>
+            </div>
+        {% endfor %}
     {% endblock %}
     <div class="container">
         <div class="span-24 last">
-            <div class="span-17 colborder" id="header">
+            <div class="span-18 colborder" id="header">
                 {% block header %}
-                <div class="menu span-12">
+                <div class="site-banner span-11 prepend-1">
+                    <h1><a href="http://{{ site.domain }}" title="home">{{ site.title }}</a></h1>
+                    {% if site.motto %}
+                    <h4>
+                        {{ site.motto }}
+                    </h4>
+                    {% endif %}
+                </div>
+                <div class="span-5 site-logo last">
+                    <img src="{{ site.logo }}" />
+                </div>
+                <div class="menu span-18 colborder last">
                     <ul>
 			    <li><a href="http://{{ site.domain }}/">home</a></li>
 			    <li><a href="http://{{site.domain}}/about">about</a></li>
@@ -75,15 +93,12 @@
 			    {% endif %}
                     </ul>
                 </div>
-                <div class="span-4 last">
-                    <img src="{{ site.logo }}" />
-                </div>
                 {% endblock %}
             </div>
-        <div class="span-4 last">
+        <div id="userbox" class="span-4 last">
             {% if logged_in %}
-            <p>Howdy, <a href="/profile/{{ user.username }}">{{
-                user.username}}</a><br /><a href="/logout">logout</a></p>
+            <p id="userbox">Howdy, <a href="/profile/{{ user.username }}">{{
+                user.username}}</a><br /><a class="login_button" href="/logout">logout</a></p>
             {% else %}
             <p><button href="#login" class="login_button" id="login_show">login</button></p>
             <fieldset id="login_hidden" style="display: none">
@@ -91,7 +106,7 @@
                     {{ loginform.hidden_tag() }}
                     {{ loginform.username.label }} {{ loginform.username(size=20) }}<br />
                     {{ loginform.password.label }} {{ loginform.password(size=20) }}
-                    <input class="login_button" type='submit' value='login' />
+                    <button class="unlock" type='submit'>unlock</button>
                 </form>
             </fieldset>
             {% endif %}
@@ -99,11 +114,11 @@
     </div>
     {% block content %}
     {% endblock %}
-    </div>
-    <div class="container" id="footer">
+    <div class="span-24" id="footer">
     {% block footer %}
     <div class="span-24 last">copyright 2010. Faris Chebib</div>
     {% endblock %}
     </div>
+</div>
 </body>
 </html>
