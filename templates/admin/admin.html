@@ -1,11 +1,6 @@
 {% extends "base.html" %}
 {% from "_formhelpers.html" import render_field %}
 {% block title %}ADMIN{% endblock %}
-{% block errors %}
-    {% for msg in get_flashed_messages() %}
-    <h2>{{ msg }}</h2>
-    {% endfor %}
-{% endblock %}
 {% block content %}
 <h1>Administration Panel</h1>
 

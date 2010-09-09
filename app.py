@@ -48,17 +48,20 @@ def allowed_file(filename):
 @app.route('/')
 @template('index.html')
 def index():
+    logged_in = False
     loginform = LoginForm(request.form)
     if 'username' in session:
         username = escape(session['username'])
         user = User.objects(username=username).first()
+        logged_in = True
     else:
         user = "anonymous"
     posts = Post.objects()
     selfurl = url_for('index')
     site = Site.objects().first()
     users = User.objects()
-    return dict(loginform=loginform, user=user, users=users, posts=posts, site=site, selfurl=selfurl)
+    return dict(loginform=loginform, user=user, users=users, posts=posts,\
+            site=site, selfurl=selfurl, logged_in=logged_in)
 
 # GETTERS
 @app.route('/profile/<username>')
@@ -122,8 +125,10 @@ def raw_image(title):
 @app.route('/admin/add/user', methods=['GET', 'POST'])
 #@login_required
 def register_user():
-    form = RegistrationForm(request.form)
-    if form.validate_on_submit():
+    user_form = RegistrationForm(request.form)
+    site = Site.objects.first()
+    loginform = LoginForm()
+    if user_form.validate_on_submit():
         user = User(username=form.username.data, email=form.email.data)
         password = form.password.data
         user.hashedpassword = hash_it(form.username.data, form.password.data)
@@ -136,7 +141,8 @@ def register_user():
             flash("could not find user after adding")
             return redirect(url_for('login'))
     else:
-        return render_template('register.html', form=form)
+        return render_template('register.html', user_form=user_form,\
+                loginform=loginform, site=site)
 
 @app.route('/logout')
 def logout():
@@ -191,12 +197,15 @@ def single_text_post(year, month, day, slug):
 @app.route('/admin')
 @template('admin/admin.html')
 def admin():
+    site = Site.objects().first()
+    loginform = LoginForm()
     user_form = RegistrationForm(request.form)
     text_post_form = TextPostForm(request.form)
     audio_post_form = AudioPostForm(request.form)
     image_post_form = ImagePostForm(request.form)
     return dict(user_form=user_form, text_post_form=text_post_form,\
-            audio_post_form=audio_post_form, image_post_form=image_post_form)
+            audio_post_form=audio_post_form, image_post_form=image_post_form,\
+            site=site, loginform=loginform)
 
 @app.route('/admin/edit/<slug>/_title', methods=['POST', 'PUT', 'GET'])
 def add_text__title(slug):

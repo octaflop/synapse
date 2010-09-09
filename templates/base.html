@@ -68,8 +68,11 @@
                 {% block header %}
                 <div class="menu span-12">
                     <ul>
-                        <li><a href="http://dendrite.local:5002/">home</a></li>
-                        <li><a href="http://dendrite.local:5002/about">about</a></li>
+			    <li><a href="http://{{ site.domain }}/">home</a></li>
+			    <li><a href="http://{{site.domain}}/about">about</a></li>
+			    {% if logged_in %}
+			    <li><a href="http://{{site.domain}}/admin">admin</a></li>
+			    {% endif %}
                     </ul>
                 </div>
                 <div class="span-4 last">
