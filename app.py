@@ -258,14 +258,14 @@ def edit_text_ajax(slug):
     return render_template("add_text_post.html", text_post=text_post,\
             loginform=loginform, site=site)
 
-
 @app.route('/admin/add/text', methods=['POST', 'GET'])
 def add_text_post():
+    site = Site.objects.first()
+    loginform = LoginForm()
     form = TextPostForm(request.form)
     if form.validate_on_submit():
         text_post = TextPost(slug=slugfy(form.title.data))
         text_post.date_created = datetime.datetime.now()
-        #text_post.author = escape(form.author.data)
         text_post.title = escape(form.title.data)
         text_post.content = escape(form.content.data)
         try:
@@ -275,8 +275,10 @@ def add_text_post():
             return redirect(url_for('text_post', slug=text_post.slug))
         except:
             flash("DBG: slug not unique")
-            return redirect(url_for('add_text_post', form=form))
-    return render_template('admin/admin_entry.html', form=form)
+            return redirect(url_for('add_text_post', form=form, site=site,\
+                    loginform=loginform))
+    return render_template('admin/admin_entry.html', form=form, site=site,\
+            loginform=loginform)
 
 @app.route('/post/<slug>')
 def post(slug):
