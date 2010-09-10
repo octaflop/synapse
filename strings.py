@@ -6,6 +6,7 @@ from settings import SALT
 from models import TextPost
 import datetime
 import hashlib
+import random
 
 def slugfy(text, separator='-'):
   ret = ""
@@ -17,19 +18,7 @@ def slugfy(text, separator='-'):
   ret = re.sub("([a-zA-Z])(uml|acute|grave|circ|tilde|cedil)", r"\1", ret)
   ret = re.sub("\W", " ", ret)
   ret = re.sub(" +", separator, ret)
-  first_try = ret.strip()
-  try:
-      text_post = TextPost(slug=first_try)
-      text_post.save()
-  except:
-      try:
-          rando = "%irnd" % random.randrange(0,99)
-          second_try = "%s_%i" % (first_try, rando)
-          text_post = TextPost(slug=second_try)
-          text_post.save()
-      except:
-          return "ERROR: Duplicate slug!"
-  return text_post.slug
+  return ret.strip()
 
 def stamp_time():
     """Format a timestamp for display."""
