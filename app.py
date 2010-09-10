@@ -258,11 +258,12 @@ def edit_text_ajax(slug):
     return render_template("add_text_post.html", text_post=text_post,\
             loginform=loginform, site=site)
 
+
 @app.route('/admin/add/text', methods=['POST', 'GET'])
 def add_text_post():
+    form = TextPostForm(request.form)
     site = Site.objects.first()
     loginform = LoginForm()
-    form = TextPostForm(request.form)
     if form.validate_on_submit():
         text_post = TextPost(slug=slugfy(form.title.data))
         text_post.date_created = datetime.datetime.now()
@@ -283,14 +284,12 @@ def add_text_post():
 @app.route('/post/<slug>')
 def post(slug):
     loginform = LoginForm()
-    site = {}
-    site['title'] = u'synapse'
-    site['logo'] = '/'
+    site = Site.objects.first()
     text_post = TextPost.objects(slug=slug).first()
     text_post.save()
     text_post['date_created'] =\
         datetime.datetime.strftime(text_post.date_created,\
-                                "%Y-%m-%d @ %H:%M:%S")
+                                "%Y-%m-%d @ %H:%M")
     return render_template('text_post.html', text_post=text_post,\
             loginform=loginform, site=site)
 
