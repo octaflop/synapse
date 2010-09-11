@@ -1,5 +1,8 @@
 from flaskext.wtf import Form, BooleanField, TextField, validators, PasswordField, FileField, TextAreaField
 
+## be careful of a circular import here
+from form_helper import TagListField
+
 class RegistrationForm(Form):
     username = TextField('Username', [validators.required(), validators.length(min=4, max=25)])
     email = TextField('Email', [validators.required(), validators.length(min=6, max=35)])
@@ -10,20 +13,21 @@ class RegistrationForm(Form):
     confirm = PasswordField('Repeat password')
     accept_tos = BooleanField('I accept the TOS', [validators.required()])
 
-class TextPostForm(Form):
-    title = TextField('Entitle your work', [validators.required()])
-    content = TextAreaField('Make your mark')
-    author = TextField('Author')
-
-class AudioPostForm(Form):
+class GenericFormAbstract(Form):
     title = TextField('Entitle your work', [validators.required(),\
         validators.length(min=3, max=50)])
+    author = TextField('Author')
+    taglist = TagListField()
+
+class TextPostForm(GenericFormAbstract):
+    content = TextAreaField('Make your mark')
+
+class AudioPostForm(TextPostForm):
     description = TextField("Describe the audio file")
     audio = FileField('Audio upload', [validators.required()])
 
-class ImagePostForm(Form):
+class ImagePostForm(GenericFormAbstract):
     image = FileField(u'Image upload', [validators.required()])
-    title = TextField(u"Title", [validators.required(), validators.length(min=3, max=50)])
     description = TextAreaField(u"English")
 
 class LoginForm(Form):
