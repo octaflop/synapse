@@ -97,8 +97,8 @@
             </div>
         <div id="userbox" class="span-4 last">
             {% if logged_in %}
-            <p id="userbox">Howdy, <a href="/profile/{{ user.username }}">{{
-                user.username}}</a><br /><a class="login_button" href="/logout">logout</a></p>
+            <p id="userbox">Howdy, <a href="/profile/{{ current_user.username }}">{{
+                current_user.username}}</a><br /><a class="login_button" href="/logout">logout</a></p>
             {% else %}
             <p><button href="#login" class="login_button" id="login_show">login</button></p>
             <fieldset id="login_hidden" style="display: none">

@@ -44,51 +44,55 @@ def allowed_file(filename):
     return '.' in filename and \
        filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
+# META
+class Meta:
+    def __init__(self):
+        self.logged_in = False
+        self.loginform = LoginForm(request.form)
+        if 'username' in session:
+            self.username = escape(session['username'])
+            self.user = User.objects(username=self.username).first()
+            self.logged_in = True
+        else:
+            self.user = "anonymous"
+        self.site = Site.objects().first()
+        assert self.site is not None
+
 # HOME PAGE
 @app.route('/')
 @template('index.html')
 def index():
-    logged_in = False
-    loginform = LoginForm(request.form)
-    if 'username' in session:
-        username = escape(session['username'])
-        user = User.objects(username=username).first()
-        logged_in = True
-    else:
-        user = "anonymous"
+    meta = Meta()
+    logged_in, loginform, user, site =\
+            meta.logged_in, meta.loginform, meta.user, meta.site
     posts = Post.objects()
-    selfurl = url_for('index')
-    site = Site.objects().first()
     users = User.objects()
-    return dict(loginform=loginform, user=user, users=users, posts=posts,\
-            site=site, selfurl=selfurl, logged_in=logged_in)
+    selfurl = url_for('index')
+    return dict(loginform=loginform, current_user=user, users=users,\
+            posts=posts, site=site, selfurl=selfurl, logged_in=logged_in)
 
 # GETTERS
 @app.route('/profile/<username>')
 def profile(username):
-    loginform = LoginForm(request.form)
-    site = Site.objects.first()
+    meta = Meta()
+    logged_in, loginform, current_user, site =\
+            meta.logged_in, meta.loginform, meta.user, meta.site
     try:
         user = User.objects(username=username).get()
     except:
         return abort(404)
-    if 'username' in session:
-        user_is_logged_in = True
-        if session['username'] == user.username:
-            user_is_home = True
-    ret = {
-            'username' : user.username,
-            'logged_in' : user_is_logged_in,
-            'is_home' : user_is_home,
-            }
-    return render_template("home.html", user=ret, loginform=loginform,
-            site=site)
+    if session['username'] == user.username:
+        user_is_home = True
+    return render_template("home.html", current_user=current_user,user=user,
+            loginform=loginform, site=site, logged_in=logged_in,
+            user_is_home=user_is_home)
 
 @app.route('/profile/id/<id>')
 @template('home.html')
 def user_by_id(id):
-    loginform = LoginForm(request.form)
-    user = {}
+    meta = Meta()
+    logged_in, loginform, current_user, site =\
+            meta.logged_in, meta.loginform, meta.user, meta.site
     try:
         user = User.objects(id=id).first()
         ret = {
@@ -97,7 +101,8 @@ def user_by_id(id):
                 }
     except:
         return abort(404)
-    return dict(user=ret, loginform=loginform)
+    return dict(user=ret, loginform=loginform, site=site,\
+            current_user=current_user)
 
 # Image Getter
 @app.route('/image/<title>')
@@ -125,9 +130,10 @@ def raw_image(title):
 @app.route('/admin/add/user', methods=['GET', 'POST'])
 #@login_required
 def register_user():
+    meta = Meta()
+    logged_in, loginform, current_user, site =\
+            meta.logged_in, meta.loginform, meta.user, meta.site
     user_form = RegistrationForm(request.form)
-    site = Site.objects.first()
-    loginform = LoginForm()
     if user_form.validate_on_submit():
         user = User(username=form.username.data, email=form.email.data)
         password = form.password.data
@@ -142,7 +148,7 @@ def register_user():
             return redirect(url_for('login'))
     else:
         return render_template('register.html', user_form=user_form,\
-                loginform=loginform, site=site)
+                loginform=loginform, site=site, current_user=current_user)
 
 @app.route('/logout')
 def logout():
@@ -156,6 +162,9 @@ def logout():
 
 @app.route('/login', methods=['GET','POST'])
 def login():
+    meta = Meta()
+    logged_in, loginform, current_user, site =\
+            meta.logged_in, meta.loginform, meta.user, meta.site
     form = LoginForm(request.form)
     if form.validate_on_submit():
         username = form.username.data
@@ -175,7 +184,8 @@ def login():
             return redirect(url_for('profile', username=user.username))
         else:
             abort(500)
-    return render_template('login.html', form=form)
+    return render_template('login.html', form=form, loginform=form, site=site,\
+            current_user=current_user)
 
 #TODO
 """
@@ -197,15 +207,17 @@ def single_text_post(year, month, day, slug):
 @app.route('/admin')
 @template('admin/admin.html')
 def admin():
-    site = Site.objects().first()
-    loginform = LoginForm()
+    meta = Meta()
+    logged_in, loginform, current_user, site =\
+            meta.logged_in, meta.loginform, meta.user, meta.site
     user_form = RegistrationForm(request.form)
     text_post_form = TextPostForm(request.form)
     audio_post_form = AudioPostForm(request.form)
     image_post_form = ImagePostForm(request.form)
     return dict(user_form=user_form, text_post_form=text_post_form,\
             audio_post_form=audio_post_form, image_post_form=image_post_form,\
-            site=site, loginform=loginform)
+            site=site, loginform=loginform, current_user=current_user,\
+            logged_in=logged_in)
 
 @app.route('/admin/edit/<slug>/_title', methods=['POST', 'PUT', 'GET'])
 def add_text__title(slug):
@@ -243,27 +255,24 @@ def add_text__content(slug):
 
 @app.route('/post/<slug>/edit')
 def edit_text_ajax(slug):
-    loginform = LoginForm()
-    siteo = Site.objects.first()
-    site = {
-            'title' : siteo.title,
-            'domain': siteo.domain,
-            'logo'  : siteo.logo,
-            'motto' : siteo.motto,
-            }
+    meta = Meta()
+    logged_in, loginform, current_user, site =\
+            meta.logged_in, meta.loginform, meta.user, meta.site
     try:
         text_post = TextPost.objects(slug=slug).first()
     except:
         return error(404)
     return render_template("add_text_post.html", text_post=text_post,\
-            loginform=loginform, site=site)
+            loginform=loginform, site=site, current_user=current_user,\
+            logged_in=logged_in)
 
 
 @app.route('/admin/add/text', methods=['POST', 'GET'])
 def add_text_post():
+    meta = Meta()
+    logged_in, loginform, current_user, site =\
+            meta.logged_in, meta.loginform, meta.user, meta.site
     form = TextPostForm(request.form)
-    site = Site.objects.first()
-    loginform = LoginForm()
     if form.validate_on_submit():
         text_post = TextPost(slug=slugfy(form.title.data))
         text_post.date_created = datetime.datetime.now()
@@ -279,22 +288,28 @@ def add_text_post():
             return redirect(url_for('add_text_post', form=form, site=site,\
                     loginform=loginform))
     return render_template('admin/admin_entry.html', form=form, site=site,\
-            loginform=loginform)
+            loginform=loginform, current_user=current_user,\
+            logged_in=logged_in)
 
 @app.route('/post/<slug>')
 def post(slug):
-    loginform = LoginForm()
-    site = Site.objects.first()
+    meta = Meta()
+    logged_in, loginform, current_user, site =\
+            meta.logged_in, meta.loginform, meta.user, meta.site
     text_post = TextPost.objects(slug=slug).first()
     text_post.save()
     text_post['date_created'] =\
         datetime.datetime.strftime(text_post.date_created,\
                                 "%Y-%m-%d @ %H:%M")
     return render_template('text_post.html', text_post=text_post,\
-            loginform=loginform, site=site)
+            loginform=loginform, site=site, current_user=current_user,\
+            logged_in=logged_in)
 
 @app.route('/admin/add/artist', methods=['POST', 'GET'])
 def add_artist():
+    meta = Meta()
+    logged_in, loginform, current_user, site =\
+            meta.logged_in, meta.loginform, meta.user, meta.site
     form = ArtistForm(request.form)
     if form.validate_on_submit():
         artist = Artist(unique_name=form.unique_name.data)
@@ -310,7 +325,8 @@ def add_artist():
         else:
             flash("username not unique")
             return redirect(url_for('add_artist'))
-    return render_template('add_artist.html', form=form)
+    return render_template('add_artist.html', form=form, loginform=loginform,\
+            logged_in=logged_in, current_user=current_user)
 
 @app.route('/artist/<unique_name>')
 def artistpage(unique_name):
@@ -322,6 +338,9 @@ def artistpage(unique_name):
 
 @app.route('/admin/add/image', methods=['POST', 'GET'])
 def add_image():
+    meta = Meta()
+    logged_in, loginform, current_user, site =\
+            meta.logged_in, meta.loginform, meta.user, meta.site
     form = UploadImage(request.form)
     if request.method == "POST":
         file = request.files['image']
@@ -337,7 +356,8 @@ def add_image():
                 return redirect(url_for('imagepage', title=photo.title))
             except:
                 return "Error of some sort"
-    return render_template('add_image.html', form=form)
+    return render_template('add_image.html', form=form, loginform=loginform,\
+            logged_in=logged_in, current_user=current_user)
 
 if __name__ == "__main__":
     app.debug = True
