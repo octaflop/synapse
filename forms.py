@@ -1,6 +1,7 @@
 from flaskext.wtf import Form, BooleanField, TextField, validators, PasswordField, FileField, TextAreaField
 
-## be careful of a circular import here
+## still not working
+# be careful of a circular import here
 from form_helper import TagListField
 
 class RegistrationForm(Form):
@@ -17,7 +18,7 @@ class GenericFormAbstract(Form):
     title = TextField('Entitle your work', [validators.required(),\
         validators.length(min=3, max=50)])
     author = TextField('Author')
-    taglist = TagListField()
+##    taglist = TagListField('Enter some tags, separated with a comma.')
 
 class TextPostForm(GenericFormAbstract):
     content = TextAreaField('Make your mark')
