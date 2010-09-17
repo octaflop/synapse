@@ -73,13 +73,20 @@ def index():
 
 # GETTERS
 @app.route('/profile/<username>')
-def profile(username):
+@app.route('/profile/id/<id>')
+def profile(username=None, id=None):
     meta = Meta()
     logged_in, loginform, current_user, site =\
             meta.logged_in, meta.loginform, meta.user, meta.site
-    try:
-        user = User.objects(username=username).get()
-    except:
+    if not (username == None and id == None):
+        try:
+            user = User.objects(username=username).get()
+        except:
+            try:
+                user = User.objects(id=id).get()
+            except:
+                return abort(404)
+    else:
         return abort(404)
     if session['username'] == user.username:
         user_is_home = True
@@ -87,7 +94,6 @@ def profile(username):
             loginform=loginform, site=site, logged_in=logged_in,
             user_is_home=user_is_home)
 
-@app.route('/profile/id/<id>')
 @template('home.html')
 def user_by_id(id):
     meta = Meta()
@@ -297,7 +303,6 @@ def post(slug):
     logged_in, loginform, current_user, site =\
             meta.logged_in, meta.loginform, meta.user, meta.site
     text_post = TextPost.objects(slug=slug).first()
-    text_post.save()
     text_post['date_created'] =\
         datetime.datetime.strftime(text_post.date_created,\
                                 "%Y-%m-%d @ %H:%M")
