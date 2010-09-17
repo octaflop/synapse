@@ -1,14 +1,19 @@
 {% extends "base.html" %}
 {% block title %}Home: {{user.username}}{% endblock %}
 {% block content %}
-{% if user.is_home %}
-    <a href="{{user.username}}/edit">edit {{ user.username }}</a><br />
-{% elif user.logged_in %}
-        <a href="{{user.username}}/message">message {{user.username}}</a><br />
-{% else %}
-    <p>You are not <a href="/login">logged in</a>.
-{% endif %}
+<div class="span-17 prepend-1 colborder">
+    {% if user.is_home %}
+        <a href="{{user.username}}/edit">edit {{ user.username }}</a><br />
+    {% elif user.logged_in %}
+            <a href="{{user.username}}/message">message {{user.username}}</a><br />
+    {% else %}
+        <p>You are not <a href="/login">logged in</a>.
+    {% endif %}
+</div>
 
-This is {{user.username}}'s page!<br />
-The id of this user is: {{user.id}}
+<div class="span-5 last">
+    This is {{user.username}}'s page!<br />
+    The id of this user is: <a href="http://{{ site.domain
+        }}/profile/id/{{user.id}}">{{user.id}}</a>
+</div>
 {% endblock %}
