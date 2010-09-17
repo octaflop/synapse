@@ -34,3 +34,11 @@ class ImagePostForm(GenericFormAbstract):
 class LoginForm(Form):
     username = TextField(u'Username', [validators.required()])
     password = PasswordField(u'Password')
+
+class SitePostForm(Form):
+    title = TextField(u'Site title (the banner)', [validators.required()])
+    motto = TextField(u'Site motto (below the banner)')
+    domain = TextField(u"domain of site (leave off 'http'; eg\
+            example.com:5001)", [validators.required()])
+    logo = FileField(u'Logo upload')
+

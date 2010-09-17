@@ -55,7 +55,7 @@ class Meta:
             self.logged_in = True
         else:
             self.user = "anonymous"
-        self.site = Site.objects().first()
+        self.site = Site.objects.first()
         assert self.site is not None
 
 # HOME PAGE
@@ -220,10 +220,11 @@ def admin():
     text_post_form = TextPostForm(request.form)
     audio_post_form = AudioPostForm(request.form)
     image_post_form = ImagePostForm(request.form)
+    site_post_form = SitePostForm(request.form)
     return dict(user_form=user_form, text_post_form=text_post_form,\
             audio_post_form=audio_post_form, image_post_form=image_post_form,\
             site=site, loginform=loginform, current_user=current_user,\
-            logged_in=logged_in)
+            site_post_form=site_post_form, logged_in=logged_in)
 
 @app.route('/admin/edit/<slug>/_title', methods=['POST', 'PUT', 'GET'])
 def add_text__title(slug):
@@ -271,6 +272,36 @@ def edit_text_ajax(slug):
     return render_template("add_text_post.html", text_post=text_post,\
             loginform=loginform, site=site, current_user=current_user,\
             logged_in=logged_in)
+
+@app.route('/admin/add/site', methods=['POST'])
+def add_site():
+    form = SitePostForm(request.form)
+    if form.validate_on_submit():
+        site = Site(title=form.title.data, domain=form.domain.data)
+        site.motto = form.motto.data
+        if form.logo.file:
+            filename = secure_filename(form.logo.file.filename)
+            try:
+                form.logo.file.save(os.path.join(UPLOAD_FOLDER, filename))
+                site.logo = STATIC_PATH + filename
+            except:
+                flash("error in file %s upload" % filename)
+        prev_site = Site.objects.first()
+        if prev_site is not None:
+            prev_site.title = site.title
+            prev_site.motto = site.motto
+            prev_site.domain = site.domain
+            prev_site.logo = site.logo
+            site = prev_site
+        try:
+            site.save()
+            return redirect(url_for('admin'))
+        except:
+            flash("there was an error saving site %s" % site.title)
+            return redirect(url_for('admin'))
+    else:
+        flash("There was an error with your submission")
+        return redirect(url_for('admin'))
 
 
 @app.route('/admin/add/text', methods=['POST', 'GET'])
