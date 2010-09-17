@@ -32,4 +32,16 @@
     </dl>
   <p><input type=submit value='save' /></p>
 </form>
+
+<h3>Meta Site Stuff</h3>
+<form method="POST" action="/admin/add/site" enctype="multipart/form-data">
+    <dl>
+        {{ site_post_form.hidden_tag() }}
+        {{ render_field(site_post_form.title) }}
+        {{ render_field(site_post_form.motto) }}
+        {{ render_field(site_post_form.domain) }}
+        {{ render_field(site_post_form.logo) }}
+    </dl>
+  <p><input type=submit value='save' /></p>
+</form>
 {% endblock %}
