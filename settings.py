@@ -24,3 +24,6 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 TIME_ZONE = 'America/Vancouver' # Doesn't do anything, yet
 
+## RECAPTCHA SETTINGS
+RECAPTCHA_PUBLIC_KEY = "6Lf0JL0SAAAAAG1SCgtzqjEyFhG63Xp0FtXmoktb"
+RECAPTCHA_PRIVATE_KEY = "6Lf0JL0SAAAAAEVVxQaOrrZoZoEx8n1EaU0Ad_bQ"

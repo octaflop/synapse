@@ -39,7 +39,6 @@ app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
     '/uploads': UPLOAD_FOLDER,
     })
 
-
 def allowed_file(filename):
     return '.' in filename and \
        filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
@@ -54,7 +53,7 @@ class Meta:
             self.user = User.objects(username=self.username).first()
             self.logged_in = True
         else:
-            self.user = "anonymous"
+            self.user = None
         self.site = Site.objects.first()
         assert self.site is not None
 
@@ -63,52 +62,44 @@ class Meta:
 @template('index.html')
 def index():
     meta = Meta()
-    logged_in, loginform, user, site =\
-            meta.logged_in, meta.loginform, meta.user, meta.site
     posts = Post.objects()
     users = User.objects()
     selfurl = url_for('index')
-    return dict(loginform=loginform, current_user=user, users=users,\
-            posts=posts, site=site, selfurl=selfurl, logged_in=logged_in)
+    return dict(meta=meta, users=users, posts=posts)
+
+# FLATPAGE
+@app.route('/about')
+@template('base.html')
+def about():
+    meta = Meta()
+    flatpage = {
+            'title'     : "About",
+            'content'   : "**Synapse** is a prototype of a new blogging\
+                            platform. It is very alpha.",
+                }
+    return dict(meta=meta, flatpage=flatpage)
 
 # GETTERS
 @app.route('/profile/<username>')
 @app.route('/profile/id/<id>')
 def profile(username=None, id=None):
     meta = Meta()
-    logged_in, loginform, current_user, site =\
-            meta.logged_in, meta.loginform, meta.user, meta.site
+    user_is_home=False
     if not (username == None and id == None):
         try:
-            user = User.objects(username=username).get()
+            userpage = User.objects(username=username).get()
         except:
             try:
-                user = User.objects(id=id).get()
+                userpage = User.objects(id=id).get()
             except:
                 return abort(404)
     else:
         return abort(404)
-    if session['username'] == user.username:
-        user_is_home = True
-    return render_template("home.html", current_user=current_user,user=user,
-            loginform=loginform, site=site, logged_in=logged_in,
-            user_is_home=user_is_home)
-
-@template('home.html')
-def user_by_id(id):
-    meta = Meta()
-    logged_in, loginform, current_user, site =\
-            meta.logged_in, meta.loginform, meta.user, meta.site
-    try:
-        user = User.objects(id=id).first()
-        ret = {
-                'username': user.username,
-                'id': user.id,
-                }
-    except:
-        return abort(404)
-    return dict(user=ret, loginform=loginform, site=site,\
-            current_user=current_user)
+    if 'username' in session:
+        if session['username'] == userpage.username:
+            user_is_home = True
+    return render_template("home.html", meta=meta,\
+            userpage=userpage,user_is_home=user_is_home)
 
 # Image Getter
 @app.route('/image/<title>')
@@ -134,11 +125,9 @@ def raw_image(title):
 
 # User Functions
 @app.route('/admin/add/user', methods=['GET', 'POST'])
-#@login_required
+@login_required
 def register_user():
     meta = Meta()
-    logged_in, loginform, current_user, site =\
-            meta.logged_in, meta.loginform, meta.user, meta.site
     user_form = RegistrationForm(request.form)
     if user_form.validate_on_submit():
         user = User(username=form.username.data, email=form.email.data)
@@ -153,8 +142,7 @@ def register_user():
             flash("could not find user after adding")
             return redirect(url_for('login'))
     else:
-        return render_template('register.html', user_form=user_form,\
-                loginform=loginform, site=site, current_user=current_user)
+        return render_template('register.html', meta=meta)
 
 @app.route('/logout')
 def logout():
@@ -166,8 +154,9 @@ def logout():
     flash("logged out: %s" % user)
     return redirect(url_for('index'))
 
+@app.route('/login/<next>', methods=['GET','POST'])
 @app.route('/login', methods=['GET','POST'])
-def login():
+def login(next=None):
     meta = Meta()
     logged_in, loginform, current_user, site =\
             meta.logged_in, meta.loginform, meta.user, meta.site
@@ -211,22 +200,21 @@ def single_text_post(year, month, day, slug):
     return dict(text_post=ret)
 
 @app.route('/admin')
+@login_required
 @template('admin/admin.html')
 def admin():
     meta = Meta()
-    logged_in, loginform, current_user, site =\
-            meta.logged_in, meta.loginform, meta.user, meta.site
     user_form = RegistrationForm(request.form)
     text_post_form = TextPostForm(request.form)
     audio_post_form = AudioPostForm(request.form)
     image_post_form = ImagePostForm(request.form)
     site_post_form = SitePostForm(request.form)
-    return dict(user_form=user_form, text_post_form=text_post_form,\
+    return dict(meta=meta,user_form=user_form, text_post_form=text_post_form,\
             audio_post_form=audio_post_form, image_post_form=image_post_form,\
-            site=site, loginform=loginform, current_user=current_user,\
-            site_post_form=site_post_form, logged_in=logged_in)
+            site_post_form=site_post_form)
 
 @app.route('/admin/edit/<slug>/_title', methods=['POST', 'PUT', 'GET'])
+@login_required
 def add_text__title(slug):
     """Ajax event to title"""
     try:
@@ -243,6 +231,7 @@ def add_text__title(slug):
         return str(text_post.title)
 
 @app.route('/admin/edit/<slug>/_content', methods=['POST', 'PUT', 'GET'])
+@login_required
 def add_text__content(slug):
     """Ajax event & markdown for content"""
     try:
@@ -273,6 +262,7 @@ def edit_text_ajax(slug):
             loginform=loginform, site=site, current_user=current_user,\
             logged_in=logged_in)
 
+@login_required
 @app.route('/admin/add/site', methods=['POST'])
 def add_site():
     form = SitePostForm(request.form)
@@ -305,6 +295,7 @@ def add_site():
 
 
 @app.route('/admin/add/text', methods=['POST', 'GET'])
+@login_required
 def add_text_post():
     meta = Meta()
     logged_in, loginform, current_user, site =\
