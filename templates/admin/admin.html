@@ -2,46 +2,53 @@
 {% from "_formhelpers.html" import render_field %}
 {% block title %}ADMIN{% endblock %}
 {% block content %}
-<script type="text/javascript">
-	$(document).ready( function () {
-		$(button).button();
-	});
-</script>
 <h1>Administration Panel</h1>
+<div class="accordion span-18 colborder">
+    <h3><a href='#'>Add Text Entry</a></h3>
+    <div>
+    <form method="POST" action="/admin/add/text">
+        <dl>
+            {{ text_post_form.hidden_tag() }}
+            {{ render_field(text_post_form.title) }}
+            {{ render_field(text_post_form.author) }}
+            {{ render_field(text_post_form.content) }}
+        </dl>
+      <p><input type=submit value='save' /></p>
+    </form>
+    </div>
+    <h3><a href="#">Add a user (for admin purposes)</a></h3>
+    <div>
+    <form method="POST" action="/admin/add/user">
+        <dl>
+        {{ user_form.hidden_tag() }}
+        {{ render_field(user_form.username) }}
+        {{ render_field(user_form.email) }}
+        {{ render_field(user_form.password) }}
+        {{ render_field(user_form.confirm) }}
+        {{ render_field(user_form.accept_tos) }}
+        </dl>
+      <p><input type='submit' value='Add User' /></p>
+    </form>
+    </div>
 
-<h3>Add a user (for admin purposes)</h3>
-<form method="POST" action="/admin/add/user">
-    <dl>
-    {{ user_form.hidden_tag() }}
-    {{ render_field(user_form.username) }}
-    {{ render_field(user_form.email) }}
-    {{ render_field(user_form.password) }}
-    {{ render_field(user_form.confirm) }}
-    {{ render_field(user_form.accept_tos) }}
-    </dl>
-  <p><input type='submit' value='Add User' /></p>
-</form>
-
-<h3>Add Text Entry</h3>
-<form method="POST" action="/admin/add/text">
-    <dl>
-        {{ text_post_form.hidden_tag() }}
-        {{ render_field(text_post_form.title) }}
-        {{ render_field(text_post_form.author) }}
-        {{ render_field(text_post_form.content) }}
-    </dl>
-  <p><input type=submit value='save' /></p>
-</form>
-
-<h3>Meta Site Stuff</h3>
-<form method="POST" action="/admin/add/site" enctype="multipart/form-data">
-    <dl>
-        {{ site_post_form.hidden_tag() }}
-        {{ render_field(site_post_form.title) }}
-        {{ render_field(site_post_form.motto) }}
-        {{ render_field(site_post_form.domain) }}
-        {{ render_field(site_post_form.logo) }}
-    </dl>
-  <p><input type=submit value='save' /></p>
-</form>
+    <h3><a href="#">Meta Site Stuff</a></h3>
+    <div>
+    <form method="POST" action="/admin/add/site" enctype="multipart/form-data">
+        <dl>
+            {{ site_post_form.hidden_tag() }}
+            {{ render_field(site_post_form.title) }}
+            {{ render_field(site_post_form.motto) }}
+            {{ render_field(site_post_form.domain) }}
+            {{ render_field(site_post_form.logo) }}
+        </dl>
+      <p><input type=submit value='save' /></p>
+    </form>
+    </div>
+</div>
+<div class="span-5 last">
+    <div class="accordion photoacc">
+        <h3><a>Add a photo</a></h3>
+        <p>(This is where the photo addition could go).</p>
+    </div>
+</div>
 {% endblock %}

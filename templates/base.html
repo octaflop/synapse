@@ -4,7 +4,7 @@
 <html lang="en">
 <head>
 	{% block head %}
-	<title>{% block title %}{{ site.title }}{% endblock %}</title>
+	<title>{% block title %}{{ meta.site.title }}{% endblock %}</title>
         <!-- JavaScript -->
 	<!--<script type="text/javascript" src="/static/js/jquery.js"></script>-->
 	<script type="text/javascript" src="/static/js/jquery-1.4.2.min.js"></script>
@@ -27,6 +27,7 @@
 	<![endif]-->
     <script type='text/javascript'>
             $(document).ready(function () {
+                $(".accordion").accordion();
 		$(".login_button").button({
 			icons: {
 				primary: 'ui-icon-locked',
@@ -58,6 +59,9 @@
 			}
             	);
 	});
+</script>
+
+
         </script>
 	{% endblock %}
 </head>
@@ -74,38 +78,38 @@
             <div class="span-18 colborder" id="header">
                 {% block header %}
                 <div class="site-banner span-11 prepend-1">
-                    <h1><a href="http://{{ site.domain }}" title="home">{{ site.title }}</a></h1>
-                    {% if site.motto %}
+                    <h1><a href="http://{{ meta.site.domain }}" title="home">{{ meta.site.title }}</a></h1>
+                    {% if meta.site.motto %}
                     <h4>
-                        {{ site.motto }}
+                        {{ meta.site.motto }}
                     </h4>
                     {% endif %}
                 </div>
                 <div class="span-5 site-logo last">
-                    <img src="{{ site.logo }}" />
+                    <img src="{{ meta.site.logo }}" />
                 </div>
                 <div class="menu span-18 colborder last">
                     <ul>
-			    <li><a href="http://{{ site.domain }}/">home</a></li>
-			    <li><a href="http://{{site.domain}}/about">about</a></li>
-			    {% if logged_in %}
-			    <li><a href="http://{{site.domain}}/admin">admin</a></li>
+			    <li><a href="http://{{ meta.site.domain }}/">home</a></li>
+			    <li><a href="http://{{meta.site.domain}}/about">about</a></li>
+			    {% if meta.logged_in %}
+			    <li><a href="http://{{meta.site.domain}}/admin">admin</a></li>
 			    {% endif %}
                     </ul>
                 </div>
                 {% endblock %}
             </div>
         <div id="userbox" class="span-4 last">
-            {% if logged_in %}
-            <p id="userbox">Howdy, <a href="/profile/{{ current_user.username }}">{{
-                current_user.username}}</a><br /><a class="login_button" href="/logout">logout</a></p>
+            {% if meta.logged_in %}
+            <p id="userbox">Howdy, <a href="/profile/{{ meta.user.username }}">{{
+                meta.user.username}}</a><br /><a class="login_button" href="/logout">logout</a></p>
             {% else %}
             <p><button href="#login" class="login_button" id="login_show">login</button></p>
             <fieldset id="login_hidden" style="display: none">
                 <form action="/login" method="POST">
-                    {{ loginform.hidden_tag() }}
-                    {{ loginform.username.label }} {{ loginform.username(size=20) }}<br />
-                    {{ loginform.password.label }} {{ loginform.password(size=20) }}
+                    {{ meta.loginform.hidden_tag() }}
+                    {{ meta.loginform.username.label }} {{ meta.loginform.username(size=20) }}<br />
+                    {{ meta.loginform.password.label }} {{ meta.loginform.password(size=20) }}
                     <button class="unlock" type='submit'>unlock</button>
                 </form>
             </fieldset>
@@ -113,6 +117,10 @@
         </div>
     </div>
     {% block content %}
+    {% if flatpage %}
+    <h1>{{ flatpage.title }}</h1>
+            {{ flatpage.content|markdown }}
+    {% endif %}
     {% endblock %}
     <div class="span-24" id="footer">
     {% block footer %}
