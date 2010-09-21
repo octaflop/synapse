@@ -15,7 +15,7 @@ class Site(Document):
     logo = StringField()
 
 class User(Document, object):
-    email = StringField(required=True)##, regex=EMAILREG)
+    email = StringField(required=True)#, regex=EMAILREG)
     username = StringField(required=True, unique=True)
     first_name = StringField(max_length=50)
     last_name = StringField(max_length=50)
@@ -34,9 +34,16 @@ class Post(Document, object):
     tags = ListField(StringField(max_length=45))
     date_created = DateTimeField()
 
+    meta = {
+            'ordering': ['-published_date']
+            }
+
 class TextPost(Post):
     content = StringField()
     html_content = StringField()
+
+class FlatPage(TextPost):
+    pass
 
 class ImagePost(Post):
     image_path = StringField()

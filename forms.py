@@ -29,7 +29,7 @@ class AudioPostForm(TextPostForm):
 
 class ImagePostForm(GenericFormAbstract):
     image = FileField(u'Image upload', [validators.required()])
-    description = TextAreaField(u"English")
+    description = TextAreaField(u"Image description")
 
 class LoginForm(Form):
     username = TextField(u'Username', [validators.required()])
