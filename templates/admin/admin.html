@@ -13,7 +13,7 @@
             {{ render_field(text_post_form.author) }}
             {{ render_field(text_post_form.content) }}
         </dl>
-      <p><input type=submit value='save' /></p>
+      <p><input class='submit_button' type='submit' value='save' /></p>
     </form>
     </div>
     <h3><a href="#">Add a user (for admin purposes)</a></h3>
@@ -27,7 +27,7 @@
         {{ render_field(user_form.confirm) }}
         {{ render_field(user_form.accept_tos) }}
         </dl>
-      <p><input type='submit' value='Add User' /></p>
+      <p><input class='submit_button' type='submit' value='Add User' /></p>
     </form>
     </div>
 
@@ -41,14 +41,24 @@
             {{ render_field(site_post_form.domain) }}
             {{ render_field(site_post_form.logo) }}
         </dl>
-      <p><input type=submit value='save' /></p>
+      <p><input class='submit_button' type='submit' value='save' /></p>
     </form>
     </div>
 </div>
 <div class="span-5 last">
-    <div class="accordion photoacc">
-        <h3><a>Add a photo</a></h3>
-        <p>(This is where the photo addition could go).</p>
+    <div class="accordion imageacc">
+        <h3><a>Add an image</a></h3>
+        <form action='/admin/add/image' method='POST'
+            enctype='multipart/form-data'>
+            <dl>
+            {{ image_post_form.hidden_tag() }}
+            {{ render_field(image_post_form.title) }}
+            {{ render_field(image_post_form.author) }}
+            {{ render_field(image_post_form.image) }}
+            {{ render_field(image_post_form.description) }}
+            </dl>
+      <p><input class='submit_button' type='submit' value='save' /></p>
+    </form>
     </div>
 </div>
 {% endblock %}

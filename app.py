@@ -29,7 +29,7 @@ import hashlib
 import datetime
 from decorators import template, login_required
 from werkzeug import SharedDataMiddleware, secure_filename
-from models import Site, User, Post, TextPost, AudioPost, ImagePost
+from models import Site, User, Post, TextPost, AudioPost, ImagePost, FlatPage
 import os
 
 app = Flask(__name__)
@@ -72,11 +72,13 @@ def index():
 @template('base.html')
 def about():
     meta = Meta()
-    flatpage = {
-            'title'     : "About",
-            'content'   : "**Synapse** is a prototype of a new blogging\
-                            platform. It is very alpha.",
-                }
+    flatpage = FlatPage.objects.first()
+    if flatpage == None:
+        flatpage = {
+                'title'     : "About",
+                'content'   : "**Synapse** is a prototype of a new blogging\
+                                platform. It is very alpha.",
+                    }
     return dict(meta=meta, flatpage=flatpage)
 
 # GETTERS
@@ -130,19 +132,20 @@ def register_user():
     meta = Meta()
     user_form = RegistrationForm(request.form)
     if user_form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data)
-        password = form.password.data
-        user.hashedpassword = hash_it(form.username.data, form.password.data)
+        user = User(username=user_form.username.data, email=user_form.email.data)
+        password = user_form.password.data
+        user.hashedpassword = hash_it(user_form.username.data, password)
         try:
             user.save()
-            session['username'] = user.username
+            if not 'username' in session:
+                session['username'] = user.username
             flash("user: %s was added successfully" % user.username)
             return redirect(url_for('profile', username=user.username))
         except:
             flash("could not find user after adding")
             return redirect(url_for('login'))
     else:
-        return render_template('register.html', meta=meta)
+        return render_template('register.html', meta=meta, user_form=user_form)
 
 @app.route('/logout')
 def logout():
@@ -158,8 +161,6 @@ def logout():
 @app.route('/login', methods=['GET','POST'])
 def login(next=None):
     meta = Meta()
-    logged_in, loginform, current_user, site =\
-            meta.logged_in, meta.loginform, meta.user, meta.site
     form = LoginForm(request.form)
     if form.validate_on_submit():
         username = form.username.data
@@ -179,8 +180,7 @@ def login(next=None):
             return redirect(url_for('profile', username=user.username))
         else:
             abort(500)
-    return render_template('login.html', form=form, loginform=form, site=site,\
-            current_user=current_user)
+    return render_template('login.html', meta=meta, form=form)
 
 #TODO
 """
@@ -322,15 +322,11 @@ def add_text_post():
 @app.route('/post/<slug>')
 def post(slug):
     meta = Meta()
-    logged_in, loginform, current_user, site =\
-            meta.logged_in, meta.loginform, meta.user, meta.site
     text_post = TextPost.objects(slug=slug).first()
     text_post['date_created'] =\
         datetime.datetime.strftime(text_post.date_created,\
                                 "%Y-%m-%d @ %H:%M")
-    return render_template('text_post.html', text_post=text_post,\
-            loginform=loginform, site=site, current_user=current_user,\
-            logged_in=logged_in)
+    return render_template('text_post.html', meta=meta, text_post=text_post)
 
 @app.route('/admin/add/artist', methods=['POST', 'GET'])
 def add_artist():
