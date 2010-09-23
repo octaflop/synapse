@@ -29,7 +29,7 @@ import hashlib
 import datetime
 from decorators import template, login_required
 from werkzeug import SharedDataMiddleware, secure_filename
-from models import Site, User, Post, TextPost, AudioPost, ImagePost, FlatPage
+from models import Site, User, Post, TextPost, Media, FlatPage
 import os
 
 app = Flask(__name__)
@@ -328,44 +328,18 @@ def post(slug):
                                 "%Y-%m-%d @ %H:%M")
     return render_template('text_post.html', meta=meta, text_post=text_post)
 
-@app.route('/admin/add/artist', methods=['POST', 'GET'])
-def add_artist():
-    meta = Meta()
-    logged_in, loginform, current_user, site =\
-            meta.logged_in, meta.loginform, meta.user, meta.site
-    form = ArtistForm(request.form)
-    if form.validate_on_submit():
-        artist = Artist(unique_name=form.unique_name.data)
-        artist.unique_name = form.unique_name.data
-        artist.first_name = form.first_name.data
-        artist.last_name = form.last_name.data
-        artist.bio_en = form.bio_en.data
-        artist.bio_fr = form.bio_fr.data
-        if artist.save():
-            flash("%s was saved successfully to id: %s" % (artist.unique_name,\
-                artist.id))
-            return redirect(url_for('artistpage', unique_name=artist.unique_name))
-        else:
-            flash("username not unique")
-            return redirect(url_for('add_artist'))
-    return render_template('add_artist.html', form=form, loginform=loginform,\
-            logged_in=logged_in, current_user=current_user)
-
-@app.route('/artist/<unique_name>')
-def artistpage(unique_name):
-    try:
-        artist = Artist.objects(unique_name=unique_name).first()
-    except:
-        return abort(404)
-    return "first name: %s" % artist.first_name
-
 @app.route('/admin/add/image', methods=['POST', 'GET'])
 def add_image():
     meta = Meta()
-    logged_in, loginform, current_user, site =\
-            meta.logged_in, meta.loginform, meta.user, meta.site
     form = UploadImage(request.form)
-    if request.method == "POST":
+    if form.validate_on_submit():
+        if form.logo.file:
+            filename = secure_filename(form.image.file.filename)
+            try:
+                form.image.file.save(os.path.join(UPLOAD_FOLDER, filename))
+                site.logo = STATIC_PATH + filename
+            except:
+                flash("error in file %s upload" % filename)
         file = request.files['image']
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
@@ -379,8 +353,7 @@ def add_image():
                 return redirect(url_for('imagepage', title=photo.title))
             except:
                 return "Error of some sort"
-    return render_template('add_image.html', form=form, loginform=loginform,\
-            logged_in=logged_in, current_user=current_user)
+    return render_template('add_image.html', meta=meta, form=form)
 
 if __name__ == "__main__":
     app.debug = True
