@@ -19,6 +19,10 @@ SALT = 'vba937ei38mq2'
 UPLOAD_FOLDER = '%s/static/uploads/' % os.getcwd()
 STATIC_PATH = '/static/uploads/'
 USER = None
+## Flask-upload manager SETTINGS
+UPLOADS_DEFAULT_DEST = '/static/%s/media' % os.getcwd()
+UPLOADS_DEFAULT_URL = '/static/media'
+
 #ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
@@ -27,3 +31,4 @@ TIME_ZONE = 'America/Vancouver' # Doesn't do anything, yet
 ## RECAPTCHA SETTINGS
 RECAPTCHA_PUBLIC_KEY = "6Lf0JL0SAAAAAG1SCgtzqjEyFhG63Xp0FtXmoktb"
 RECAPTCHA_PRIVATE_KEY = "6Lf0JL0SAAAAAEVVxQaOrrZoZoEx8n1EaU0Ad_bQ"
+

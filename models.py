@@ -27,13 +27,20 @@ class Comment(EmbeddedDocument):
     name = StringField(max_length=120)
     date_created = DateTimeField()
 
+class Media(EmbeddedDocument):
+    title = StringField(required=True)
+    filename = StringField(required=True)
+    slug = StringField(required=True)
+    date_created = DateTimeField(required=True)
+    author = ReferenceField(User)
+    description = StringField()
+
 class Post(Document, object):
     title = StringField(max_length=120)
     author = ReferenceField(User)
     slug = StringField(required=True, unique=True)
     tags = ListField(StringField(max_length=45))
     date_created = DateTimeField()
-
     meta = {
             'ordering': ['-published_date']
             }
@@ -41,13 +48,8 @@ class Post(Document, object):
 class TextPost(Post):
     content = StringField()
     html_content = StringField()
+    media = ListField(EmbeddedDocumentField(Media))
 
 class FlatPage(TextPost):
     pass
-
-class ImagePost(Post):
-    image_path = StringField()
-
-class AudioPost(Post):
-    audio_path = StringField()
 
