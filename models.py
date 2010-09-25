@@ -53,3 +53,9 @@ class TextPost(Post):
 class FlatPage(TextPost):
     pass
 
+class Dependency(Document):
+    title = StringField(required=True)
+    url = StringField(required=True)
+    authors = ListField(StringField())
+    imgurl = StringField()
+

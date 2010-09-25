@@ -42,3 +42,8 @@ class SitePostForm(Form):
             example.com:5001)", [validators.required()])
     logo = FileField(u'Logo upload')
 
+class DepPostForm(Form):
+    title = TextField(u'Software title', [validators.required()])
+    url = TextField(u"url of dependency", [validators.required()])
+    imgurl = TextField(u"url of dependency logo")
+    authors = TagListField(u"Author names, separated with a comma")
