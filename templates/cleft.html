@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}About Synapse{% endblock %}
+{% block content %}
+<div class="span-24 push-2 last">
+    <h2>{{ title }}</h2>
+
+<h2>Thanks</h2>
+This software could not have been possible without the work of the following
+free software projects:
+{% for dep in dependencies %}
+<div class="span-18">
+    <h4><a href="{{ dep.url }}">{{ dep.title }}</a></h4>
+    <p>by:<b>{% for author in dep.authors %}{{ author }}, {% endfor %}</b></p>
+</div>
+<div class="span-4 last">
+    <a href="{{ dep.url }}"><img src="{{ dep.imgurl }}" /></a>
+</div>
+{% endfor %}
+<hr />
+<h2>Intellectual Property Stuff</h2>
+{{ copyrightinfo|safe }}
+
+<div>
+{% endblock %}
