@@ -29,8 +29,11 @@ import hashlib
 import datetime
 from decorators import template, login_required
 from werkzeug import SharedDataMiddleware, secure_filename
-from models import Site, User, Post, TextPost, Media, FlatPage
+from models import Site, User, Post, TextPost, Media, FlatPage,\
+        Dependency
 import os
+
+from markdown2 import markdown as markdown
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
@@ -56,6 +59,15 @@ class Meta:
             self.user = None
         self.site = Site.objects.first()
         assert self.site is not None
+        ## this should probably be somewhere else (in the model?)
+        self.copyrightinfo = u"""
+<a rel="license"
+href="http://creativecommons.org/licenses/by-sa/2.5/ca/"><img
+alt="Creative Commons License" style="border-width:0"
+src="http://i.creativecommons.org/l/by-sa/2.5/ca/88x31.png" /></a><br
+/>Content is released under a
+[Creative Commons Attribution-ShareAlike 2.5 Canada License](http://creativecommons.org/licenses/by-sa/2.5/ca/)
+        """
 
 # HOME PAGE
 @app.route('/')
@@ -72,14 +84,30 @@ def index():
 @template('base.html')
 def about():
     meta = Meta()
-    flatpage = FlatPage.objects.first()
-    if flatpage == None:
-        flatpage = {
-                'title'     : "About",
-                'content'   : "**Synapse** is a prototype of a new blogging\
-                                platform. It is very alpha.",
-                    }
+    try:
+        flatpage = FlatPage.objects(title='About').get()
+    except:
+        content = u"**Synapse** is a prototype of a new blogging\
+                    platform. It is very alpha."
+        newflatpage = FlatPage(title='About', content=content)
+        try:
+            newflatpage.save()
+            flatpage = newflatpage
+        except:
+            return error(500)
     return dict(meta=meta, flatpage=flatpage)
+
+# Meta-flatpage
+# Includes credits
+@app.route('/cleft')
+@template('cleft.html')
+def cleft():
+    meta = Meta()
+    flatpage = FlatPage.objects
+    dependencies = Dependency.objects()
+    copyrightinfo = markdown(meta.copyrightinfo)
+    return dict(meta=meta, flatpage=flatpage, dependencies=dependencies,\
+            copyrightinfo=copyrightinfo)
 
 # GETTERS
 @app.route('/profile/<username>')
@@ -354,6 +382,36 @@ def add_image():
             except:
                 return "Error of some sort"
     return render_template('add_image.html', meta=meta, form=form)
+
+# helper functions
+
+# fill the initial database
+def init_db():
+    depends = [
+            {   'title' : u'Flask',
+                'url'   : u'http://flask.pocoo.org/',
+                'imgurl': u'http://flask.pocoo.org/static/logo.png',
+                'authors': ['Armin Ronacher'],
+                },
+            {   'title' : u'jQuery',
+                'url'   : u'http://jquery.com/',
+                'imgurl':
+                u'http://static.jquery.com/files/rocker/images/logo_jquery_215x53.gif',
+                'authors': ['John Resig'],
+                },
+            ]
+    for dep in depends:
+        dependency =\
+        Dependency(title=dep['title'],authors=dep['authors'],url=dep['url'],\
+            imgurl=dep['imgurl'])
+        try:
+            dependency.save()
+        except:
+            flash("problem")
+
+# import database fixtures TK
+
+# reset the database
 
 if __name__ == "__main__":
     app.debug = True
