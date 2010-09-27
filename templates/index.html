@@ -4,9 +4,13 @@
        <div class='prepend-1 posts span-17 colborder'>
                 {% for post in posts %}
                 <div class="post_text span-10 colborder">
-                    id:{{ post.id }}<br />
-                    <h1><a href="/post/{{ post.slug }}">{{ post.title }}</a></h1><p>{{ post.date_created }}</p>
-                    {{ post.html_content|safe }}
+                    <h1><a href="/post/{{ post.slug }}">{{ post.title
+                            }}</a></h1><p><b>{{ post.date_created }}</b></p>
+                    <div class="content">
+                    {{ post.html_content|safe }}<a href="/post/{{ post.slug
+                        }}" title="read more">...</a>
+                    </div>
+                    id:{{ post.id }}
                 </div>
                 <div class="post_img span-3 last">
                     <img src="{# post.image.path #}" alt={# post.image.alt #} />
