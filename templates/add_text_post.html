@@ -34,14 +34,12 @@ $(document).ready(function() {
 //!>
 </script>
 <div class="span-18 colborder">
-    title: <h2 name="title" class="title">{{ text_post.title|escape }}<span class="ui-icon ui-icon-pencil editable"></span></h2>
-    content:
     <div class="span-16 prepend-1 append-2 last">
-        <div name="content" class="autogrow">{{ text_post.content|markdown
+        <h2 name="title" class="title">{{ text_post.title|escape }}<span class="ui-icon ui-icon-pencil editable"></span></h2>
+        {{ text_post.date_created|escape }}
+        <div name="content" class="autogrow">{{
+            text_post.html_content|safe
             }}<span class="ui-icon ui-icon-pencil editable"></span></div>
         </div>
 </div>
-{% endblock %}
-{% block footer %}
-
 {% endblock %}

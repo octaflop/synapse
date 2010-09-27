@@ -3,9 +3,11 @@
 {% block content %}
 <div class="span-18 colborder">
     <div class="span-16 prepend-1 append-2 last">
-        title: <h2>{{ text_post.title }}</h2>
-        date: {{ text_post.date_created }}
-        content: {{ text_post.content|markdown }}
+        <h2>{{ text_post.title|escape }}</h2>
+        {{ text_post.date_created|escape }}
+        <div name="content">
+            {{ text_post.html_content|safe }}
+        </div>
     </div>
 </div>
 <div class="span-4 last">

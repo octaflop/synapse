@@ -124,7 +124,7 @@
     {% block content %}
     {% if flatpage %}
     <h1>{{ flatpage.title }}</h1>
-            {{ flatpage.content|markdown }}
+            {{ flatpage.html_content|safe }}
     {% endif %}
     {% endblock %}
     <div class="span-24" id="footer">
