@@ -41,6 +41,7 @@ class Post(Document, object):
     slug = StringField(required=True, unique=True)
     tags = ListField(StringField(max_length=45))
     date_created = DateTimeField()
+    rss = StringField()
     meta = {
             'ordering': ['-published_date']
             }

@@ -19,21 +19,33 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301
 # USA
 
+# external deps
 from flask import Flask, url_for, flash, escape, request, redirect,\
     render_template, session, abort, jsonify
-from flaskext.markdown import Markdown
+from werkzeug import SharedDataMiddleware, secure_filename
+import hashlib
+import datetime
+import os
+from markdown import markdown as markdown
+from PIL import Image
+## from flaskext.markdown import Markdown # because I want an ajax loader...
+
+# internal deps
 from settings import *
 from forms import *
 from strings import *
-import hashlib
-import datetime
 from decorators import template, login_required
-from werkzeug import SharedDataMiddleware, secure_filename
 from models import Site, User, Post, TextPost, Media, FlatPage,\
         Dependency
-import os
 
-from markdown2 import markdown as markdown
+# markdown extensions
+extensions = ['footnotes', 'fenced_code']
+
+def buildrss(text, url, creator, title):
+    # returns rss xhtml
+    extensions.append = "rss(URL=%s,CREATOR=%s,TITLE=%s)" % \
+            (url, creator, title)
+    return markdown(text, extensions)
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
@@ -253,7 +265,6 @@ def add_text__title(slug):
         title = request.values.get('title', type=str)
         text_post.title = title
         text_post.save()
-        #return jsonify(text_post.title)
         return text_post.title
     elif request.method == "GET":
         return str(text_post.title)
@@ -263,14 +274,14 @@ def add_text__title(slug):
 def add_text__content(slug):
     """Ajax event & markdown for content"""
     try:
-        text_post = TextPost.objects(slug=slug).first()
+        text_post = TextPost.objects(slug=slug).get()
     except:
         return error(404)
     if request.method == "PUT" or request.method == 'POST':
-        content = request.values.get('content', type=str)
-        text_post.content = content
+        text_post.content = request.values.get('content', type=str)
+        text_post.html_content = markdown(text_post.content, extensions)
         text_post.save()
-        return text_post.content
+        return text_post.html_content
     elif request.method == "GET":
         try:
             return text_post.content
@@ -286,7 +297,8 @@ def edit_text_ajax(slug):
         text_post = TextPost.objects(slug=slug).first()
     except:
         return error(404)
-    return render_template("add_text_post.html", text_post=text_post,\
+    return render_template("add_text_post.html", meta=meta,\
+            text_post=text_post,\
             loginform=loginform, site=site, current_user=current_user,\
             logged_in=logged_in)
 
@@ -334,6 +346,7 @@ def add_text_post():
         text_post.date_created = datetime.datetime.now()
         text_post.title = escape(form.title.data)
         text_post.content = escape(form.content.data)
+        text_post.html_content = markdown(text_post.content, extensions)
         try:
             text_post.save()
             flash("%s was successfully saved as id %s" % (text_post.title,\
@@ -341,9 +354,9 @@ def add_text_post():
             return redirect(url_for('text_post', slug=text_post.slug))
         except:
             flash("DBG: slug not unique")
-            return redirect(url_for('add_text_post', form=form, site=site,\
+            return redirect(url_for('add_text_post', meta=meta, form=form, site=site,\
                     loginform=loginform))
-    return render_template('admin/admin_entry.html', form=form, site=site,\
+    return render_template('admin/admin_entry.html', meta=meta, form=form, site=site,\
             loginform=loginform, current_user=current_user,\
             logged_in=logged_in)
 
@@ -387,6 +400,21 @@ def add_image():
 
 # fill the initial database
 def init_db():
+    sites = Site.objects()
+    sites.delete()
+    # Should probably add something for setting up the site
+    title = raw_input("What are you naming this site?\n")
+    domain = raw_input("What is the site's domain?\n")
+    motto = raw_input("What is the site's motto? (optional)\n")
+    logo = raw_input("What is the relative path to the logo?\n \
+            ex: '/static/uploads/brainBadge.png' \n")
+
+    site = Site(title=title, motto=motto, domain=domain, logo=logo)
+    try:
+        site.save()
+    except:
+        print "Sorry, something went wrong..."
+        init_db()
     depends = [
             {   'title' : u'Flask',
                 'url'   : u'http://flask.pocoo.org/',
@@ -415,6 +443,5 @@ def init_db():
 
 if __name__ == "__main__":
     app.debug = True
-    Markdown(app)
     app.run(host="0.0.0.0", port=5002)
 
