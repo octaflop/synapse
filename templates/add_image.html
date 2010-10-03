@@ -1,0 +1,11 @@
+<!doctype html>
+{% from "_formhelpers.html" import render_field %}
+<title>Upload new photo</title>
+<h1>Upload new photo</h1>
+<form action="/admin/add/image" method='POST' enctype='multipart/form-data'>
+    {{ form.hidden_tag() }}
+    {{ render_field(form.title) }}
+    {{ render_field(form.description) }}
+    <p><input type=submit value='Upload Image' /></p>
+</form>
+

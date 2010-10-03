@@ -7,6 +7,7 @@ from models import TextPost
 import datetime
 import hashlib
 import random
+import uuid
 
 def slugfy(text, separator='-'):
   ret = ""
@@ -19,6 +20,9 @@ def slugfy(text, separator='-'):
   ret = re.sub("\W", " ", ret)
   ret = re.sub(" +", separator, ret)
   return ret.strip()
+
+def slugidfy():
+    return unicode(uuid.uuid1())[:8]
 
 def stamp_time():
     """Format a timestamp for display."""
