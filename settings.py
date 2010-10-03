@@ -4,11 +4,11 @@ from forms import LoginForm
 
 """
 NOTE
-For full settings ups: be sure to set up the "site" document.
+For full settings ups: be sure to set up the "site" document along with
+ininitialing the database with the init_db() command:
 
-    >>>> from models import Site
-    >>>> site = Site(title=u'<site title>', motto=u'<site motto>', logo=u'<logo>',\
-    >>>> domain=u'<site domain>')
+    >>>> from app import init_db()
+    >>>> init_db()
 """
 
 #from passwd import *

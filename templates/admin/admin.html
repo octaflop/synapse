@@ -15,6 +15,29 @@
         </dl>
       <p><input class='submit_button' type='submit' value='save' /></p>
     </form>
+        <div span-17 colborder><!-- dynamic image addition -->
+            <script type='text/javascript' charset="utf-8">
+                $(document).ready(function () {
+                    $(".add_image").button();
+                    $(".add_image").click(function () {
+                        $.get("{{ meta.site.domain }}/{{ url_for('add_image') }}", 
+                            function (data) {
+                                $(".image_form").html(data);
+                                $(".image_form").append(
+                                    "<a class='add_image'>add another</a>"
+                                );
+                            });
+                        });
+                    $(".post_image").button();
+                    $(".post_image").click(function () {
+                        $(this).post("{{ meta.site.domain }}/{{ url_for('add_image') }}");
+                    });
+                }); 
+            </script>
+            <a class='add_image'>Add new image</a>
+            <div class='image_form'>
+            </div>
+        </div>
     </div>
     <h3><a href="#">Add a user (for admin purposes)</a></h3>
     <div>
