@@ -6,7 +6,7 @@
 // <![CDATA[
 $(document).ready(function() {
         $(".title").editable("http://{{ site.domain }}/admin/edit/{{
-            text_post.slug|escape }}/_title",
+            text_post.slugid|escape }}/_title",
             {
                 submit : 'OK',
                 method : 'PUT',
@@ -14,17 +14,17 @@ $(document).ready(function() {
                 indicator : '<img src="/static/img/ajax-loader.gif">',
                 tooltip : 'click to edit',
                 loadurl : 'http://{{ site.domain }}/admin/edit/{{
-                text_post.slug|escape }}/_title',
+                text_post.slugid|escape }}/_title',
                 name    : 'title',
             });
 
         $(".autogrow").editable("http://{{ site.domain }}/admin/edit/{{
-            text_post.slug|escape }}/_content", {
+            text_post.slugid|escape }}/_content", {
                 submit : 'OK',
                 method : 'PUT',
                 cancel : 'Cancel',
                 loadurl : 'http://{{ site.domain }}/admin/edit/{{
-                text_post.slug|escape
+                text_post.slugid|escape
                 }}/_content',
                 //tooltip : 'click to edit...',
                 name    : 'content',

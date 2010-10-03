@@ -72,14 +72,15 @@ class Meta:
         self.site = Site.objects.first()
         assert self.site is not None
         ## this should probably be somewhere else (in the model?)
-        self.copyrightinfo = u"""
+        self.copyrightinfo = \
+u"""
 <a rel="license"
 href="http://creativecommons.org/licenses/by-sa/2.5/ca/"><img
 alt="Creative Commons License" style="border-width:0"
 src="http://i.creativecommons.org/l/by-sa/2.5/ca/88x31.png" /></a><br
 />Content is released under a
 [Creative Commons Attribution-ShareAlike 2.5 Canada License](http://creativecommons.org/licenses/by-sa/2.5/ca/)
-        """
+"""
 
 # HOME PAGE
 @app.route('/')
@@ -229,15 +230,12 @@ perhaps make a metafile to this effect.
 or maybe put them in separate apps.
 ~foenix
 """
-@app.route('/<year>/<month>/<day>/<slug>')
+@app.route('/<year>/<month>/<day>/<slugid>/<slug>')
 @template('text_post.html')
-def single_text_post(year, month, day, slug):
-    text_post = TextPost.objects(slug=slug).first()
-    ret = {
-            'title': text_post.title,
-            'content': text_post.content,
-            }
-    return dict(text_post=ret)
+def single_text_post(year, month, day, slugid, slug=None):
+    meta = Meta()
+    text_post = TextPost.objects(slugid=slugid).get()
+    return dict(meta=meta, text_post=text_post)
 
 @app.route('/admin')
 @login_required
@@ -249,11 +247,13 @@ def admin():
     audio_post_form = AudioPostForm(request.form)
     image_post_form = ImagePostForm(request.form)
     site_post_form = SitePostForm(request.form)
-    return dict(meta=meta,user_form=user_form, text_post_form=text_post_form,\
-            audio_post_form=audio_post_form, image_post_form=image_post_form,\
+    return dict(meta=meta,user_form=user_form,\
+            text_post_form=text_post_form,\
+            audio_post_form=audio_post_form,\
+            image_post_form=image_post_form,\
             site_post_form=site_post_form)
 
-@app.route('/admin/edit/<slug>/_title', methods=['POST', 'PUT', 'GET'])
+@app.route('/admin/edit/<slugid>/_title', methods=['POST', 'PUT', 'GET'])
 @login_required
 def add_text__title(slug):
     """Ajax event to title"""
@@ -288,13 +288,11 @@ def add_text__content(slug):
         except:
             return abort(500)
 
-@app.route('/post/<slug>/edit')
-def edit_text_ajax(slug):
+@app.route('/post/<slugid>/edit')
+def edit_text_ajax(slugid):
     meta = Meta()
-    logged_in, loginform, current_user, site =\
-            meta.logged_in, meta.loginform, meta.user, meta.site
     try:
-        text_post = TextPost.objects(slug=slug).first()
+        text_post = TextPost.objects(slugid=slugid).first()
     except:
         return error(404)
     return render_template("add_text_post.html", meta=meta,\
@@ -347,11 +345,12 @@ def add_text_post():
         text_post.title = escape(form.title.data)
         text_post.content = escape(form.content.data)
         text_post.html_content = markdown(text_post.content, extensions)
+        text_post.slugid = slugidfy()
         try:
             text_post.save()
-            flash("%s was successfully saved as id %s" % (text_post.title,\
-                text_post.id))
-            return redirect(url_for('text_post', slug=text_post.slug))
+            flash("%s was successfully saved as slugid %s" % (text_post.title,\
+                text_post.slugid))
+            return redirect(url_for('text_post', slugid=text_post.slugid))
         except:
             flash("DBG: slug not unique")
             return redirect(url_for('add_text_post', meta=meta, form=form, site=site,\
@@ -372,7 +371,7 @@ def post(slug):
 @app.route('/admin/add/image', methods=['POST', 'GET'])
 def add_image():
     meta = Meta()
-    form = UploadImage(request.form)
+    form = ImagePostForm(request.form)
     if form.validate_on_submit():
         if form.logo.file:
             filename = secure_filename(form.image.file.filename)
@@ -414,7 +413,9 @@ def init_db():
         site.save()
     except:
         print "Sorry, something went wrong..."
-        init_db()
+        userreponse = raw_input("try again? [Y,n]")
+        if userresponse == 'Y' or userresponse == 'y' or userresponse == '\n':
+            init_db()
     depends = [
             {   'title' : u'Flask',
                 'url'   : u'http://flask.pocoo.org/',
@@ -437,9 +438,55 @@ def init_db():
         except:
             flash("problem")
 
-# import database fixtures TK
-
 # reset the database
+def reset_db():
+    try:
+        posts = Post.objects()
+        sites = Site.objects()
+        users = User.objects()
+        images = Image.objects()
+        deps = Dependancy.objects()
+        flatpages = FlatPage.objects()
+
+        posts.delete()
+        sites.delete()
+        users.delete()
+        deps.delete()
+        flatpages.delete()
+        return "all images, posts, sites, and users deleted successfully!"
+    except:
+        print "There was an error..."
+
+# import database fixtures
+def dev_site():
+    """
+    Deploys a "hello world" demo site with default settings
+    """
+    init_db()
+    meta = Meta()
+    # fix up a default user
+    username = u'admin'
+    password = u'password'
+    hash = hash_it(username, password)
+    email = u'admin@example.com'
+    user = User(username=u'admin', hashedpassword=hash, email=email)
+    user.first_name = u'Joe'
+    user.last_name = u'Schmoe'
+    user.save()
+
+    # fix up a hello post
+    content = u"""
+**This** is an example post for the wonderful site of %s.  
+This is a simple dev-post. Ready to be deleted at your leisure.  
+[This](http://example.com/#) is a link.  
+and  
+""" % (meta.domain)
+    html_content = markdown(content)
+    title = u"Hello, World!"
+    post = Post(title=title,content=content, html_content=html_content, author=user)
+    post.slugid = slugidfy()
+    post.slug = slugfy(title)
+    post.save()
 
 if __name__ == "__main__":
     app.debug = True

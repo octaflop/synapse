@@ -31,6 +31,7 @@ class Media(EmbeddedDocument):
     title = StringField(required=True)
     filename = StringField(required=True)
     slug = StringField(required=True)
+    slugid = StringField(required=True, unique=True, min_length=8, max_length=8)
     date_created = DateTimeField(required=True)
     author = ReferenceField(User)
     description = StringField()
@@ -38,7 +39,8 @@ class Media(EmbeddedDocument):
 class Post(Document, object):
     title = StringField(max_length=120)
     author = ReferenceField(User)
-    slug = StringField(required=True, unique=True)
+    slug = StringField(required=True)#, unique=True)
+    slugid = StringField(required=True, unique=True, min_length=8, max_length=8)
     tags = ListField(StringField(max_length=45))
     date_created = DateTimeField()
     rss = StringField()
