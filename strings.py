@@ -1,28 +1,38 @@
 # -*- encoding: utf-8 -*-
 # strings.py
 # all of the fiddly bits.
-import re
-from settings import SALT
-from models import TextPost
+from flask import url_for
+from werkzeug.routing import BuildError
+from settings import SALT, ALLOWED_EXTENSIONS
+
+from unidecode import unidecode
 import datetime
 import hashlib
 import random
 import uuid
+import re
 
-def slugfy(text, separator='-'):
-  ret = ""
-  for c in text.lower():
-    try:
-      ret += htmlentitydefs.codepoint2name[ord(c)]
-    except:
-      ret += c
-  ret = re.sub("([a-zA-Z])(uml|acute|grave|circ|tilde|cedil)", r"\1", ret)
-  ret = re.sub("\W", " ", ret)
-  ret = re.sub(" +", separator, ret)
-  return ret.strip()
+_punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
+
+def slugfy(text, delim=u'-'):
+    """Generates an ASCII-only slug."""
+    result = []
+    for word in _punct_re.split(text.lower()):
+        result.extend(unidecode(word).split())
+    return unicode(delim.join(result))
 
 def slugidfy():
     return unicode(uuid.uuid1())[:8]
+
+def permalink(function):
+    """Build a permalink decorator for models"""
+    def inner(*args, **kwargs):
+        endpoint, values = function(*args, **kwargs)
+        try:
+            return url_for(endpoint, **values)
+        except BuildError:
+            return
+    return inner
 
 def stamp_time():
     """Format a timestamp for display."""
@@ -44,3 +54,9 @@ def hash_it(username, password):
     except TypeError:
         return False
 
+def make_external(url):
+    return urljoin(request.url_root, url)
+
+def allowed_file(filename):
+    return '.' in filename and \
+            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS

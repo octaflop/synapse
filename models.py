@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
+from settings import UPLOAD_FOLDER, STATIC_PATH
 import datetime
-
+from strings import permalink
 from mongoengine import *
 connect('synapse')
 
@@ -20,21 +21,54 @@ class User(Document, object):
     first_name = StringField(max_length=50)
     last_name = StringField(max_length=50)
     hashedpassword = StringField()
-    date_created = DateTimeField()
+    # datetime
+    created = DateTimeField()
+    published = DateTimeField()
+    updated = ListField(DateTimeField())
+    meta = {
+        'ordering': ['-published']
+        }
+    @permalink
+    def permalink(self):
+        return 'profile', {'username':self.username}
 
 class Comment(EmbeddedDocument):
+    slugid = StringField(required=True, unique=True, min_length=8, max_length=8)
     content = StringField()
     name = StringField(max_length=120)
-    date_created = DateTimeField()
+    # datetime
+    created = DateTimeField()
+    published = DateTimeField()
+    updated = ListField(DateTimeField())
+    meta = {
+        'ordering': ['-published']
+        }
+    @permalink
+    def permalink(self):
+        return 'comment', {'slugid': self.slugid}
 
-class Media(EmbeddedDocument):
+#class Media(EmbeddedDocument, object):
+class Media(Document, object):
     title = StringField(required=True)
     filename = StringField(required=True)
     slug = StringField(required=True)
     slugid = StringField(required=True, unique=True, min_length=8, max_length=8)
-    date_created = DateTimeField(required=True)
     author = ReferenceField(User)
     description = StringField()
+    # datetime
+    created = DateTimeField()
+    published = DateTimeField()
+    updated = ListField(DateTimeField())
+    @permalink
+    def raw(self):
+        return STATIC_PATH, {'filename':self.filename}
+    meta = {
+        'ordering': ['-published']
+        }
+    #@permalink
+    #def permalink(self):
+    #    return 'media', {'slugid': self.slugid}
+
 
 class Post(Document, object):
     title = StringField(max_length=120)
@@ -42,19 +76,25 @@ class Post(Document, object):
     slug = StringField(required=True)#, unique=True)
     slugid = StringField(required=True, unique=True, min_length=8, max_length=8)
     tags = ListField(StringField(max_length=45))
-    date_created = DateTimeField()
     rss = StringField()
+    # datetime
+    created = DateTimeField()
+    published = DateTimeField()
+    updated = ListField(DateTimeField())
     meta = {
-            'ordering': ['-published_date']
-            }
+        'ordering': ['-published']
+        }
+    @permalink
+    def permalink(self):
+        return 'post_by_slugid', {'slugid':self.slugid}
 
 class TextPost(Post):
     content = StringField()
     html_content = StringField()
-    media = ListField(EmbeddedDocumentField(Media))
+    #media = ListField(EmbeddedDocumentField(Media))
 
 class FlatPage(TextPost):
-    pass
+    title = StringField(max_length=120, unique=True)
 
 class Dependency(Document):
     title = StringField(required=True)
