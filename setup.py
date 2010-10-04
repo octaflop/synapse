@@ -11,6 +11,7 @@ setup(
         'Flask',
         'MongoWrapper',
         'MongoEngine',
-        'Markdown'
+        'Markdown',
+        'Unidecode'
         ]
     )
