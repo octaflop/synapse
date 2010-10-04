@@ -28,7 +28,7 @@ class AudioPostForm(TextPostForm):
     audio = FileField('Audio upload', [validators.required()])
 
 class ImagePostForm(GenericFormAbstract):
-    image = FileField(u'Image upload', [validators.required()])
+    image = FileField(u'Image upload')#, [validators.required()])
     description = TextAreaField(u"Image description")
 
 class LoginForm(Form):

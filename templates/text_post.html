@@ -4,7 +4,14 @@
 <div class="span-18 colborder">
     <div class="span-16 prepend-1 append-2 last">
         <h2>{{ text_post.title|escape }}</h2>
-        {{ text_post.date_created|escape }}
+        created:{{ text_post.created|escape }}<br />
+        {% if text_post.updated %}
+        updated:
+        {% for update in text_post.updated %} 
+            {{ update|escape }}, 
+        {% endfor %}
+        <br />
+        {% endif %}
         <div name="content">
             {{ text_post.html_content|safe }}
         </div>

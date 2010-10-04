@@ -5,25 +5,25 @@
 <script type="text/javascript" charset="utf-8">
 // <![CDATA[
 $(document).ready(function() {
-        $(".title").editable("http://{{ site.domain }}/admin/edit/{{
+        $(".title").editable("http://{{ meta.site.domain }}/admin/edit/{{
             text_post.slugid|escape }}/_title",
             {
-                submit : 'OK',
+                submit : 'save',
                 method : 'PUT',
-                cancel : 'Cancel',
+                cancel : 'cancel',
                 indicator : '<img src="/static/img/ajax-loader.gif">',
                 tooltip : 'click to edit',
-                loadurl : 'http://{{ site.domain }}/admin/edit/{{
+                loadurl : 'http://{{ meta.site.domain }}/admin/edit/{{
                 text_post.slugid|escape }}/_title',
                 name    : 'title',
             });
 
-        $(".autogrow").editable("http://{{ site.domain }}/admin/edit/{{
+        $(".autogrow").editable("http://{{ meta.site.domain }}/admin/edit/{{
             text_post.slugid|escape }}/_content", {
-                submit : 'OK',
+                submit : 'save',
                 method : 'PUT',
-                cancel : 'Cancel',
-                loadurl : 'http://{{ site.domain }}/admin/edit/{{
+                cancel : 'cancel',
+                loadurl : 'http://{{ meta.site.domain }}/admin/edit/{{
                 text_post.slugid|escape
                 }}/_content',
                 //tooltip : 'click to edit...',
