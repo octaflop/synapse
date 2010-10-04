@@ -20,7 +20,7 @@
                 $(document).ready(function () {
                     $(".add_image").button();
                     $(".add_image").click(function () {
-                        $.get("{{ meta.site.domain }}/{{ url_for('add_image') }}", 
+                        $.get("{{ url_for('add_image') }}", 
                             function (data) {
                                 $(".image_form").html(data);
                                 $(".image_form").append(
