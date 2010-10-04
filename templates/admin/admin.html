@@ -18,20 +18,20 @@
         <div span-17 colborder><!-- dynamic image addition -->
             <script type='text/javascript' charset="utf-8">
                 $(document).ready(function () {
-                    $(".add_image").button();
-                    $(".add_image").click(function () {
+                    $(".add_image").live('click', function () {
                         $.get("{{ url_for('add_image') }}", 
                             function (data) {
                                 $(".image_form").html(data);
-                                $(".image_form").append(
-                                    "<a class='add_image'>add another</a>"
-                                );
                             });
-                        });
-                    $(".post_image").button();
+			$(".image_form").append(
+			    "<a class='add_image'>add another</a>"
+			);
+		    });
                     $(".post_image").click(function () {
                         $(this).post("{{ meta.site.domain }}/{{ url_for('add_image') }}");
                     });
+                    $(".post_image").button();
+                    $(".add_image").button();
                 }); 
             </script>
             <a class='add_image'>Add new image</a>
