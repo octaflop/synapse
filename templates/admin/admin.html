@@ -28,7 +28,12 @@
 			);
 		    });
                     $(".post_image").click(function () {
-                        $(this).post("{{ meta.site.domain }}/{{ url_for('add_image') }}");
+                        $(this).post(
+                            "{{ meta.site.domain }}/{{ url_for('add_image')
+                            }}",
+                            function () {
+                                $('.image_form').html(data);
+                            });
                     });
                     $(".post_image").button();
                     $(".add_image").button();
