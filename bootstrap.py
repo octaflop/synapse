@@ -17,6 +17,14 @@ def after_install(options, home_dir):
                     '-U', 'gunicorn'])
     subprocess.call([join(home_dir, 'bin', 'easy_install'),
                     '-U', 'markdown'])
+    subprocess.call([join(home_dir, 'bin', 'easy_install'),
+                    '-U', 'flask-openid'])
 """))
-print output
 
+file = open('bootstrap.sh', 'w')
+file.write(output)
+file.close()
+
+import subprocess
+subprocess.call(['chmod', '+x', 'bootstrap.sh'])
+subprocess.call(['./bootstrap.sh', '../'])

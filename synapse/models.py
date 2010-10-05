@@ -33,7 +33,7 @@ class User(Document, object):
         return 'profile', {'username':self.username}
 
 class Comment(EmbeddedDocument):
-    slugid = StringField(required=True, unique=True, min_length=8, max_length=8)
+    slugid = StringField(required=True, unique=True, max_length=8) #min_length=8, max_length=8)
     content = StringField()
     name = StringField(max_length=120)
     # datetime
@@ -52,7 +52,7 @@ class Media(Document, object):
     title = StringField(required=True)
     filename = StringField(required=True)
     slug = StringField(required=True)
-    slugid = StringField(required=True, unique=True, min_length=8, max_length=8)
+    slugid = StringField(required=True, unique=True, max_length=8) #min_length=8, max_length=8)
     author = ReferenceField(User)
     description = StringField()
     # datetime
@@ -74,7 +74,7 @@ class Post(Document, object):
     title = StringField(max_length=120)
     author = ReferenceField(User)
     slug = StringField(required=True)#, unique=True)
-    slugid = StringField(required=True, unique=True, min_length=8, max_length=8)
+    slugid = StringField(required=True, unique=True, max_length=8) #min_length=8, max_length=8)
     tags = ListField(StringField(max_length=45))
     rss = StringField()
     # datetime
