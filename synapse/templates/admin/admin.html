@@ -15,34 +15,7 @@
         </dl>
       <p><input class='submit_button' type='submit' value='save' /></p>
     </form>
-        <div span-17 colborder><!-- dynamic image addition -->
-            <script type='text/javascript' charset="utf-8">
-                $(document).ready(function () {
-                    $(".add_image").live('click', function () {
-                        $.get("{{ url_for('add_image') }}", 
-                            function (data) {
-                                $(".image_form").html(data);
-                            });
-			$(".image_form").append(
-			    "<a class='add_image'>add another</a>"
-			);
-		    });
-                    $(".post_image").click(function () {
-                        $(this).post(
-                            "{{ meta.site.domain }}/{{ url_for('add_image')
-                            }}",
-                            function () {
-                                $('.image_form').html(data);
-                            });
-                    });
-                    $(".post_image").button();
-                    $(".add_image").button();
-                }); 
-            </script>
-            <a class='add_image'>Add new image</a>
-            <div class='image_form'>
-            </div>
-        </div>
+        <div span-17 colborder>        </div>
     </div>
     <h3><a href="#">Add a user (for admin purposes)</a></h3>
     <div>
@@ -73,20 +46,30 @@
     </form>
     </div>
 </div>
+<script type='text/javascript' charset="utf-8">
+            $(document).ready(function () {
+                $(".add_image").live('click', function () {
+                    $.get("{{ url_for('add_image') }}", 
+                        function (data) {
+                            //$(".image_form").html(data);
+                            $('.image_form').after(data)
+                        });
+                });
+                $(".post_image").click(function () {
+                    $(this).post(
+                        "{{ meta.site.domain }}/{{ url_for('add_image')
+                        }}",
+                        function () {
+                            (data).appendTo($('.image_form'));
+                        });
+                });
+                $(".post_image").button();
+                $(".add_image").button();
+            }); 
+</script>
 <div class="span-5 last">
-    <div class="accordion imageacc">
-        <h3><a>Add an image</a></h3>
-        <form action='/admin/add/image' method='POST'
-            enctype='multipart/form-data'>
-            <dl>
-            {{ image_post_form.hidden_tag() }}
-            {{ render_field(image_post_form.title) }}
-            {{ render_field(image_post_form.author) }}
-            {{ render_field(image_post_form.image) }}
-            {{ render_field(image_post_form.description) }}
-            </dl>
-      <p><input class='submit_button' type='submit' value='save' /></p>
-    </form>
+    <div class='image_form'>
     </div>
+    <a class='add_image'>Add new image</a>
 </div>
 {% endblock %}
