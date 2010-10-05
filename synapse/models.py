@@ -52,7 +52,11 @@ class Media(Document, object):
     title = StringField(required=True)
     filename = StringField(required=True)
     slug = StringField(required=True)
+<<<<<<< HEAD
     slugid = StringField(required=True, unique=True, max_length=8) #min_length=8, max_length=8)
+=======
+    slugid = StringField(required=True, unique=True, min_length=8, max_length=8)
+>>>>>>> be32bd6abe4dc110e2e3a9e2080d72d49aed9560
     author = ReferenceField(User)
     description = StringField()
     # datetime
@@ -74,7 +78,11 @@ class Post(Document, object):
     title = StringField(max_length=120)
     author = ReferenceField(User)
     slug = StringField(required=True)#, unique=True)
+<<<<<<< HEAD
     slugid = StringField(required=True, unique=True, max_length=8) #min_length=8, max_length=8)
+=======
+    slugid = StringField(required=True, unique=True, min_length=8, max_length=8)
+>>>>>>> be32bd6abe4dc110e2e3a9e2080d72d49aed9560
     tags = ListField(StringField(max_length=45))
     rss = StringField()
     # datetime
