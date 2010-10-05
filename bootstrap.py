@@ -2,23 +2,11 @@ import virtualenv, textwrap
 output = virtualenv.create_bootstrap_script(textwrap.dedent("""
 def after_install(options, home_dir):
     subprocess.call([join(home_dir, 'bin', 'easy_install'),
-                    '-U', 'yolk'])
-    subprocess.call([join(home_dir, 'bin', 'easy_install'),
-                    '-U', 'flask'])
-    subprocess.call([join(home_dir, 'bin', 'easy_install'),
-                    '-U', 'flask-wtf'])
-    subprocess.call([join(home_dir, 'bin', 'easy_install'),
-                    '-U', 'unidecode'])
-    subprocess.call([join(home_dir, 'bin', 'easy_install'),
-                    '-U', 'pymongo'])
-    subprocess.call([join(home_dir, 'bin', 'easy_install'),
-                    '-U', 'mongoengine'])
-    subprocess.call([join(home_dir, 'bin', 'easy_install'),
-                    '-U', 'gunicorn'])
-    subprocess.call([join(home_dir, 'bin', 'easy_install'),
-                    '-U', 'markdown'])
-    subprocess.call([join(home_dir, 'bin', 'easy_install'),
-                    '-U', 'flask-openid'])
+                    '-U', 'pip'])
+    apps = ['flask', 'flask-wtf', 'unidecode', 'pymongo', 'mongoengine', 'gunicorn', 'markdown', 'flask-openid']
+    for app in apps:
+        subprocess.call([join(home_dir, 'bin', 'pip'),
+                        'install', '-U', app])
 """))
 
 file = open('bootstrap.sh', 'w')
