@@ -19,10 +19,15 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301
 # USA
 
+__VERSION__ = '0.2'
+__AUTHOR__ = 'Faris Chebib'
+
 # external deps
 from flask import Flask, url_for, flash, escape, request, redirect,\
     render_template, session, abort, jsonify
 from werkzeug import SharedDataMiddleware, secure_filename
+from werkzeug.contrib.atom import AtomFeed
+from urlparse import urljoin
 import hashlib
 import datetime
 import os
@@ -36,16 +41,11 @@ from forms import *
 from strings import *
 from decorators import template, login_required
 from models import Site, User, Post, TextPost, Media, FlatPage,\
-        Dependency
+        Dependency, Image
+from PIL import Image as Picture
 
 # markdown extensions
 extensions = ['footnotes', 'fenced_code']
-
-def buildrss(text, url, creator, title):
-    # returns rss xhtml
-    extensions.append = "rss(URL=%s,CREATOR=%s,TITLE=%s)" % \
-            (url, creator, title)
-    return markdown(text, extensions)
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
@@ -53,10 +53,6 @@ app.add_url_rule('/uploads/<filename>', 'uploaded_file', build_only=True)
 app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
     '/uploads': UPLOAD_FOLDER,
     })
-
-def allowed_file(filename):
-    return '.' in filename and \
-       filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 # META
 class Meta:
@@ -83,6 +79,22 @@ src="http://i.creativecommons.org/l/by-sa/2.5/ca/88x31.png" /></a><br
 [Creative Commons Attribution-ShareAlike 2.5 Canada License](http://creativecommons.org/licenses/by-sa/2.5/ca/)
 """
 
+# Atom feed
+@app.route('/feed.atom')
+def atom_feed():
+    meta = Meta()
+    feed = AtomFeed(u'%s feed' % meta.site,
+            feed_url=request.url, url=request.url_root)
+    posts = Posts.query.order_by(Article.created.desc()).all()
+    for post in posts:
+        feed.add(post.title, unicode(post.html_content),
+                content_type='html',
+                author=post.author.username,
+                url=make_external(post.permalink),
+                updated=post.updated[0],
+                published=article.created)
+        return feed.get_response()
+
 # HOME PAGE
 @app.route('/')
 @template('index.html')
@@ -99,16 +111,19 @@ def index():
 def about():
     meta = Meta()
     try:
-        flatpage = FlatPage.objects(title='About').get()
+        flatpage, created = FlatPage.objects.get_or_create(title='About',\
+            defaults =\
+                {'content' : u"**Synapse** is a prototype of a new blogging\
+                        platform. It is very alpha.",
+                'created' : datetime.datetime.now(),
+                'slug' : 'about',
+                'slugid' : slugidfy(),
+                })
+        if created:
+            flatpage.html_content = markdown(flatpage.content, extensions)
+            flatpage.save()
     except:
-        content = u"**Synapse** is a prototype of a new blogging\
-                    platform. It is very alpha."
-        newflatpage = FlatPage(title='About', content=content)
-        try:
-            newflatpage.save()
-            flatpage = newflatpage
-        except:
-            return error(500)
+        abort(404)
     return dict(meta=meta, flatpage=flatpage)
 
 # Meta-flatpage
@@ -231,7 +246,6 @@ perhaps make a metafile to this effect.
 or maybe put them in separate apps.
 ~foenix
 """
-@app.route('/<year>/<month>/<day>/<slugid>/<slug>')
 @template('text_post.html')
 def single_text_post(year, month, day, slugid, slug=None):
     meta = Meta()
@@ -256,31 +270,35 @@ def admin():
 
 @app.route('/admin/edit/<slugid>/_title', methods=['POST', 'PUT', 'GET'])
 @login_required
-def add_text__title(slug):
+def add_text__title(slugid, ):
     """Ajax event to title"""
     try:
-        text_post = TextPost.objects(slug=slug).first()
+        text_post = TextPost.objects(slugid=slugid).first()
     except:
-        return error(404)
+        return abort(404)
     if request.method == "PUT" or request.method == "POST":
         title = request.values.get('title', type=str)
         text_post.title = title
+        text_post.updated.append(datetime.datetime.now())
+        text_post.slug = slugfy(text_post.title)
         text_post.save()
-        return text_post.title
+        return escape(text_post.title)
     elif request.method == "GET":
         return str(text_post.title)
 
-@app.route('/admin/edit/<slug>/_content', methods=['POST', 'PUT', 'GET'])
+@app.route('/admin/edit/<slugid>/_content', methods=['POST', 'PUT', 'GET'])
 @login_required
-def add_text__content(slug):
+def add_text__content(slugid):
     """Ajax event & markdown for content"""
     try:
-        text_post = TextPost.objects(slug=slug).get()
+        text_post = TextPost.objects(slugid=slugid).get()
     except:
-        return error(404)
+        return abort(404)
     if request.method == "PUT" or request.method == 'POST':
-        text_post.content = request.values.get('content', type=str)
-        text_post.html_content = markdown(text_post.content, extensions)
+        content = request.values.get('content')
+        text_post.content = content
+        text_post.html_content = markdown(content, extensions)
+        text_post.updated.append(datetime.datetime.now())
         text_post.save()
         return text_post.html_content
     elif request.method == "GET":
@@ -289,17 +307,16 @@ def add_text__content(slug):
         except:
             return abort(500)
 
-@app.route('/post/<slugid>/edit')
-def edit_text_ajax(slugid):
+@app.route('/post/<slugid>/<slug>/edit')
+@app.route('/post/<int:year>/<int:month>/<int:day>/<slugid>/<slug>/edit')
+def edit_text_ajax(slugid, year=None, month=None, day=None, slug=None):
     meta = Meta()
     try:
         text_post = TextPost.objects(slugid=slugid).first()
     except:
-        return error(404)
+        return abort(404)
     return render_template("add_text_post.html", meta=meta,\
-            text_post=text_post,\
-            loginform=loginform, site=site, current_user=current_user,\
-            logged_in=logged_in)
+            text_post=text_post)
 
 @login_required
 @app.route('/admin/add/site', methods=['POST'])
@@ -311,10 +328,15 @@ def add_site():
         if form.logo.file:
             filename = secure_filename(form.logo.file.filename)
             try:
-                form.logo.file.save(os.path.join(UPLOAD_FOLDER, filename))
-                site.logo = STATIC_PATH + filename
+                os.chdir(os.path.join(UPLOAD_FOLDER, 'orig'))
+                form.logo.file.save(filename)
+                image = Picture.open(filename)
+                os.chdir('../medium')
+                image.thumbnail((80,80))
+                image.save(filename)
+                site.logo = os.path.join(STATIC_PATH, 'medium', filename)
             except:
-                flash("error in file %s upload" % filename)
+                flash("error in file: %s's upload" % filename)
         prev_site = Site.objects.first()
         if prev_site is not None:
             prev_site.title = site.title
@@ -342,7 +364,7 @@ def add_text_post():
     form = TextPostForm(request.form)
     if form.validate_on_submit():
         text_post = TextPost(slug=slugfy(form.title.data))
-        text_post.date_created = datetime.datetime.now()
+        text_post.created = datetime.datetime.now()
         text_post.title = escape(form.title.data)
         text_post.content = escape(form.content.data)
         text_post.html_content = markdown(text_post.content, extensions)
@@ -351,7 +373,7 @@ def add_text_post():
             text_post.save()
             flash("%s was successfully saved as slugid %s" % (text_post.title,\
                 text_post.slugid))
-            return redirect(url_for('text_post', slugid=text_post.slugid))
+            return redirect(url_for('post_by_slugid', slugid=text_post.slugid))
         except:
             flash("DBG: slug not unique")
             return redirect(url_for('add_text_post', meta=meta, form=form, site=site,\
@@ -360,12 +382,35 @@ def add_text_post():
             loginform=loginform, current_user=current_user,\
             logged_in=logged_in)
 
+# Most reliable post retrieval url
+@app.route('/post/<slugid>')
+@app.route('/post/<slugid>/')
+@app.route('/post/<slugid>/<slug>')
+@app.route('/post/<int:year>/<int:month>/<int:day>/<slugid>/')
+@app.route('/post/<int:year>/<int:month>/<int:day>/<slugid>')
+@app.route('/post/<int:year>/<int:month>/<int:day>/<slugid>/<slug>')
+def post_by_slugid(slugid, slug=None, year=None, month=None, day=None):
+    meta = Meta()
+    try:
+        post = Post.objects(slugid=slugid).get()
+    except:
+        return abort(404)
+    if (slug == None or year == None or month == None or day == None):
+        return redirect(url_for('post_by_slugid', slugid=slugid,\
+            slug=post.slug, year=post.created.year, month=post.created.month,
+            day=post.created.day))
+    post['created'] =\
+        datetime.datetime.strftime(post.created,\
+                                "%Y-%m-%d @ %H:%M")
+    return render_template("text_post.html", meta=meta, text_post=post)
+
+## TK returns possible collisions in slug name
 @app.route('/post/<slug>')
-def post(slug):
+def post_by_slug(slug):
     meta = Meta()
     text_post = TextPost.objects(slug=slug).first()
-    text_post['date_created'] =\
-        datetime.datetime.strftime(text_post.date_created,\
+    text_post['created'] =\
+        datetime.datetime.strftime(text_post.created,\
                                 "%Y-%m-%d @ %H:%M")
     return render_template('text_post.html', meta=meta, text_post=text_post)
 
@@ -377,23 +422,47 @@ def add_image():
         if form.image.file:
             filename = secure_filename(form.image.file.filename)
             try:
-                form.image.file.save(os.path.join(UPLOAD_FOLDER, filename))
-                site.logo = STATIC_PATH + filename
+                os.chdir(os.path.join(UPLOAD_FOLDER, 'orig'))
+                form.image.file.save(filename)
+                path = os.path.join(UPLOAD_FOLDER, 'orig', filename)
+                image = Picture.open(path)
+                # small images
+                os.chdir('../small')
+                image.thumbnail((75,75))
+                image.save(filename)
+                small = os.path.join(STATIC_PATH, 'small', filename)
+                image = Picture.open(path)
+                # medium images
+                os.chdir('../medium')
+                image.thumbnail((200,200))
+                image.save(filename)
+                medium = os.path.join(STATIC_PATH, 'medium', filename)
+                image = Picture.open(path)
+                # large images
+                os.chdir('../large')
+                image.thumbnail((600,600))
+                image.save(filename)
+                large = os.path.join(STATIC_PATH, 'large', filename)
             except:
-                flash("error in file %s upload" % filename)
-        file = request.files['image']
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            image = Image(title=form.title_en.data,\
-                    title_en=form.title_en.data, title_fr=form.title_fr.data,\
-                    filename=filename)
+                return "error in file %s upload" % filename
+            ## FIX THIS PART TK
+            image = Image(title=form.title.data, \
+                    author=User.objects(username=form.author.data).get(),\
+                    description=form.description.data,\
+                    slug=slugfy(form.title.data), slugid=slugidfy(),\
+                    filename=filename, created=datetime.datetime.now(),\
+                    published=datetime.datetime.now(),\
+                    path=path,\
+                    orig=path,\
+                    small=small,\
+                    medium=medium,\
+                    large=large)
             try:
-                file.save(os.path.join(UPLOAD_FOLDER, filename))
-                image.path = unicode(STATIC_PATH) + unicode(filename)
                 image.save()
-                return redirect(url_for('imagepage', title=photo.title))
+                return "Image uploaded successfully to slugid %s" %\
+                    image.slugid
             except:
-                return "Error of some sort"
+                return "Something went wrong while saving"
     return render_template('add_image.html', meta=meta, form=form)
 
 # helper functions
@@ -482,7 +551,7 @@ This is a simple dev-post. Ready to be deleted at your leisure.
 [This](http://example.com/#) is a link.  
 and  
 """ % (meta.domain)
-    html_content = markdown(content)
+    html_content = markdown(content, extensions)
     title = u"Hello, World!"
     post = Post(title=title,content=content, html_content=html_content, author=user)
     post.slugid = slugidfy()

@@ -1,8 +1,7 @@
 <!doctype html>
 {% from "_formhelpers.html" import render_field %}
-<title>Upload new media</title>
 <fieldset>
-<h5>Upload new media</h5>
+<legend>Add an image</legend>
 <form action="/admin/add/image" method='POST' enctype='multipart/form-data'>
         {{ form.hidden_tag() }}
         {{ render_field(form.title) }}
@@ -12,4 +11,3 @@
     <p><input type=submit value='Upload Image' /></p>
 </form>
 </fieldset>
-
