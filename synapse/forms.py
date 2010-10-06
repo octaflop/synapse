@@ -18,7 +18,7 @@ class GenericFormAbstract(Form):
     title = TextField('Entitle your work', [validators.required(),\
         validators.length(min=3, max=50)])
     author = TextField('Author')
-##    taglist = TagListField('Enter some tags, separated with a comma.')
+    taglist = TagListField('Enter some tags, separated with a comma.')
 
 class TextPostForm(GenericFormAbstract):
     content = TextAreaField('Make your mark')
