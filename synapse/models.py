@@ -51,7 +51,8 @@ class Comment(EmbeddedDocument):
 class Media(Document, object):
     title = StringField(required=True)
     filename = StringField(required=True)
-    slug = StringField(required=True)
+    path = StringField()
+    slug = StringField()
     slugid = StringField(required=True, unique=True, max_length=8) #min_length=8, max_length=8)
     author = ReferenceField(User)
     description = StringField()
@@ -68,6 +69,13 @@ class Media(Document, object):
     #@permalink
     #def permalink(self):
     #    return 'media', {'slugid': self.slugid}
+
+class Image(Media):
+    small = StringField()
+    medium = StringField()
+    large = StringField()
+    orig = StringField(required=True)
+
 
 
 class Post(Document, object):
