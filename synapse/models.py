@@ -60,9 +60,10 @@ class Media(Document, object):
     created = DateTimeField()
     published = DateTimeField()
     updated = ListField(DateTimeField())
+    tags = ListField(StringField(max_length=45))
     @permalink
-    def raw(self):
-        return STATIC_PATH, {'filename':self.filename}
+    def permalink(self):
+        return 'media', {'slugid':self.slugid}
     meta = {
         'ordering': ['-published']
         }
@@ -76,8 +77,6 @@ class Image(Media):
     large = StringField()
     orig = StringField(required=True)
 
-
-
 class Post(Document, object):
     title = StringField(max_length=120)
     author = ReferenceField(User)
@@ -89,6 +88,8 @@ class Post(Document, object):
     created = DateTimeField()
     published = DateTimeField()
     updated = ListField(DateTimeField())
+    media = ListField(ReferenceField(Media))
+    comments = ListField(EmbeddedDocumentField(Comment))
     meta = {
         'ordering': ['-published']
         }
@@ -99,7 +100,6 @@ class Post(Document, object):
 class TextPost(Post):
     content = StringField()
     html_content = StringField()
-    #media = ListField(EmbeddedDocumentField(Media))
 
 class FlatPage(TextPost):
     title = StringField(max_length=120, unique=True)
