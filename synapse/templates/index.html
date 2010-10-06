@@ -29,6 +29,15 @@
             </ul>
         </div>
         <div class='span-5 last'>
+            <h1>Images</h1>
+            <ul>
+                {% for image in images %}
+                <li><b>{{ image.title }}</b><br />
+                <a href='{{ url_for('image_by_slugid', slugid=image.slugid)
+                    }}' ><img src='{{ image.small }}' alt='{{ image.description
+                    }}' /></a></li>
+                {% endfor %}
+            </ul>
             <h1>Users</h1>
             <ul>
                 {% for user in users %}

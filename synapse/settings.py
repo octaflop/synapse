@@ -16,7 +16,7 @@ DEV = True
 SECRET_KEY = 'vba937ei38mq2'
 SALT = 'vba937ei38mq2'
 #UPLOAD_FOLDER = '/tmp/uploads/'
-UPLOAD_FOLDER = '%s/static/uploads/' % os.getcwd()
+UPLOAD_FOLDER = '%s/synapse/static/uploads/' % os.getcwd()
 STATIC_PATH = '/static/uploads/'
 USER = None
 ## Flask-upload manager SETTINGS
