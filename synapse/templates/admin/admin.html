@@ -48,26 +48,30 @@
 </div>
 <script type='text/javascript' charset="utf-8">
             $(document).ready(function () {
+                var options = {
+                    target: '#image_msg',
+                }
                 $(".add_image").live('click', function () {
                     $.get("{{ url_for('add_image') }}", 
                         function (data) {
-                            //$(".image_form").html(data);
-                            $('.image_form').after(data)
+                        $('.image_upload').ajaxForm(options);
+                            $('.image_form').after(data);
                         });
                 });
-                $(".post_image").click(function () {
-                    $(this).post(
-                        "{{ meta.site.domain }}/{{ url_for('add_image')
-                        }}",
-                        function () {
-                            (data).appendTo($('.image_form'));
+/*                $(".post_image").live('click', function () {
+                    $.post("{{ url_for('add_image') }}",
+                        $('#image_upload').serialize(),
+                        function (data) {
+                            $('.image_form').html(data);
+                            //alert(data);
                         });
-                });
-                $(".post_image").button();
+                });*/
                 $(".add_image").button();
             }); 
 </script>
 <div class="span-5 last">
+    <div id='image_msg'>
+    </div>
     <div class='image_form'>
     </div>
     <a class='add_image'>Add new image</a>

@@ -102,8 +102,8 @@ def index():
     meta = Meta()
     posts = Post.objects()
     users = User.objects()
-    selfurl = url_for('index')
-    return dict(meta=meta, users=users, posts=posts)
+    images = Image.objects()
+    return dict(meta=meta, users=users, posts=posts, images=images)
 
 # FLATPAGE
 @app.route('/about')
@@ -169,18 +169,6 @@ def imagepage(title):
             image.id)
     else:
         return abort(404)
-
-@app.route('/image/raw/<title>')
-def raw_image(title):
-    """
-    The method to get images referred by the database and stored unto the
-    machine
-    """
-    try:
-        image = Image.objects(title=title).first()
-    except:
-        return "not found"
-    return url_for('static', filename=image.filename)
 
 # User Functions
 @app.route('/admin/add/user', methods=['GET', 'POST'])
@@ -323,8 +311,11 @@ def edit_text_ajax(slugid, year=None, month=None, day=None, slug=None):
 def add_site():
     form = SitePostForm(request.form)
     if form.validate_on_submit():
-        site = Site(title=form.title.data, domain=form.domain.data)
-        site.motto = form.motto.data
+        prev_site = Site.objects.first()
+        if prev_site is not None:
+            prev_site.delete()
+        site = Site(title=form.title.data, domain=form.domain.data,\
+                motto=form.motto.data)
         if form.logo.file:
             filename = secure_filename(form.logo.file.filename)
             try:
@@ -337,13 +328,6 @@ def add_site():
                 site.logo = os.path.join(STATIC_PATH, 'medium', filename)
             except:
                 flash("error in file: %s's upload" % filename)
-        prev_site = Site.objects.first()
-        if prev_site is not None:
-            prev_site.title = site.title
-            prev_site.motto = site.motto
-            prev_site.domain = site.domain
-            prev_site.logo = site.logo
-            site = prev_site
         try:
             site.save()
             return redirect(url_for('admin'))
@@ -363,7 +347,13 @@ def add_text_post():
             meta.logged_in, meta.loginform, meta.user, meta.site
     form = TextPostForm(request.form)
     if form.validate_on_submit():
+        username = escape(session['username'])
         text_post = TextPost(slug=slugfy(form.title.data))
+        try:
+            text_post.author = User.objects(username=username).get()
+        except:
+            flash("user not found")
+            return redirect(url_for('add_text_post', form=form))
         text_post.created = datetime.datetime.now()
         text_post.title = escape(form.title.data)
         text_post.content = escape(form.content.data)
@@ -381,6 +371,20 @@ def add_text_post():
     return render_template('admin/admin_entry.html', meta=meta, form=form, site=site,\
             loginform=loginform, current_user=current_user,\
             logged_in=logged_in)
+
+@app.route('/media/<slugid>')
+@app.route('/media/<slugid>/<slug>')
+def image_by_slugid(slugid, slug=None):
+    """Get the image by the slugid"""
+    meta = Meta()
+    try:
+        image = Image.objects(slugid=slugid).get()
+    except:
+        return abort(404)
+    if slug == None:
+        return redirect(url_for('image_by_slugid', slugid=slugid,\
+            slug=image.slug))
+    return render_template('image_page.html', meta=meta, image=image)
 
 # Most reliable post retrieval url
 @app.route('/post/<slugid>')
@@ -423,7 +427,10 @@ def add_image():
             filename = secure_filename(form.image.file.filename)
             try:
                 os.chdir(os.path.join(UPLOAD_FOLDER, 'orig'))
+                slugid = slugidfy()
+                filename = "%s_%s%s" % (filename[:-4], slugid, filename[-4:])
                 form.image.file.save(filename)
+                orig = os.path.join(STATIC_PATH, 'orig', filename)
                 path = os.path.join(UPLOAD_FOLDER, 'orig', filename)
                 image = Picture.open(path)
                 # small images
@@ -445,28 +452,26 @@ def add_image():
                 large = os.path.join(STATIC_PATH, 'large', filename)
             except:
                 return "error in file %s upload" % filename
-            ## FIX THIS PART TK
             image = Image(title=form.title.data, \
                     author=User.objects(username=form.author.data).get(),\
                     description=form.description.data,\
-                    slug=slugfy(form.title.data), slugid=slugidfy(),\
+                    slug=slugfy(form.title.data), slugid=slugid,\
                     filename=filename, created=datetime.datetime.now(),\
                     published=datetime.datetime.now(),\
                     path=path,\
-                    orig=path,\
+                    orig=orig,\
                     small=small,\
                     medium=medium,\
                     large=large)
             try:
                 image.save()
-                return "Image uploaded successfully to slugid %s" %\
-                    image.slugid
+                return "Image uploaded successfully to slugid %s. pathed to %s" %\
+                    (image.slugid, image.path)
             except:
                 return "Something went wrong while saving"
     return render_template('add_image.html', meta=meta, form=form)
 
-# helper functions
-
+# HELPER FUNCTIONS
 # fill the initial database
 def init_db():
     sites = Site.objects()
@@ -557,8 +562,4 @@ and
     post.slugid = slugidfy()
     post.slug = slugfy(title)
     post.save()
-
-if __name__ == "__main__":
-    app.debug = True
-    app.run(host="0.0.0.0", port=5002)
 

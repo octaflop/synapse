@@ -1,9 +1,17 @@
 {% extends "base.html" %}
-{% block title %}Post: {{ text_post.title }}{% endblock %}
+{% block title %}{{ text_post.title }} - {{ meta.site.title }}{% endblock %}
 {% block content %}
+<script type="text/javascript" charset="utf-8">
+// <![CDATA[
+$(document).ready(function() {
+        $('.edit').button();
+});
+</script>
+
 <div class="span-18 colborder">
     <div class="span-16 prepend-1 append-2 last">
         <h2>{{ text_post.title|escape }}</h2>
+        by: {{ text_post.author.username }}<br />
         created:{{ text_post.created|escape }}<br />
         {% if text_post.updated %}
         updated:

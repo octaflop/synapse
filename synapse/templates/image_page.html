@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}{{ image.title }} - {{ meta.site.title }}{% endblock %}
+{% block content %}
+<a href='{{ image.orig }}'><img src='{{ image.large }}' alt='{{
+    image.description }}' /></a>
+<!-- oh hello -->
+{% endblock %}
