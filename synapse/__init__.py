@@ -41,7 +41,8 @@ from forms import *
 from strings import *
 from decorators import template, login_required
 from models import Site, User, Post, TextPost, Media, FlatPage,\
-        Dependency
+        Dependency, Image
+from PIL import Image as Picture
 
 # markdown extensions
 extensions = ['footnotes', 'fenced_code']
@@ -327,10 +328,15 @@ def add_site():
         if form.logo.file:
             filename = secure_filename(form.logo.file.filename)
             try:
-                form.logo.file.save(os.path.join(UPLOAD_FOLDER, filename))
-                site.logo = STATIC_PATH + filename
+                os.chdir(os.path.join(UPLOAD_FOLDER, 'orig'))
+                form.logo.file.save(filename)
+                image = Picture.open(filename)
+                os.chdir('../medium')
+                image.thumbnail((80,80))
+                image.save(filename)
+                site.logo = os.path.join(STATIC_PATH, 'medium', filename)
             except:
-                flash("error in file %s upload" % filename)
+                flash("error in file: %s's upload" % filename)
         prev_site = Site.objects.first()
         if prev_site is not None:
             prev_site.title = site.title
@@ -416,15 +422,41 @@ def add_image():
         if form.image.file:
             filename = secure_filename(form.image.file.filename)
             try:
-                form.image.file.save(os.path.join(UPLOAD_FOLDER, filename))
+                os.chdir(os.path.join(UPLOAD_FOLDER, 'orig'))
+                form.image.file.save(filename)
+                path = os.path.join(UPLOAD_FOLDER, 'orig', filename)
+                image = Picture.open(path)
+                # small images
+                os.chdir('../small')
+                image.thumbnail((75,75))
+                image.save(filename)
+                small = os.path.join(STATIC_PATH, 'small', filename)
+                image = Picture.open(path)
+                # medium images
+                os.chdir('../medium')
+                image.thumbnail((200,200))
+                image.save(filename)
+                medium = os.path.join(STATIC_PATH, 'medium', filename)
+                image = Picture.open(path)
+                # large images
+                os.chdir('../large')
+                image.thumbnail((600,600))
+                image.save(filename)
+                large = os.path.join(STATIC_PATH, 'large', filename)
             except:
                 return "error in file %s upload" % filename
             ## FIX THIS PART TK
-            image = Media(title=form.title.data, author=form.author.data,\
+            image = Image(title=form.title.data, \
+                    author=User.objects(username=form.author.data).get(),\
                     description=form.description.data,\
                     slug=slugfy(form.title.data), slugid=slugidfy(),\
                     filename=filename, created=datetime.datetime.now(),\
-                    published=datetime.datetime.now())
+                    published=datetime.datetime.now(),\
+                    path=path,\
+                    orig=path,\
+                    small=small,\
+                    medium=medium,\
+                    large=large)
             try:
                 image.save()
                 return "Image uploaded successfully to slugid %s" %\
