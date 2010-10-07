@@ -11,6 +11,11 @@ $(document).ready(function() {
 <div class="span-18 colborder">
     <div class="span-16 prepend-1 append-2 last">
         <h2>{{ text_post.title|escape }}</h2>
+        <div name="content">
+            {{ text_post.html_content|safe }}
+        </div>
+        <fieldset>
+            <legend>metadata</legend>
         by: {{ text_post.author.username }}<br />
         created:{{ text_post.created|escape }}<br />
         {% if text_post.updated %}
@@ -20,12 +25,14 @@ $(document).ready(function() {
         {% endfor %}
         <br />
         {% endif %}
-        <div name="content">
-            {{ text_post.html_content|safe }}
-        </div>
+    </fieldset>
     </div>
 </div>
 <div class="span-4 last">
-    <h5>Still under construction?</h5>
+    {% if showedit %}
+    <b>Hey there {{ meta.user.username|escape }}.</b>
+    <p>Care to <a class='edit' href='{{ url_for('post_by_slugid', slugid=text_post.slugid)
+        }}/edit'>edit</a> this page?</p>
+    {% endif %}
 </div>
 {% endblock %}

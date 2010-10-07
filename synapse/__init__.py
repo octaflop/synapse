@@ -240,6 +240,15 @@ def single_text_post(year, month, day, slugid, slug=None):
     text_post = TextPost.objects(slugid=slugid).get()
     return dict(meta=meta, text_post=text_post)
 
+@app.route('/admin/manage')
+@login_required
+@template('admin/manage.html')
+def manage():
+    flats = FlatPage.objects()
+    posts = Post.objects()
+    images = Image.objects()
+    return dict(posts=posts, images=images, flats=flats)
+
 @app.route('/admin')
 @login_required
 @template('admin/admin.html')
@@ -265,14 +274,17 @@ def add_text__title(slugid, ):
     except:
         return abort(404)
     if request.method == "PUT" or request.method == "POST":
-        title = request.values.get('title', type=str)
+        title = request.values.get('title', type=unicode)
         text_post.title = title
-        text_post.updated.append(datetime.datetime.now())
-        text_post.slug = slugfy(text_post.title)
+        if text_post.updated:
+            text_post.updated.append(datetime.datetime.now())
+        else:
+            text_post.updated = [datetime.datetime.now()]
+        text_post.slug = slugfy(unicode(title))
         text_post.save()
-        return escape(text_post.title)
+        return text_post.title
     elif request.method == "GET":
-        return str(text_post.title)
+        return text_post.title
 
 @app.route('/admin/edit/<slugid>/_content', methods=['POST', 'PUT', 'GET'])
 @login_required
@@ -295,14 +307,19 @@ def add_text__content(slugid):
         except:
             return abort(500)
 
+@app.route('/post/<slugid>/edit')
 @app.route('/post/<slugid>/<slug>/edit')
 @app.route('/post/<int:year>/<int:month>/<int:day>/<slugid>/<slug>/edit')
 def edit_text_ajax(slugid, year=None, month=None, day=None, slug=None):
     meta = Meta()
     try:
-        text_post = TextPost.objects(slugid=slugid).first()
+        text_post = TextPost.objects(slugid=slugid).get()
     except:
         return abort(404)
+    if (slug == None or year == None or month == None or day == None):
+        return redirect(url_for('edit_text_ajax', slugid=slugid,\
+            slug=text_post.slug, year=text_post.created.year,\
+            month=text_post.created.month, day=text_post.created.day))
     return render_template("add_text_post.html", meta=meta,\
             text_post=text_post)
 
@@ -343,8 +360,6 @@ def add_site():
 @login_required
 def add_text_post():
     meta = Meta()
-    logged_in, loginform, current_user, site =\
-            meta.logged_in, meta.loginform, meta.user, meta.site
     form = TextPostForm(request.form)
     if form.validate_on_submit():
         username = escape(session['username'])
@@ -368,9 +383,7 @@ def add_text_post():
             flash("DBG: slug not unique")
             return redirect(url_for('add_text_post', meta=meta, form=form, site=site,\
                     loginform=loginform))
-    return render_template('admin/admin_entry.html', meta=meta, form=form, site=site,\
-            loginform=loginform, current_user=current_user,\
-            logged_in=logged_in)
+    return render_template('admin/admin_entry.html', meta=meta, form=form)
 
 @app.route('/media/<slugid>')
 @app.route('/media/<slugid>/<slug>')
@@ -401,12 +414,17 @@ def post_by_slugid(slugid, slug=None, year=None, month=None, day=None):
         return abort(404)
     if (slug == None or year == None or month == None or day == None):
         return redirect(url_for('post_by_slugid', slugid=slugid,\
-            slug=post.slug, year=post.created.year, month=post.created.month,
-            day=post.created.day))
+            slug=post.slug, year=post.created.year,\
+            month=post.created.month, day=post.created.day))
     post['created'] =\
-        datetime.datetime.strftime(post.created,\
-                                "%Y-%m-%d @ %H:%M")
-    return render_template("text_post.html", meta=meta, text_post=post)
+        datetime.datetime.strftime(post.created, "%y-%m-%d @ %H:%m")
+    updated = []
+    for date in post.updated:
+        updated.append(datetime.datetime.strftime(date, "%y-%m-%d @ %H:%m"))
+    post['updated'] = updated
+    showedit = True
+    return render_template("text_post.html", meta=meta, text_post=post,\
+            showedit=showedit)
 
 ## TK returns possible collisions in slug name
 @app.route('/post/<slug>')
