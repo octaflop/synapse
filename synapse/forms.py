@@ -1,8 +1,8 @@
 from flaskext.wtf import Form, BooleanField, TextField, validators, PasswordField, FileField, TextAreaField
 
-## still not working
+## still not working. wish it were. TK
 # be careful of a circular import here
-from form_helper import TagListField
+#from form_helper import TagListField
 
 class RegistrationForm(Form):
     username = TextField('Username', [validators.required(), validators.length(min=4, max=25)])
@@ -18,7 +18,7 @@ class GenericFormAbstract(Form):
     title = TextField('Entitle your work', [validators.required(),\
         validators.length(min=3, max=50)])
     author = TextField('Author')
-    taglist = TagListField('Enter some tags, separated with a comma.')
+    #taglist = TagListField('Enter some tags, separated with a comma.')
 
 class TextPostForm(GenericFormAbstract):
     content = TextAreaField('Make your mark')
@@ -46,4 +46,4 @@ class DepPostForm(Form):
     title = TextField(u'Software title', [validators.required()])
     url = TextField(u"url of dependency", [validators.required()])
     imgurl = TextField(u"url of dependency logo")
-    authors = TagListField(u"Author names, separated with a comma")
+    # authors = TagListField(u"Author names, separated with a comma")

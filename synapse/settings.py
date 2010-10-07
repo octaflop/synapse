@@ -24,7 +24,7 @@ UPLOADS_DEFAULT_DEST = '/static/%s/media' % os.getcwd()
 UPLOADS_DEFAULT_URL = '/static/media'
 
 #ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'gif'])
 
 TIME_ZONE = 'America/Vancouver' # Doesn't do anything, yet
 

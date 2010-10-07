@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}New Text Post{% endblock %}
+{% block title %}Editing: {{ text_post.title|escape }} - {{ meta.site.name }}{% endblock %}
 
 {% block content %}
 <script type="text/javascript" charset="utf-8">
@@ -30,6 +30,7 @@ $(document).ready(function() {
                 name    : 'content',
                 type    : 'textarea',
             });
+        $('#finish').button();
     });
 //!>
 </script>
@@ -42,4 +43,9 @@ $(document).ready(function() {
             }}<span class="ui-icon ui-icon-pencil editable"></span></div>
         </div>
 </div>
+    <div class='span-4 last'>
+        <a class='edit' id='finish' href='{{ url_for('post_by_slugid',
+            slugid=text_post.slugid ) }}'>Finish</a>
+    </div>
+
 {% endblock %}
