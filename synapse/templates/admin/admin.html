@@ -5,7 +5,7 @@
 <script type='text/javascript' charset="utf-8">
             $(document).ready(function () {
                 var options = {
-                    target: '#image_msg',
+                    target: $('#image_msg'),
                 }
                 $(".add_image").live('click', function () {
                     $.get("{{ url_for('add_image') }}", 
@@ -46,6 +46,8 @@
                     {{ render_field(text_post_form.title) }}
                     {{ render_field(text_post_form.author) }}
                     {{ render_field(text_post_form.content) }}
+		    {{ render_field(text_post_form.is_published) }}
+		    {{ render_field(text_post_form.published) }}
                 </dl>
               <p><input class='submit_button' type='submit' value='save' /></p>
             </form>

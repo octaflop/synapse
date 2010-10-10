@@ -1,6 +1,5 @@
 {% from "_formhelpers.html" import render_field %}
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <html lang="en">
 <head>
 	{% block head %}
@@ -70,6 +69,10 @@
 
 
         </script>
+	<link href="{{ url_for('atom_feed') }}"
+	      rel="alternate"
+	      title="{{ meta.site.title|escape }} - Feed" 
+    	      type="application/atom+xml">
 	{% endblock %}
 </head>
 <body>

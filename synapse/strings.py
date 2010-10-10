@@ -54,8 +54,6 @@ def hash_it(username, password):
     except TypeError:
         return False
 
-def make_external(url):
-    return urljoin(request.url_root, url)
 
 def allowed_file(filename):
     return '.' in filename and \

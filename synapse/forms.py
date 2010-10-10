@@ -1,4 +1,5 @@
-from flaskext.wtf import Form, BooleanField, TextField, validators, PasswordField, FileField, TextAreaField
+from flaskext.wtf import Form, BooleanField, TextField, validators,\
+PasswordField, FileField, TextAreaField, DateTimeField
 
 ## still not working. wish it were. TK
 # be careful of a circular import here
@@ -19,6 +20,8 @@ class GenericFormAbstract(Form):
         validators.length(min=3, max=50)])
     author = TextField('Author')
     #taglist = TagListField('Enter some tags, separated with a comma.')
+    published = DateTimeField('Date to publish');
+    is_published = BooleanField('Publish');
 
 class TextPostForm(GenericFormAbstract):
     content = TextAreaField('Make your mark')

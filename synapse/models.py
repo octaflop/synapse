@@ -79,6 +79,7 @@ class Image(Media):
 
 class Post(Document, object):
     title = StringField(max_length=120)
+    is_published = BooleanField()
     author = ReferenceField(User)
     slug = StringField(required=True)#, unique=True)
     slugid = StringField(required=True, unique=True, max_length=8) #min_length=8, max_length=8)
@@ -93,6 +94,9 @@ class Post(Document, object):
     meta = {
         'ordering': ['-published']
         }
+    @queryset_manager
+    def live_posts(doc_cls, queryset):
+        return queryset(is_published=True).filter(is_published=True)
     @permalink
     def permalink(self):
         return 'post_by_slugid', {'slugid':self.slugid}
