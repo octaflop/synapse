@@ -79,20 +79,24 @@ src="http://i.creativecommons.org/l/by-sa/2.5/ca/88x31.png" /></a><br
 [Creative Commons Attribution-ShareAlike 2.5 Canada License](http://creativecommons.org/licenses/by-sa/2.5/ca/)
 """
 
+def make_external(url):
+    return urljoin(request.url_root, url)
+
 # Atom feed
 @app.route('/feed.atom')
 def atom_feed():
     meta = Meta()
     feed = AtomFeed(u'%s feed' % meta.site,
             feed_url=request.url, url=request.url_root)
-    posts = Posts.query.order_by(Article.created.desc()).all()
+    posts = Post.objects()
     for post in posts:
         feed.add(post.title, unicode(post.html_content),
                 content_type='html',
                 author=post.author.username,
-                url=make_external(post.permalink),
+                url=make_external(url_for('post_by_slugid',\
+                    slugid=post.slugid)),
                 updated=post.updated[0],
-                published=article.created)
+                published=post.created)
         return feed.get_response()
 
 # HOME PAGE
@@ -419,9 +423,10 @@ def post_by_slugid(slugid, slug=None, year=None, month=None, day=None):
     post['created'] =\
         datetime.datetime.strftime(post.created, "%y-%m-%d @ %H:%m")
     updated = []
-    for date in post.updated:
-        updated.append(datetime.datetime.strftime(date, "%y-%m-%d @ %H:%m"))
-    post['updated'] = updated
+    if post.updated:
+        for date in post.updated:
+            updated.append(datetime.datetime.strftime(date, "%y-%m-%d @ %H:%m"))
+        post['updated'] = updated
     showedit = True
     return render_template("text_post.html", meta=meta, text_post=post,\
             showedit=showedit)
