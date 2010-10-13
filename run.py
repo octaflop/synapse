@@ -14,6 +14,6 @@ def prod():
         )).start()
 
 if __name__ == "__main__":
-    from synapse import app
-    app.run(debug=True)
-    #print prod()
+    #from synapse import app
+    #app.run(debug=True)
+    print prod()
