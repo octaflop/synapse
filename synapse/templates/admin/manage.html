@@ -1,0 +1,29 @@
+<!doctype html>
+<div id='manage-content'>
+    <fieldset>
+        <legend>Manage Posts</legend>
+        <ul>
+            {% for post in posts %}
+            <li>
+            <a href={{ url_for('post_by_slugid', slugid=post.slugid) }}<b>{{
+                    post.title }}</a></b> | <i>{{ post.slugid }}</i> |
+            created: {{ post.created }}, updated: {{ post.updated[0] }}
+            </li>
+            {% endfor %}
+        </ul>
+    </fieldset>
+    <fieldset>
+        <legend>Manage Images</legend>
+        <ul>
+            {% for image in images %}
+            <li>
+            <a href={{ url_for('image_by_slugid', slugid=image.slugid) }}<b>{{
+                    image.title }}</a></b> | <i>{{ image.slugid }}</i> |
+            created: {{ image.created }}, updated: {{ image.updated[0] }}
+            </li>
+            {% endfor %}
+        </ul>
+
+    </fieldset>
+</div>
+
