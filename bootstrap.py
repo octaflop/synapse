@@ -13,7 +13,8 @@ def after_install(options, home_dir):
     import os
     os.chdir('nginx-0.8.52')
     try:
-        subprocess.call(['./configure', '--prefix=%s/usr' % (os.getcwd())])
+        subprocess.call(['./configure', '--prefix=%s/usr' % (os.getcwd()),\
+                        '--conf-path=%s/usr/conf/gunicorn.conf' % (os.getcwd())])
         subprocess.call(['make'])
         subprocess.call(['make', 'install'])
     except:
