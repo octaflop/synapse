@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 from settings import UPLOAD_FOLDER, STATIC_PATH
+## from settings import CONNECT
 import datetime
 from strings import permalink
 from mongoengine import *

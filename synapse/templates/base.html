@@ -7,7 +7,10 @@
         <!-- JavaScript -->
 	<!--<script type="text/javascript" src="/static/js/jquery.js"></script>-->
 	<script type="text/javascript" src="/static/js/jquery-1.4.2.min.js"></script>
-        <script type="text/javascript" src="/static/js/jquery-ui-1.8.4.custom.min.js"></script>
+	<!--<script type="text/javascript" src="/static/js/jquery-ui-1.8.4.custom.min.js"></script>-->
+	<script type="text/javascript" src="/static/js/jquery.ui.widget.js"></script>
+	<script type="text/javascript" src="/static/js/jquery.ui.tabs.js"></script>
+	<script type="text/javascript" src="/static/js/jquery.ui.button.js"></script>
         <!-- jQuery Forms -->
         <script type="text/javascript" src="/static/js/jquery.form.js"></script>
         <!-- Galleria -->
@@ -28,7 +31,6 @@
 	<![endif]-->
     <script type='text/javascript'>
             $(document).ready(function () {
-                $(".accordion").accordion();
                 $(".submit_button").button({
                         icons: {
                                 primary: 'ui-icon-save',
@@ -96,7 +98,7 @@
                     {% endif %}
                 </div>
                 <div class="span-5 site-logo last">
-                    <img src="{{ meta.site.logo }}" />
+                    <img src="/{{ meta.site.logo }}" />
                 </div>
                 <div class="menu span-18 colborder last">
                     <ul>
