@@ -1,6 +1,7 @@
+import atexit
+import subprocess
+import os
 def prod():
-    import subprocess
-    import os
     from multiprocessing import Process
 
     Process(target=subprocess.call, args=(
@@ -13,7 +14,20 @@ def prod():
         os.path.join('conf', 'gunicorn.conf')),
         )).start()
 
+def cleanup():
+    subprocess.call(['killall', 'gunicorn'])
+    subprocess.call(['killall', 'nginx'])
+
+
 if __name__ == "__main__":
-    #from synapse import app
-    #app.run(debug=True)
-    print prod()
+    import sys
+    if 'prod' in sys.argv:
+        atexit.register(cleanup)
+        print prod()
+    elif 'dev' in sys.argv:
+        from synapse import app
+        app.run(debug=True)
+    else:
+        from synapse import app
+        app.run(debug=True)
+
