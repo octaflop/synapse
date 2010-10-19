@@ -27,4 +27,4 @@ file.close()
 
 import subprocess
 subprocess.call(['chmod', '+x', 'bootstrap.sh'])
-subprocess.call(['./bootstrap.sh', '../synapse'])
+subprocess.call(['./bootstrap.sh', '../synapse/'])
