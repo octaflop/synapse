@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<script type=text/javascript>
+	$(document).ready(function () {
+                    $("#addwall").html("{{ url_for('add_wall') }}");
+            });
+</script>
+
+<div id="add_wall">
+</div>
+
+<div id='wall'>
+	<ol>
+		{% for wall in walls %}
+		<li>
+			<p><b>{{ wall.username }}</b> wrote:</p>
+			<p>{{ wall.html_content|safe }}</p>
+			<p>on: {{ wall.created }}</p>
+		</li>
+		{% endfor %}
+	</ol>
+</div>
+{% endblock %}
