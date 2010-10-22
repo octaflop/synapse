@@ -115,3 +115,8 @@ class Dependency(Document):
     authors = ListField(StringField())
     imgurl = StringField()
 
+class Wall(Document):
+    content = StringField(required=True)
+    html_content = StringField(required=True)
+    username = StringField(required=True)
+    created = DateTimeField(required=True)

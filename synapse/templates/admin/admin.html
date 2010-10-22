@@ -44,7 +44,9 @@
                 <dl>
                     {{ text_post_form.hidden_tag() }}
                     {{ render_field(text_post_form.title) }}
-                    {{ render_field(text_post_form.author) }}
+                    <dt>{{ text_post_form.author.label|safe }}</dt>
+                    <dd>{{ text_post_form.author(value =
+                    meta.user.username) }}</dd>
                     {{ render_field(text_post_form.content) }}
 		    {{ render_field(text_post_form.is_published) }}
 		    {{ render_field(text_post_form.published) }}

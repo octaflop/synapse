@@ -41,7 +41,7 @@ from forms import *
 from strings import *
 from decorators import template, login_required
 from models import Site, User, Post, TextPost, Media, FlatPage,\
-        Dependency, Image
+        Dependency, Image, Wall
 from PIL import Image as Picture
 
 # markdown extensions
@@ -53,6 +53,10 @@ app.add_url_rule('/uploads/<filename>', 'uploaded_file', build_only=True)
 app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
     '/uploads': UPLOAD_FOLDER,
     })
+app.config.update(
+    RECAPTCHA_PUBLIC_KEY = RECAPTCHA_PUBLIC_KEY,
+    RECAPTCHA_PRIVATE_KEY = RECAPTCHA_PRIVATE_KEY
+    )
 
 # META
 class Meta:
@@ -129,6 +133,33 @@ def about():
     except:
         abort(404)
     return dict(meta=meta, flatpage=flatpage)
+
+# Wall
+@app.route('/wall')
+@template('wall.html')
+def wall():
+    meta = Meta()
+    walls = Wall.objects()
+    return dict(meta=meta, walls=walls)
+
+# Wall Form
+@app.route('/wall/add', methods=['GET', 'POST'])
+@template('wall_form.html')
+def add_wall():
+    meta = Meta()
+    wall_form = WallForm(request.form)
+    if wall_form.validate_on_submit():
+        wall = Wall(username=wall_form.username.data,\
+                content = wall_form.content.data)
+        wall.html_content = markdown(wall.content, extensions)
+        wall.created = datetime.datetime.now()
+        try:
+            wall.save()
+            return redirect(url_for('wall'))
+        except:
+            return abort(500)
+    return dict(meta=meta, wall_form=wall_form)
+
 
 # Meta-flatpage
 # Includes credits

@@ -1,5 +1,5 @@
 from flaskext.wtf import Form, BooleanField, TextField, validators,\
-PasswordField, FileField, TextAreaField, DateTimeField
+PasswordField, FileField, TextAreaField, DateTimeField, RecaptchaField
 
 ## still not working. wish it were. TK
 # be careful of a circular import here
@@ -50,3 +50,8 @@ class DepPostForm(Form):
     url = TextField(u"url of dependency", [validators.required()])
     imgurl = TextField(u"url of dependency logo")
     # authors = TagListField(u"Author names, separated with a comma")
+
+class WallForm(Form):
+    content = TextAreaField(u"", [validators.required()])
+    username = TextField(u"please enter a username", [validators.required()])
+    recaptcha = RecaptchaField(u"Mutually beneficial turing-test")
