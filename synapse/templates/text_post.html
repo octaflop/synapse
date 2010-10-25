@@ -16,7 +16,7 @@ $(document).ready(function() {
         </div>
         <fieldset>
             <legend>metadata</legend>
-        by: {{ text_post.author.username }}<br />
+        by: {{ text_post.author.username|escape }}<br />
         published:{{ text_post.published|escape }}<br />
         created:{{ text_post.created|escape }}<br />
         {% if text_post.updated %}

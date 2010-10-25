@@ -13,17 +13,17 @@ $(document).ready(function() {
                 cancel : 'cancel',
                 indicator : '<img src="/static/img/ajax-loader.gif">',
                 tooltip : 'click to edit',
-                loadurl : 'http://{{ meta.site.domain }}/admin/edit/{{
+                loadurl : '/admin/edit/{{
                 text_post.slugid|escape }}/_title',
                 name    : 'title',
             });
 
-        $(".autogrow").editable("http://{{ meta.site.domain }}/admin/edit/{{
+        $(".autogrow").editable("/admin/edit/{{
             text_post.slugid|escape }}/_content", {
                 submit : 'save',
                 method : 'PUT',
                 cancel : 'cancel',
-                loadurl : 'http://{{ meta.site.domain }}/admin/edit/{{
+                loadurl : '/admin/edit/{{
                 text_post.slugid|escape
                 }}/_content',
                 //tooltip : 'click to edit...',

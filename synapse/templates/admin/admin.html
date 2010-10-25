@@ -2,16 +2,17 @@
 {% from "_formhelpers.html" import render_field %}
 {% block title %}ADMIN{% endblock %}
 {% block content %}
+
 <script type='text/javascript' charset="utf-8">
-            function slugidResponse(responseText, statusText, xhr, $form) {
+           /* function slugidResponse(responseText, statusText, xhr, $form) {
                     $('#content').insertAtCaret(responseText);
                     $('#media').val($('#media').val() + responseText);
-                }
-                $(".add_image").button();
+                }*/
             $(document).ready(function () {
+                $(".add_image").button();
                 var options = {
-                    target: $('#image_msg'),
-                    sucess: slugidResponse
+                    //target: '#image_msg',
+                    //sucess: slugidResponse,
                 }
                 $(".submit_button").button({
                         icons: {
@@ -21,7 +22,9 @@
                 $(".add_image").live('click', function () {
                     $.get("{{ url_for('add_image') }}", 
                         function (data) {
-                            $('.image_upload').ajaxForm(options);
+				$('.image_upload').ajaxForm({
+					target: '#image_msg'
+				});
                             $('.image_form').after(data);
                         });
                 });
@@ -35,7 +38,7 @@
 <div id='admin' class='span-18 colborder'>
     <ul>
         <li><a href='#add-content'>Add Content</a></li>
-        <li><a href='/admin/manage'>Manage Content</a></li>
+        <li><a href='/admin/manage#manage'>Manage Content</a></li>
         <li><a href='#manage-meta'>Manage Meta</a></li>
     </ul>
     <div id='add-content'>
@@ -44,14 +47,15 @@
             <form method="POST" action="/admin/add/text">
                 <dl>
                     {{ text_post_form.hidden_tag() }}
-		    {{ render_field(text_post_form.media) }}
+		    {{ text_post_form.media|safe }}
                     {{ render_field(text_post_form.title) }}
                     <dt>{{ text_post_form.author.label|safe }}</dt>
                     <dd>{{ text_post_form.author(value =
                     meta.user.username) }}</dd>
                     {{ render_field(text_post_form.content) }}
 		    {{ render_field(text_post_form.is_published) }}
-		    {{ render_field(text_post_form.published) }}
+		    {{ render_field(text_post_form.published_date) }}
+		    {{ render_field(text_post_form.published_time) }}
                 </dl>
               <p><input class='submit_button' type='submit' value='save' /></p>
             </form>
