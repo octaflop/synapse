@@ -41,6 +41,7 @@
          <table>
                 <tr>
                         <td><b>Title</b></td>
+                        <td><b>Thumbnail</b></td>
                         <td><b>SlugID</b></td>
                         <td><b>Created</b></td>
                         <td><b>Actions</b></td>
@@ -49,6 +50,12 @@
                 <tr>
                         <td><a href={{ image.orig }}><b>{{
                                     image.title }}</a></b>
+                        </td>
+			<td>
+				<a href={{ image.orig }}>
+					<img alt={{ image.description }} 
+					src={{ image.small }} />
+				</a>
                         </td>
                         <td>
                              <i>{{ image.slugid }}</i>
