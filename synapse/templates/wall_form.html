@@ -1,11 +1,11 @@
-{% extends "base.html" %}
-{% block content %}
-<form method='POST' action='/wall/add'>
-    <fieldset><legend>Add to the wall</legend>
-{{ render_field(wall_form.content) }}
-{{ render_field(wall_form.username) }}
-{{ render_field(wall_form.recaptcha) }}
-<input type='submit' value='add' />
-</fieldset>
-</form>
-{% endblock %}
+{% from "_formhelpers.html" import render_field %}
+    <fieldset>
+    <form method='POST' action='/wall/add'>
+    <legend>Add to the wall</legend>
+    {{ render_field(wall_form.content) }}
+    {{ render_field(wall_form.username) }}
+    {{ render_field(wall_form.recaptcha) }}
+    <input type='submit' value='add' />
+    </form>
+    </fieldset>
+

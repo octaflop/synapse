@@ -5,17 +5,23 @@
 	{% block head %}
 	<title>{% block title %}{{ meta.site.title }}{% endblock %}</title>
         <!-- JavaScript -->
+        <!-- JQuery -->
 	<!--<script type="text/javascript" src="/static/js/jquery.js"></script>-->
 	<script type="text/javascript" src="/static/js/jquery-1.4.2.min.js"></script>
-	<!--<script type="text/javascript" src="/static/js/jquery-ui-1.8.4.custom.min.js"></script>-->
+	<script type="text/javascript" src="/static/js/jquery.ui.core.js"></script>
 	<script type="text/javascript" src="/static/js/jquery.ui.widget.js"></script>
 	<script type="text/javascript" src="/static/js/jquery.ui.tabs.js"></script>
 	<script type="text/javascript" src="/static/js/jquery.ui.button.js"></script>
+	<script type="text/javascript" src="/static/js/jquery.ui.datepicker.js"></script>
         <!-- jQuery Forms -->
         <script type="text/javascript" src="/static/js/jquery.form.js"></script>
         <!-- Galleria -->
 	<script type="text/javascript" src="/static/js/galleria.js"></script>
 	<script type="text/javascript" src="/static/js/galleria/plugins/galleria.flickr.js"></script>
+        <!-- WMD -->
+        <script type="text/javascript" src='/static/js/wmd/wmd.js'></script>
+        <!-- InsertAtCaret -->
+        <script src="/static/js/insertAtCaret.js" type="text/javascript"></script> 
         <!-- jEditable -->
         <script src="/static/js/plugins/jeditable/jquery.jeditable.js" type="text/javascript"></script> 
         <script src="/static/js/plugins/jeditable/jquery.jeditable.autogrow.js" type="text/javascript"></script>
@@ -31,12 +37,7 @@
 	<![endif]-->
     <script type='text/javascript'>
             $(document).ready(function () {
-                $(".submit_button").button({
-                        icons: {
-                                primary: 'ui-icon-save',
-                        },
-                });
-		$(".login_button").button({
+                $(".login_button").button({
 			icons: {
 				primary: 'ui-icon-locked',
 			},
@@ -66,10 +67,9 @@
 				}, 1500, 'swing');
 			}
             	);
+                $("#published").datepicker();
 	});
 </script>
-
-
         </script>
 	<link href="{{ url_for('atom_feed') }}"
 	      rel="alternate"

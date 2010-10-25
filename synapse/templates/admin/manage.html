@@ -2,28 +2,68 @@
 <div id='manage-content'>
     <fieldset>
         <legend>Manage Posts</legend>
-        <ul>
+        <table>
+                <tr>
+                        <td><b>Title</b></td>
+                        <td><b>SlugID</b></td>
+                        <td><b>Created</b></td>
+                        <td><b>Updated</b></td>
+                        <td><b>Actions</b></td>
+                </tr>
             {% for post in posts %}
-            <li>
-            <a href={{ url_for('post_by_slugid', slugid=post.slugid) }}<b>{{
-                    post.title }}</a></b> | <i>{{ post.slugid }}</i> |
-            created: {{ post.created }}, updated: {{ post.updated[0] }}
-            </li>
-            {% endfor %}
-        </ul>
+                <tr>
+                        <td><a href={{ url_for('post_by_slugid',
+                                slugid=post.slugid) }}><b>{{
+                                    post.title }}</a></b>
+                        </td>
+                        <td>
+                             <i>{{ post.slugid }}</i>
+                        </td>
+                        <td>
+                             <i>{{ post.created }}</i>
+                        </td>
+                        <td>
+                             <i>{{ post.updated[0] }}</i>
+                        </td>
+                        <td>
+                            <p><a href='{{ url_for('delete_post',
+                                slugid=post.slugid) }}'>delete</a> | 
+                            <a href='{{ url_for('edit_text_ajax',
+                                slugid=post.slugid) }}'>edit</a>
+                            </p>
+                        </td>
+                </tr>
+                {% endfor %}
+        </table>
     </fieldset>
     <fieldset>
         <legend>Manage Images</legend>
-        <ul>
+         <table>
+                <tr>
+                        <td><b>Title</b></td>
+                        <td><b>SlugID</b></td>
+                        <td><b>Created</b></td>
+                        <td><b>Actions</b></td>
+                </tr>
             {% for image in images %}
-            <li>
-            <a href={{ url_for('image_by_slugid', slugid=image.slugid) }}<b>{{
-                    image.title }}</a></b> | <i>{{ image.slugid }}</i> |
-            created: {{ image.created }}, updated: {{ image.updated[0] }}
-            </li>
-            {% endfor %}
-        </ul>
-
+                <tr>
+                        <td><a href={{ image.orig }}><b>{{
+                                    image.title }}</a></b>
+                        </td>
+                        <td>
+                             <i>{{ image.slugid }}</i>
+                        </td>
+                        <td>
+                             <i>{{ image.created }}</i>
+                        </td>
+                        <td>
+                            <p><a href='{{ url_for('delete_image',
+                                slugid=image.slugid) }}'>delete</a>
+                            </p>
+                        </td>
+                </tr>
+                {% endfor %}
+        </table>
     </fieldset>
 </div>
 

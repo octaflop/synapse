@@ -1,23 +1,42 @@
 {% extends "base.html" %}
 {% block content %}
+{#
 <script type=text/javascript>
 	$(document).ready(function () {
-                    $("#addwall").html("{{ url_for('add_wall') }}");
+                $.get("{{ url_for('add_wall') }}", function(data) {
+                    $("#add_wall").html(data);
+                });
             });
 </script>
-
 <div id="add_wall">
 </div>
+#}
 
-<div id='wall'>
-	<ol>
-		{% for wall in walls %}
-		<li>
-			<p><b>{{ wall.username }}</b> wrote:</p>
-			<p>{{ wall.html_content|safe }}</p>
-			<p>on: {{ wall.created }}</p>
-		</li>
-		{% endfor %}
-	</ol>
+<div class='span-18 colborder'>
+    <fieldset>
+    <form method='POST' action='/wall/add'>
+    <legend>Add to the wall</legend>
+    {{ render_field(wall_form.content) }}
+    {{ render_field(wall_form.username) }}
+    {{ render_field(wall_form.recaptcha) }}
+    <input type='submit' value='add' />
+    </form>
+    </fieldset>
+
+    <div id='wall'>
+            <ol>
+                    {% for wall in walls %}
+                    <li>
+                            <p><b>{{ wall.username }}</b> wrote:</p>
+                            <p>{{ wall.html_content|safe }}</p>
+                            <p>on: {{ wall.created }}</p>
+                    </li>
+                    {% endfor %}
+            </ol>
+    </div>
+
+</div>
+<div class='span-4 last'>
+    Alright
 </div>
 {% endblock %}

@@ -3,29 +3,30 @@
 {% block title %}ADMIN{% endblock %}
 {% block content %}
 <script type='text/javascript' charset="utf-8">
+            function slugidResponse(responseText, statusText, xhr, $form) {
+                    $('#content').insertAtCaret(responseText);
+                    $('#media').val($('#media').val() + responseText);
+                }
+                $(".add_image").button();
             $(document).ready(function () {
                 var options = {
                     target: $('#image_msg'),
+                    sucess: slugidResponse
                 }
+                $(".submit_button").button({
+                        icons: {
+                                primary: 'ui-icon-save',
+                        },
+                });
                 $(".add_image").live('click', function () {
                     $.get("{{ url_for('add_image') }}", 
                         function (data) {
-                        $('.image_upload').ajaxForm(options);
+                            $('.image_upload').ajaxForm(options);
                             $('.image_form').after(data);
                         });
                 });
-/*                $(".post_image").live('click', function () {
-                    $.post("{{ url_for('add_image') }}",
-                        $('#image_upload').serialize(),
-                        function (data) {
-                            $('.image_form').html(data);
-                            //alert(data);
-                        });
-                });*/
-                $(".add_image").button();
             }); 
 </script>
-
 <script type='text/javascript'>
     $(document).ready(function () {
         $('#admin').tabs();
@@ -43,6 +44,7 @@
             <form method="POST" action="/admin/add/text">
                 <dl>
                     {{ text_post_form.hidden_tag() }}
+		    {{ render_field(text_post_form.media) }}
                     {{ render_field(text_post_form.title) }}
                     <dt>{{ text_post_form.author.label|safe }}</dt>
                     <dd>{{ text_post_form.author(value =

@@ -140,7 +140,8 @@ def about():
 def wall():
     meta = Meta()
     walls = Wall.objects()
-    return dict(meta=meta, walls=walls)
+    wall_form = WallForm(request.form)
+    return dict(meta=meta, walls=walls, wall_form=wall_form)
 
 # Wall Form
 @app.route('/wall/add', methods=['GET', 'POST'])
@@ -194,6 +195,25 @@ def profile(username=None, id=None):
             user_is_home = True
     return render_template("home.html", meta=meta,\
             userpage=userpage,user_is_home=user_is_home)
+
+# Image deleter
+@app.route('/image/<slugid>/delete')
+@login_required
+def delete_image(slugid):
+    try:
+        image = Image.objects(slugid=slugid).get()
+    except:
+        return error(404)
+    try:
+        slugid = image.slugid
+        title = image.title
+        image.delete()
+        flash("The image '%s' with slugid '%s' was deleted." % (title, slugid))
+    except:
+        flash("Could not delete image")
+    return redirect(url_for('admin'))
+
+
 
 # Image Getter
 @app.route('/image/<title>')
@@ -358,6 +378,22 @@ def edit_text_ajax(slugid, year=None, month=None, day=None, slug=None):
     return render_template("add_text_post.html", meta=meta,\
             text_post=text_post)
 
+@app.route('/<slugid>/delete')
+@login_required
+def delete_post(slugid):
+    try:
+        asset = Post.objects(slugid=slugid).get()
+    except:
+        error(404)
+    try:
+        slugid = asset.slugid
+        title = asset.title
+        asset.delete()
+        flash("Post '%s'. With slugid '%s' was deleted." % (title, slugid))
+    except:
+        error(404)
+    return redirect(url_for('admin'))
+
 @login_required
 @app.route('/admin/add/site', methods=['POST'])
 def add_site():
@@ -404,6 +440,18 @@ def add_text_post():
         except:
             flash("user not found")
             return redirect(url_for('add_text_post', form=form))
+        def rip_media(mediastr):
+            try:
+                assert len(mediastr) % 8 == 0
+            except:
+                flash("could not save media %s " % escape(form.media.data))
+            ret = []
+            for i in range(len(mediastr) / 8):
+                ret.append(mediastr[i*8:(i+1)*8])
+        media = rip_media(form.media.data)
+        for j in range(len(media)):
+            med = Media.objects(slugid=media[j]).get()
+            text_post.media.append(med)
         text_post.created = datetime.datetime.now()
         text_post.title = escape(form.title.data)
         text_post.content = escape(form.content.data)
@@ -519,8 +567,7 @@ def add_image():
                     large=large)
             try:
                 image.save()
-                return "Image uploaded successfully to slugid %s. pathed to %s" %\
-                    (image.slugid, image.path)
+                return image.slugid
             except:
                 return "Something went wrong while saving"
     return render_template('add_image.html', meta=meta, form=form)
