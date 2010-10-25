@@ -80,7 +80,6 @@ class Image(Media):
 
 class Post(Document, object):
     title = StringField(max_length=120)
-    is_published = BooleanField()
     author = ReferenceField(User)
     slug = StringField(required=True)#, unique=True)
     slugid = StringField(required=True, unique=True, max_length=8) #min_length=8, max_length=8)
@@ -89,6 +88,7 @@ class Post(Document, object):
     # datetime
     created = DateTimeField()
     published = DateTimeField()
+    is_published = BooleanField()
     updated = ListField(DateTimeField())
     media = ListField(ReferenceField(Media))
     comments = ListField(EmbeddedDocumentField(Comment))
@@ -96,7 +96,7 @@ class Post(Document, object):
         'ordering': ['-published']
         }
     @queryset_manager
-    def live_posts(doc_cls, queryset):
+    def live(doc_cls, queryset):
         return queryset(is_published=True).filter(is_published=True)
     @permalink
     def permalink(self):

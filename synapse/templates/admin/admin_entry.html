@@ -8,11 +8,13 @@
     <dl>
 	{{ form.hidden_tag() }}
 	{{ render_field(form.title) }}
-        {{ render_field(form.author) }}
+        <dt>{{ form.author.label|safe }}</dt>
+        <dd>{{ form.author(value =
+        meta.user.username) }}</dd>
         {{ render_field(form.content) }}
         {{ render_field(form.is_published) }}
-        {{ render_field(form.published) }}
-        {## render_field(form.taglist) ##}
+        {{ render_field(form.published_date) }}
+        {{ render_field(form.published_time) }}
     </dl>
   <p><input type=submit value='save' /></p>
 </form>

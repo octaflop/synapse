@@ -322,7 +322,7 @@ def admin():
 
 @app.route('/admin/edit/<slugid>/_title', methods=['POST', 'PUT', 'GET'])
 @login_required
-def add_text__title(slugid, ):
+def add_text__title(slugid):
     """Ajax event to title"""
     try:
         text_post = TextPost.objects(slugid=slugid).first()
@@ -440,6 +440,7 @@ def add_text_post():
         except:
             flash("user not found")
             return redirect(url_for('add_text_post', form=form))
+        # Media ripping method
         def rip_media(mediastr):
             try:
                 assert len(mediastr) % 8 == 0
@@ -448,10 +449,18 @@ def add_text_post():
             ret = []
             for i in range(len(mediastr) / 8):
                 ret.append(mediastr[i*8:(i+1)*8])
-        media = rip_media(form.media.data)
-        for j in range(len(media)):
-            med = Media.objects(slugid=media[j]).get()
-            text_post.media.append(med)
+        if form.media.data:
+            media = rip_media(form.media.data)
+            if media:
+                for j in range(len(media)):
+                    med = Media.objects(slugid=media[j]).get()
+                    text_post.media.append(med)
+        published_time = escape(form.published_time.data)
+        published_date = escape(form.published_date.data)
+        published = "%s %s" % (published_date, published_time)
+        datetimeformat = "%Y-%m-%d %H:%M"
+        published = datetime.datetime.strptime(published, datetimeformat)
+        text_post.published = published
         text_post.created = datetime.datetime.now()
         text_post.title = escape(form.title.data)
         text_post.content = escape(form.content.data)
