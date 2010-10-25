@@ -16,7 +16,7 @@
                 <div class="post_img span-3 last">
                     <ul class='galleria'>
                         {% for media in post.media %}
-                        <img src="{{ media.raw }}" alt={{
+                        <img src="{{ media.medium }}" alt={{
                         media.description|escape }} />
                         {% endfor %}
                 </div>

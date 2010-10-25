@@ -1,5 +1,6 @@
 from flaskext.wtf import Form, BooleanField, TextField, validators,\
-PasswordField, FileField, TextAreaField, DateTimeField, RecaptchaField
+PasswordField, FileField, TextAreaField, DateTimeField, RecaptchaField,\
+HiddenField
 
 ## still not working. wish it were. TK
 # be careful of a circular import here
@@ -25,6 +26,7 @@ class GenericFormAbstract(Form):
 
 class TextPostForm(GenericFormAbstract):
     content = TextAreaField('Make your mark')
+    media = HiddenField(u'')
 
 class AudioPostForm(TextPostForm):
     description = TextField("Describe the audio file")

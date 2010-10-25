@@ -5,7 +5,8 @@
 <form action="/admin/add/image" method='POST' class="image_upload" enctype='multipart/form-data'>
         {{ form.hidden_tag() }}
         {{ render_field(form.title) }}
-        {{ render_field(form.author) }}
+        <dt>{{ form.author.label|safe }}</dt>
+        <dd>{{ form.author(value = meta.user.username) }}</dd>
         {{ render_field(form.image) }}
         {{ render_field(form.description) }}
         <p><input type=submit value='Upload Image' /></p>
