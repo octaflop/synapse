@@ -39,7 +39,7 @@
 	<link rel="stylesheet" type="text/css" href="/static/css/blueprint/src/forms.css" media="screen,projection" />
 	<link rel="stylesheet" type="text/css" href="/static/css/blueprint/print.css" media="print" />
 	<!--[if lt IE 8]>
-	    <link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen,projection" />
+        <link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen,projection" />
 	<![endif]-->
     <script type='text/javascript'>
             $(document).ready(function () {
@@ -75,7 +75,7 @@
             	);
 		$("#published_date").datepicker({
 		        dateFormat: "yy-mm-dd"
-				});
+                        });
 	});
 </script>
         </script>
@@ -95,10 +95,10 @@
     {% endblock %}
     <div class="container">
         <div class="span-24 last">
+	{% block header %}
             <div class="span-18 colborder" id="header">
-                {% block header %}
                 <div class="site-banner span-11 prepend-1">
-                    <h1><a href="http://{{ meta.site.domain }}" title="home">{{ meta.site.title }}</a></h1>
+                    <h1><a href="/" title="home">{{ meta.site.title }}</a></h1>
                     {% if meta.site.motto %}
                     <h4>
                         {{ meta.site.motto }}
@@ -110,14 +110,13 @@
                 </div>
                 <div class="menu span-18 colborder last">
                     <ul>
-			    <li><a href="http://{{ meta.site.domain }}/">home</a></li>
-			    <li><a href="http://{{meta.site.domain}}/about">about</a></li>
+			    <li><a href="/">home</a></li>
+			    <li><a href="/about">about</a></li>
 			    {% if meta.logged_in %}
-			    <li><a href="http://{{meta.site.domain}}/admin">admin</a></li>
+			    <li><a href="/admin">admin</a></li>
 			    {% endif %}
                     </ul>
                 </div>
-                {% endblock %}
             </div>
         <div id="userbox" class="span-4 last">
             {% if meta.logged_in %}
@@ -136,6 +135,7 @@
             {% endif %}
         </div>
     </div>
+    {% endblock %}
     {% block content %}
     {% if flatpage %}
     <h1>{{ flatpage.title }}</h1>

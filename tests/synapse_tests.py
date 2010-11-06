@@ -10,9 +10,12 @@ Divided into:
 """
 
 import os
-import app as synapse
+import synapse
 import unittest
 import tempfile ## may be redundant
+
+# Fixtures
+from fixtures import *
 
 
 class SynapseTestCase(unittest.TestCase):
@@ -33,8 +36,12 @@ class SynapseTestCase(unittest.TestCase):
             title = 'Hellz',
             text = '**bellz**'
             ), follow_redirects=True)
-        assert 'Hellz' in rv.data
-        assert '<b>bellz</b>' in rv.data
+        try:
+            assert 'Hellz' in rv.data
+            assert '<b>bellz</b>' in rv.data
+        except:
+            print rv.data
+            return rv.data
 
     def register(self, username, password):
         return self.app.post('/admin/add/user', data=dict(
@@ -53,8 +60,8 @@ class SynapseTestCase(unittest.TestCase):
 
     def test_login_logout(self):
         rv = self.login(u'cogno', u'powers')
-        print rv
-        assert '200 OK' in rv.data
+        print rv.data
+        assert 'cogno' in rv.data
 
     def test_false_login(self):
         rv = self.login('admin', 'default')

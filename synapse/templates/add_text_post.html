@@ -5,7 +5,7 @@
 <script type="text/javascript" charset="utf-8">
 // <![CDATA[
 $(document).ready(function() {
-        $(".title").editable("http://{{ meta.site.domain }}/admin/edit/{{
+        $(".title").editable("/admin/edit/{{
             text_post.slugid|escape }}/_title",
             {
                 submit : 'save',

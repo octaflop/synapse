@@ -2,38 +2,22 @@
 {% from "_formhelpers.html" import render_field %}
 {% block title %}ADMIN{% endblock %}
 {% block content %}
-
 <script type='text/javascript' charset="utf-8">
-           /* function slugidResponse(responseText, statusText, xhr, $form) {
-                    $('#content').insertAtCaret(responseText);
-                    $('#media').val($('#media').val() + responseText);
-                }*/
-            $(document).ready(function () {
-                $(".add_image").button();
-                var options = {
-                    //target: '#image_msg',
-                    //sucess: slugidResponse,
-                }
-                $(".submit_button").button({
-                        icons: {
-                                primary: 'ui-icon-save',
-                        },
-                });
-                $(".add_image").live('click', function () {
-                    $.get("{{ url_for('add_image') }}", 
-                        function (data) {
-				$('.image_upload').ajaxForm({
-					target: '#image_msg'
-				});
-                            $('.image_form').after(data);
-                        });
-                });
-            }); 
-</script>
-<script type='text/javascript'>
     $(document).ready(function () {
+	$(".add_image").button();
         $('#admin').tabs();
-    });
+	$(".submit_button").button({
+		icons: {
+			primary: 'ui-icon-save',
+		},
+	});
+	$(".add_image").click(function () {
+	    $.get("{{ url_for('add_image') }}", 
+		function (data) {
+			$('.image_form').after(data);
+		});
+	});
+    }); 
 </script>
 <div id='admin' class='span-18 colborder'>
     <ul>

@@ -45,7 +45,8 @@ from models import Site, User, Post, TextPost, Media, FlatPage,\
 from PIL import Image as Picture
 
 # markdown extensions
-extensions = ['footnotes', 'fenced_code']
+#extensions = ['footnotes', 'fenced_code']
+extensions = ['footnotes', 'codehilite']
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
@@ -60,6 +61,10 @@ app.config.update(
 
 # META
 class Meta:
+    """
+    The meta class is called for all base-page requests.
+    This includes the theme mangement options
+    """
     def __init__(self):
         self.logged_in = False
         self.loginform = LoginForm(request.form)
@@ -203,7 +208,7 @@ def delete_image(slugid):
     try:
         image = Image.objects(slugid=slugid).get()
     except:
-        return error(404)
+        return abort(404)
     try:
         slugid = image.slugid
         title = image.title
@@ -394,6 +399,7 @@ def delete_post(slugid):
         error(404)
     return redirect(url_for('admin'))
 
+## TK Fix this. Use the proper mongo method...
 @login_required
 @app.route('/admin/add/site', methods=['POST'])
 def add_site():
@@ -449,6 +455,7 @@ def add_text_post():
             ret = []
             for i in range(len(mediastr) / 8):
                 ret.append(mediastr[i*8:(i+1)*8])
+            return ret
         if form.media.data:
             media = rip_media(form.media.data)
             if media:
@@ -476,6 +483,19 @@ def add_text_post():
             return redirect(url_for('add_text_post', meta=meta, form=form, site=site,\
                     loginform=loginform))
     return render_template('admin/admin_entry.html', meta=meta, form=form)
+
+@app.route('/image/<slugid>/url')
+def slugid_to_url(slugid):
+    """
+    Get the slugid from a GET request and return the url
+    """
+    meta = Meta()
+    try:
+        image = Image.objects(slugid=slugid).get()
+    except:
+        return abort(404)
+    return jsonify(slugid=image.slugid, title=image.title, url=image.medium,\
+            filename=image.filename)
 
 @app.route('/media/<slugid>')
 @app.route('/media/<slugid>/<slug>')
@@ -563,19 +583,22 @@ def add_image():
                 large = os.path.join(STATIC_PATH, 'large', filename)
             except:
                 return "error in file %s upload" % filename
-            image = Image(title=form.title.data, \
-                    author=User.objects(username=form.author.data).get(),\
-                    description=form.description.data,\
-                    slug=slugfy(form.title.data), slugid=slugid,\
-                    filename=filename, created=datetime.datetime.now(),\
-                    published=datetime.datetime.now(),\
-                    path=path,\
-                    orig=orig,\
-                    small=small,\
-                    medium=medium,\
-                    large=large)
+            image = Image(
+                title=form.title.data, \
+                author=User.objects(username=form.author.data).get(),\
+                description=form.description.data,\
+                slug=slugfy(form.title.data), slugid=slugid,\
+                filename=filename, created=datetime.datetime.now(),\
+                published=datetime.datetime.now(),\
+                path=path,\
+                orig=orig,\
+                small=small,\
+                medium=medium,\
+                large=large
+                )
             try:
                 image.save()
+                #return jsonify(slugid=image.slugid)
                 return image.slugid
             except:
                 return "Something went wrong while saving"

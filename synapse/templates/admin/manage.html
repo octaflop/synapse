@@ -1,4 +1,11 @@
 <!doctype html>
+<script>
+        $(document).ready(function () {
+            // Load theme
+            Galleria.loadTheme('static/js/galleria/themes/classic/galleria.classic.js');
+            $('.images').galleria();
+        });
+</script>
 <div id='manage-content'>
     <fieldset>
         <legend>Manage Posts</legend>
@@ -8,6 +15,7 @@
                         <td><b>SlugID</b></td>
                         <td><b>Created</b></td>
                         <td><b>Updated</b></td>
+                        <td><b>Related</b></td>
                         <td><b>Actions</b></td>
                 </tr>
             {% for post in posts %}
@@ -24,6 +32,23 @@
                         </td>
                         <td>
                              <i>{{ post.updated[0] }}</i>
+                        </td>
+                        <td>
+                            {% if post.media %}
+                            <div class='images span-6'>
+                                <ul>
+                                {% for media in post.media %}
+                                    <li><b>{{ media.title }}</b><br />
+                                    <a href='{{ url_for('image_by_slugid',
+                                        slugid=media.slugid) }}'><img src='{{
+                                        media.small }}' alt='{{ media.description
+                                        }}' /></a></li>
+                                {% endfor %}
+                                </ul>
+                            </div>
+                            {% else %}
+                            <i>none</i>
+                            {% endif %}
                         </td>
                         <td>
                             <p><a href='{{ url_for('delete_post',
