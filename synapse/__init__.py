@@ -272,13 +272,6 @@ def login(next=None):
             abort(500)
     return render_template('login.html', meta=meta, form=form)
 
-#TODO
-"""
-make "user", "image"; etc in a tuple which is called by both the models and the view.
-perhaps make a metafile to this effect.
-or maybe put them in separate apps.
-~foenix
-"""
 @template('text_post.html')
 def single_text_post(year, month, day, slugid, slug=None):
     meta = Meta()
