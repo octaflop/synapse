@@ -1,7 +1,34 @@
-<!doctype html>
 {% from "_formhelpers.html" import render_field %}
+<!DOCTYPE html>
 <fieldset>
 <legend>Add an image</legend>
+<script type='text/javascript'>
+	$(document).ready(function () {
+		var options = {
+                    dataType: 'txt',
+                    success: slugidResponse,
+                }
+                function slugidToObj(slugid) {
+                    var req = "/image/" + slugid + "/url";
+                    $.getJSON(req, function(obj) {
+                            var imgstr =  "![" + obj.title + "](" + obj.url +
+                            ")";
+                            $('#content').val($('#content').val() + imgstr);
+                            $('#media').val($('#media').val() + obj.slugid);
+                            var imgmsg = obj.title + " was added with slug: " + obj.slugid;
+                            $('#image_msg').html($('#image_msg').html() + imgmsg);
+                        });
+                }
+		function slugidResponse(slugid_html) {
+                    var slugid = slugid_html.replace(/(<([^>]+)>)/ig,"");
+                    slugidToObj(slugid);
+		}
+                $('.image_upload').submit(function() {
+                    $(this).ajaxSubmit(options);
+                    return false;
+                });
+	});
+</script>
 <form action="/admin/add/image" method='POST' class="image_upload" enctype='multipart/form-data'>
         {{ form.hidden_tag() }}
         {{ render_field(form.title) }}
@@ -9,6 +36,6 @@
         <dd>{{ form.author(value = meta.user.username) }}</dd>
         {{ render_field(form.image) }}
         {{ render_field(form.description) }}
-        <p><input type=submit value='Upload Image' /></p>
+        <p><input type='submit' class='image_upload' value='Upload Image' /></p>
 </form>
 </fieldset>

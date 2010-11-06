@@ -1,20 +1,32 @@
 {% extends "base.html" %}
 {% block title %}Welcome: Index{% endblock %}
 {% block content %}
-       <div class='prepend-1 posts span-17 colborder'>
-                {% for post in posts %}
-                <div class="post_text span-10 colborder">
-                    <h1><a href="/post/{{ post.slugid }}/{{ post.slug }}">{{ post.title
-                            }}</a></h1><p><b>{{ post.created }}</b></p>
+	<script>
+		$(document).ready(function () {
+		    // Load theme
+		    Galleria.loadTheme('static/js/galleria/themes/classic/galleria.classic.js');
+		    $('#images').galleria();
+		});
+	</script>
+       <div id='posts' class='prepend-1 posts span-17 colborder'>
+              {% for post in posts %}
+            <div class="post_text span-10 colborder">
+            <h1>
+                <a href="/post/{{ post.slugid }}/{{ post.slug }}">{{
+                   post.title }}</a>
+            </h1>
                     <div class="content">
-                    {{ post.html_content|safe }}<a href="/post/{{ post.slug
-                        }}" title="read more">...</a>
+                        {{ post.html_content|safe }}
                     </div>
-                    id:{{ post.id }}
+                    <div>
+                        <p>slugid:{{ post.slugid }}</p>
+                        <p><b>{{ post.created }}</b></p>
+                        <a href="/post/{{ post.slug }}" title="read more">...</a>
+                    </div>
                 </div>
                 {% if post.media %}
                 <div class="post_img span-3 last">
-                    <ul class='galleria'>
+                    <ul id='galleria'>
                         {% for media in post.media %}
                         <img src="{{ media.medium }}" alt={{
                         media.description|escape }} />
@@ -25,19 +37,22 @@
                     &nbsp;
                 </div>
                 {% endif %}
+                <hr />
                 {% endfor %}
             </ul>
         </div>
         <div class='span-5 last'>
             <h1>Images</h1>
-            <ul>
-                {% for image in images %}
-                <li><b>{{ image.title }}</b><br />
-                <a href='{{ url_for('image_by_slugid', slugid=image.slugid)
-                    }}' ><img src='{{ image.small }}' alt='{{ image.description
-                    }}' /></a></li>
-                {% endfor %}
-            </ul>
+	    <div id='images'>
+		    <ul>
+			{% for image in images %}
+			<li><b>{{ image.title }}</b><br />
+			<a href='{{ url_for('image_by_slugid', slugid=image.slugid)
+			    }}' ><img src='{{ image.small }}' alt='{{ image.description
+			    }}' /></a></li>
+			{% endfor %}
+		    </ul>
+	    </div>
             <h1>Users</h1>
             <ul>
                 {% for user in users %}
@@ -46,39 +61,6 @@
                 {% endfor %}
             </ul>
         </div>
-
-<!--	<div class='span-20'>
-            <ul id="gallery">
-                {% for image in images: %}
-                <li><a href="#"><img src='{{ image.src }}' /></a></li>
-                {% endfor %}
-            </ul>
-        </div>-->
 {% endblock %}
-<!--    <script>
-        //$(document).ready(function){
-            // Load theme
-            Galleria.loadTheme('static/js/galleria/themes/classic/galleria.classic.js');
-            $('#gallery').galleria();
-            // initialize flickr plugin
-            var flickr = new Galleria.Flickr('fddd7bc223fe37295faace93a4f2d8fc');
-            // search for photos tagged 'lomo', edit options and apply galleria
-            flickr.setOptions({
-                max: 50,
-                sort: 'relevancy'
-            }).getTags('simon fraser university', function(data) {
-                $('#galleria').galleria({
-                    data_source: data,
-                    image_crop: false,
-                    frame_color: '#000',
-                    transition: 'fade',
-                    hide_dock: false,
-                    extend: function() {
-                        this.$('info,counter').hide();
-                    }
-                });
-            });
-        //}
-    </script>
-    </body>
-</html>-->
+</body>
+</html>
