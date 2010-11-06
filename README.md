@@ -1,7 +1,7 @@
 # Synapse
 # Synapse
 
-![synapse logo](./synapse.png)
+![synapse logo](./synapse/raw/master/synapse.png)
 
 ## Description
 Synapse is a simple blogging application written in Flask and supported by
