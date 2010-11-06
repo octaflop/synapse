@@ -11,10 +11,15 @@ ininitialing the database with the init_db() command:
     >>>> init_db()
 """
 
-#from passwd import *
-DEV = True
-SECRET_KEY = 'vba937ei38mq2'
-SALT = 'vba937ei38mq2'
+"""
+Make a 'passwd.py' file and add the following
+constants:
+    MONGO_PASSWD
+    MONGO_HOST
+"""
+# From passwd import *DEV = True
+SECRET_KEY = 'vba937ei38mq2' ## CHANGE THIS
+SALT = 'vba937ei38mq2' ## CHANGE THIS
 #UPLOAD_FOLDER = '/tmp/uploads/'
 UPLOAD_FOLDER = '%s/synapse/static/uploads/' % os.getcwd()
 STATIC_PATH = '/static/uploads/'

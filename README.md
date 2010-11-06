@@ -12,7 +12,7 @@ MongoDB.
 use***. Be sure to report any bugs, and feel free to write your own patches.
 
 As this is the first software I've ever distributed freely (and I'm not a
-programmer by profession), there may be a few issues with the code. I have tried
+programmer by profession --- a painfully clear point when sees the 'ol git logs), there may be a few issues with the code. I have tried
 to automate most of the install process (which is documented below) and wrote
 some very basic tests (which sometimes don't pass). I could really use some help
 in writing tests and documentation.
@@ -21,9 +21,12 @@ in writing tests and documentation.
 # Getting Started
 
 ## Requirements:
+* mongodb
 * virtualenv
 
 ## Steps
+0. Start mongodb
+
 1. Run  
     python bootstrap.py
 
