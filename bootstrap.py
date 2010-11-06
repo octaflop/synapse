@@ -22,12 +22,6 @@ def after_install(options, home_dir):
 
     try:
         os.chdir(join(home_dir, '/synapse'))
-        qrcode =\
-        "http://pyqrnative.googlecode.com/svn/trunk/pyqrnative/src/PyQRNative.py"
-        subprocess.call([join('/usr/bin/', 'wget'),\
-                '-o', 'qrcode.py', qrcode])
-    except:
-        print "some sort of error occurred when downloading qrcode"
 """))
 
 file = open('bootstrap.sh', 'w')
