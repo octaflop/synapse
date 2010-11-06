@@ -2,9 +2,11 @@
 
 ![synapse logo](./synapse/raw/master/synapse.png)
 
-## Description
-Synapse is a simple blogging application written in Flask and supported by
-MongoDB. As a bonus, it "bootstraps" itself to build a gunicorn server backend for speedy production!
+## Description 
+Synapse is a simple blogging application written in
+[Flask](http://flask.pocoo.com/) and supported by
+[MongoDB](http://www.mongodb.org/). As a bonus, it "bootstraps" itself to build
+a [gunicorn](http://gunicorn.org/) server backend for speedy production!
 
 ## Caveats
 
