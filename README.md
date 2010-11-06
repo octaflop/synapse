@@ -1,10 +1,11 @@
 # Synapse
+# Synapse
 
-[! ./logo.png]
+![synapse logo](./synapse.png)
 
 ## Description
 Synapse is a simple blogging application written in Flask and supported by
-MongoDB.
+MongoDB. As a bonus, it "bootstraps" itself to build a gunicorn server backend for speedy production!
 
 ## Caveats
 

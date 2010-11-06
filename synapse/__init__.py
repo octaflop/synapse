@@ -168,16 +168,19 @@ def add_wall():
 
 
 # Meta-flatpage
-# Includes credits
+# Includes credits for hosting.
+## TODO
+"""
 @app.route('/cleft')
 @template('cleft.html')
 def cleft():
     meta = Meta()
-    flatpage = FlatPage.objects
+    flatpage = FlatPage.objects(title=Dep
     dependencies = Dependency.objects()
     copyrightinfo = markdown(meta.copyrightinfo)
     return dict(meta=meta, flatpage=flatpage, dependencies=dependencies,\
             copyrightinfo=copyrightinfo)
+"""
 
 # GETTERS
 @app.route('/profile/<username>')
@@ -653,7 +656,7 @@ def reset_db():
         sites = Site.objects()
         users = User.objects()
         images = Image.objects()
-        deps = Dependancy.objects()
+        deps = Dependency.objects()
         flatpages = FlatPage.objects()
 
         posts.delete()
@@ -687,12 +690,14 @@ def dev_site():
 **This** is an example post for the wonderful site of %s.  
 This is a simple dev-post. Ready to be deleted at your leisure.  
 [This](http://example.com/#) is a link.  
-and  
 """ % (meta.domain)
     html_content = markdown(content, extensions)
     title = u"Hello, World!"
     post = Post(title=title,content=content, html_content=html_content, author=user)
     post.slugid = slugidfy()
     post.slug = slugfy(title)
+    post.published = datetime.datetime.now()
+    post.created = datetime.datetime.now()
+    post.is_published = True
     post.save()
 
