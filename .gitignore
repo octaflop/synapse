@@ -3,4 +3,4 @@
 *.log
 *.tmp.*
 passwd.py
-static/photos/*
+synapse/static/uploads/*

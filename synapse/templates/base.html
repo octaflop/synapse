@@ -78,7 +78,7 @@
                         });
 	});
 </script>
-        </script>
+</script>
 	<link href="{{ url_for('atom_feed') }}"
 	      rel="alternate"
 	      title="{{ meta.site.title|escape }} - Feed" 
@@ -106,7 +106,7 @@
                     {% endif %}
                 </div>
                 <div class="span-5 site-logo last">
-                    <img src="/{{ meta.site.logo }}" />
+                    <img src="{{ meta.site.logo }}" />
                 </div>
                 <div class="menu span-18 colborder last">
                     <ul>
