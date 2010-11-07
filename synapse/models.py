@@ -4,7 +4,7 @@ from settings import UPLOAD_FOLDER, STATIC_PATH
 import datetime
 from strings import permalink
 from mongoengine import *
-connect('synapse')
+connect(MONGO_HOST, username=MONGO_USERNAME, password=MONGO_PASSWD)
 
 SALT = "FAkeSa8r3y2qwi"
 #EMAILREG =\

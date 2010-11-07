@@ -14,8 +14,6 @@ ininitialing the database with the init_db() command:
 """
 Make a 'passwd.py' file and add the following
 constants:
-    MONGO_PASSWD
-    MONGO_HOST
 """
 # From passwd import *DEV = True
 SECRET_KEY = 'vba937ei38mq2' ## CHANGE THIS
@@ -33,7 +31,4 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'gif'])
 
 TIME_ZONE = 'America/Vancouver' # Doesn't do anything, yet
 
-## RECAPTCHA SETTINGS
-RECAPTCHA_PUBLIC_KEY = "6Lf0JL0SAAAAAG1SCgtzqjEyFhG63Xp0FtXmoktb"
-RECAPTCHA_PRIVATE_KEY = "6Lf0JL0SAAAAAEVVxQaOrrZoZoEx8n1EaU0Ad_bQ"
 
