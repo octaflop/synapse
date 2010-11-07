@@ -17,9 +17,6 @@ def after_install(options, home_dir):
         subprocess.call(['make', 'install'])
     except:
         print "some sort of error occurred when installing nginx"
-
-    try:
-        os.chdir(join(home_dir, '/synapse'))
 """))
 
 file = open('bootstrap.sh', 'w')

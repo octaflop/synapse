@@ -3,4 +3,6 @@
 *.log
 *.tmp.*
 passwd.py
-synapse/static/uploads/*
+synapse/static/uploads/*.jpg
+synapse/static/uploads/*.png
+synapse/static/uploads/*.gif
