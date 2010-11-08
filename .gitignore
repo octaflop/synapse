@@ -2,7 +2,5 @@
 *.pyc
 *.log
 *.tmp.*
-passwd.py
-synapse/static/uploads/*.jpg
-synapse/static/uploads/*.png
-synapse/static/uploads/*.gif
+synapse/passwd.py
+synapse/static/uploads/{small,medium,large,orig}/*.{jpg,png,gif}

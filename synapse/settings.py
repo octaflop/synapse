@@ -15,7 +15,7 @@ ininitialing the database with the init_db() command:
 Make a 'passwd.py' file and add the following
 constants:
 """
-# From passwd import *DEV = True
+from passwd import *
 SECRET_KEY = 'vba937ei38mq2' ## CHANGE THIS
 SALT = 'vba937ei38mq2' ## CHANGE THIS
 #UPLOAD_FOLDER = '/tmp/uploads/'

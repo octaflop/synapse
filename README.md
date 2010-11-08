@@ -35,7 +35,7 @@ in writing tests and documentation.
         source bin/activate
 
 3. Get database settings in order:
-        cp passwd-example.py passwd.py
+        cp synapse/passwd-example.py synapse/passwd.py
         vim passwd.py
 
 4. For development, run:
