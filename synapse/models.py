@@ -1,10 +1,10 @@
 # -*- encoding: utf-8 -*-
-from settings import UPLOAD_FOLDER, STATIC_PATH
+from settings import *
+## from settings import CONNECT
 import datetime
 from strings import permalink
 from mongoengine import *
-if 
-connect('synapse')
+connect(MONGO_DB_NAME, username=MONGO_USERNAME, password=MONGO_PASSWD)
 
 SALT = "FAkeSa8r3y2qwi"
 #EMAILREG =\
