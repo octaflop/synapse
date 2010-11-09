@@ -61,7 +61,8 @@ href="http://creativecommons.org/licenses/by-sa/2.5/ca/"><img
 alt="Creative Commons License" style="border-width:0"
 src="http://i.creativecommons.org/l/by-sa/2.5/ca/88x31.png" /></a><br
 />Content is released under a
-[Creative Commons Attribution-ShareAlike 2.5 Canada License](http://creativecommons.org/licenses/by-sa/2.5/ca/)
+<a href='http://creativecommons.org/licenses/by-sa/2.5/ca/'>Creative Commons
+Attribution-ShareAlike 2.5 Canada License</a>
 """
         self.footy['copyrightinfo'] = copyrightinfo_html
         # May want to set up a model from the flatpages.
