@@ -52,9 +52,9 @@ class Meta:
         else:
             self.user = None
         self.site = Site.objects.first()
-        assert self.site is not None
         ## this should probably be somewhere else (in the model?)
-        self.copyrightinfo = \
+        self.footy = {}
+        copyrightinfo_html = \
 u"""
 <a rel="license"
 href="http://creativecommons.org/licenses/by-sa/2.5/ca/"><img
@@ -63,6 +63,12 @@ src="http://i.creativecommons.org/l/by-sa/2.5/ca/88x31.png" /></a><br
 />Content is released under a
 [Creative Commons Attribution-ShareAlike 2.5 Canada License](http://creativecommons.org/licenses/by-sa/2.5/ca/)
 """
+        self.footy['copyrightinfo'] = copyrightinfo_html
+        # May want to set up a model from the flatpages.
+        self.footy['links'] = [{\
+                'title' : u"github page",
+                'url' : u"http://github.org/octaflop/synapse"
+                }]
 
 def make_external(url):
     return urljoin(request.url_root, url)
@@ -415,11 +421,12 @@ def add_text_post():
     if form.validate_on_submit():
         username = escape(session['username'])
         text_post = TextPost(slug=slugfy(form.title.data))
+        text_post.is_published = form.is_published.data
         try:
             text_post.author = User.objects(username=username).get()
         except:
             flash("user not found")
-            return redirect(url_for('add_text_post', form=form))
+            return redirect(url_for('add_text_post', meta=meta, form=form))
         # Media ripping method
         def rip_media(mediastr):
             try:
@@ -453,9 +460,8 @@ def add_text_post():
                 text_post.slugid))
             return redirect(url_for('post_by_slugid', slugid=text_post.slugid))
         except:
-            flash("DBG: slug not unique")
-            return redirect(url_for('add_text_post', meta=meta, form=form, site=site,\
-                    loginform=loginform))
+            flash("Error: Post was not saved")
+            return redirect(url_for('add_text_post', meta=meta, form=form))
     return render_template('admin/admin_entry.html', meta=meta, form=form)
 
 @frontend.route('/image/<slugid>/url')
