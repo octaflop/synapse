@@ -1,5 +1,6 @@
 from flask import Flask
 from synapse.views.frontend import frontend
+from flaskext.babel import Babel
 
 from synapse.settings import SECRET_KEY, UPLOAD_FOLDER
 from synapse.settings import RECAPTCHA_PUBLIC_KEY, RECAPTCHA_PRIVATE_KEY

@@ -89,7 +89,7 @@ def atom_feed():
                     slugid=post.slugid)),
                 updated=post.updated[0],
                 published=post.created)
-        return feed.get_response()
+    return feed.get_response()
 
 # HOME PAGE
 @frontend.route('/')
@@ -392,7 +392,7 @@ def add_site():
                 motto=form.motto.data)
         if form.logo.file:
             filename = secure_filename(form.logo.file.filename)
-            size = 200,200
+            size = 190,190
             try:
                 os.chdir(os.path.join(UPLOAD_FOLDER, 'orig'))
                 form.logo.file.save(filename)
