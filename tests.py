@@ -15,7 +15,7 @@ import unittest
 import tempfile ## may be redundant
 
 # Fixtures
-from fixtures import *
+from tests.fixtures import user, post
 
 
 class SynapseTestCase(unittest.TestCase):
@@ -40,7 +40,6 @@ class SynapseTestCase(unittest.TestCase):
             assert 'Hellz' in rv.data
             assert '<b>bellz</b>' in rv.data
         except:
-            print rv.data
             return rv.data
 
     def register(self, username, password):
@@ -60,12 +59,12 @@ class SynapseTestCase(unittest.TestCase):
 
     def test_login_logout(self):
         rv = self.login(u'cogno', u'powers')
-        print rv.data
         assert 'cogno' in rv.data
 
     def test_false_login(self):
         rv = self.login('admin', 'default')
-        assert 'Invalid!' in rv.data
+        print rv.data
+        assert "<h1>login</h1>" in rv.data
 
 if __name__ == "__main__":
     unittest.main()

@@ -89,8 +89,8 @@ def atom_feed():
 @template('index.html')
 def index():
     meta = Meta()
-    #posts = Post.objects()
-    posts = Post.live()
+    posts = Post.objects()
+    #posts = Post.live()
     users = User.objects()
     images = Image.objects()
     return dict(meta=meta, users=users, posts=posts, images=images)

@@ -17,5 +17,6 @@ app.config.update(
     RECAPTCHA_PUBLIC_KEY = RECAPTCHA_PUBLIC_KEY,
     RECAPTCHA_PRIVATE_KEY = RECAPTCHA_PRIVATE_KEY
     )
+babel = Babel(app)
 
 app.register_module(frontend)
