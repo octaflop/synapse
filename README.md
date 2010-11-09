@@ -42,4 +42,5 @@ in writing tests and documentation.
         python run.py dev 
     or, for production, run:
         python run.py prod
+    be sure to edit usr/conf/gunicorn.conf and change the static routing to your absolute directory location.
 

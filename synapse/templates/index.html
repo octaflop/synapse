@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Welcome: Index{% endblock %}
+{% block title %}{{ meta.site.title }} | Index{% endblock %}
 {% block content %}
 	<script>
 		$(document).ready(function () {
 		    // Load theme
-		    Galleria.loadTheme('static/js/galleria/themes/classic/galleria.classic.js');
+		    Galleria.addTheme('static/js/galleria/themes/classic/galleria.classic.js');
 		    $('#images').galleria();
 		});
 	</script>

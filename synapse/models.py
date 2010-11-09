@@ -97,7 +97,7 @@ class Post(Document, object):
         }
     @queryset_manager
     def live(doc_cls, queryset):
-        return queryset(is_published=True).filter(is_published=True)
+        return queryset(is_published=True).filter(published__lte=datetime.datetime.now())
     @permalink
     def permalink(self):
         return 'post_by_slugid', {'slugid':self.slugid}
