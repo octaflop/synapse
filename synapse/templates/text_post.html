@@ -9,9 +9,11 @@ $(document).ready(function() {
 </script>
 
 <div class="span-18 colborder">
-    <div class="span-16 prepend-1 append-2 last">
-        <h2>{{ text_post.title|escape }}</h2>
-        <div name="content">
+    <div class="span-16 prepend-1 append-2 last" id='post'>
+        <div id="post-title">
+            <h3>{{ text_post.title|escape }}</h3>
+        </div>
+        <div id='post-content' name="content">
             {{ text_post.html_content|safe }}
         </div>
         <fieldset>

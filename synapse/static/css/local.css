@@ -3,54 +3,86 @@ body {
     background: #000;
     }
 
-h1, h2, h3, h4, h5, h6 {
-    color: #F0F0F0 !important;
-    }
+#header {
+    background-color: #c02942;
+}
 
-.menu {
-    background: #333;
-    }
+#header h2 {
+    color: #fefefe;
+}
 
-.menu ul {
-    margin: 0;
-    padding: 0;
-    float: right;
-    }
+#header a,p,h1 {
+    color: #fefefe;
+    text-decoration: none;
+}
 
-.menu ul li {
-    display: inline;
-    }
+#header h1 a {
+    font-family: 'Josefin Sans Std Light', arial, serif;
+    font-size: 3em;
+}
 
-.menu ul li a{
-        float: right; text-decoration: none;
-        color: white;
-        padding: 10.5px 11px;
-        background-color: #333;
-    }
+#header h2 {
+    font-family: 'Josefin Sans Std Light', arial, serif;
+    font-size: 2.0em;
+}
 
-.menu ul li a:visited {
-        color: white;
-    }
+#post-content p {
+    font-family: "Droid Sans", arial, serif;
+    font-size: 1.1em;
+}
 
-.menu ul li a:hover, .menu ul li .current{
-        color: #fff;
-        background-color:#0b75b2;}
+#post-title h3 {
+    font-family: "Droid Serif", serif;
+    font-size: 4.0em;
+}
+
+#admin-menu a, p, li {
+    font-family: "Droid Sans", arial;
+}
+
+#admin-menu li {
+    font-size: 1.5em;
+    list-decoration
+}
+#banner {
+    background-image: url('/static/img/bannery.png');
+    background-repeat: repeat-x;
+}
+
+#menubar {
+    background-color: #532336;
+    font-size: 1.6em;
+}
+
+
+#menubar a:hover {
+    background-color: #cbb6be;
+}
+
+#site-logo img {
+    border-color: #fefefe;
+    border-width: 0.5px;
+    background-color: #010101;
+}
 
 .posts {
-   background-color: #222;
+   background-color: #020202;
+   font-family: "Droid Sans";
   }
 
+.posts h1 {
+   background-color: #010101;
+   font-family: "Droid Serif";
+   font-size: 3em;
+}
 .posts div {
     margin: 0;
     padding: 0;
     float: left;
     }
 
-.posts div a {
-        float: left; text-decoration: none;
-        color: #FFF;
-        padding: 10.5px 11px;
-        background-color: #333;
+.posts div h1 h2 h3 a {
+        color: #53777A;
     }
 
 .posts div h1 a:visited {
@@ -59,11 +91,6 @@ h1, h2, h3, h4, h5, h6 {
 
 .posts div h1 a:hover {
         color: #fff;
-        background-color:#0b75b2;
-    }
-
-.posts {
-   background-color: #222;
     }
 
 .site-banner  {
@@ -96,14 +123,4 @@ h1, h2, h3, h4, h5, h6 {
 	margin: 0px;
 	}
 
-#posts:nth-of-type(2n+1) {
-    background-color: #5f5f5f;
-}
 
-.description {
-    background-color: #303030;
-}
-
-h1.title {
-    background-color: #202020;
-}

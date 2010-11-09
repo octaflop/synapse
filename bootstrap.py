@@ -2,7 +2,9 @@ import virtualenv, textwrap
 output = virtualenv.create_bootstrap_script(textwrap.dedent("""
 def after_install(options, home_dir):
     subprocess.call([join(home_dir, 'bin', 'easy_install'), '-U', 'pip'])
-    apps = ['flask', 'werkzeug', 'jinja2', 'wtforms', 'flask-wtf', 'unidecode', 'pymongo', 'mongoengine', 'gunicorn', 'markdown', 'flask-openid']
+    apps = ['flask', 'werkzeug', 'jinja2', 'wtforms', 'flask-wtf',\
+    'unidecode', 'pymongo', 'mongoengine', 'gunicorn', 'markdown',\
+    'Flask-Babel','Flask-Themes','flask-openid']
     for app in apps:
         subprocess.call([join(home_dir, 'bin', 'pip'), 'install', '-U', app])
     subprocess.call([join('/usr/bin/', 'wget'),\

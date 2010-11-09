@@ -4,25 +4,34 @@
 {% block content %}
 <script type='text/javascript' charset="utf-8">
     $(document).ready(function () {
-	$(".add_image").button();
+        $(".add_image").button();
         $('#admin').tabs();
-	$(".submit_button").button({
-		icons: {
-			primary: 'ui-icon-save',
-		},
-	});
-	$(".add_image").click(function () {
-	    $.get("{{ url_for('add_image') }}", 
-		function (data) {
-			$('.image_form').after(data);
-		});
-	});
-    }); 
+        $(".submit_button").button({
+            icons: {
+                primary: 'ui-icon-save',
+            },
+        });
+        $(".add_image").click(function () {
+            $.get("{{ url_for('add_image') }}",
+            function (data) {
+                $('.image_form').after(data);
+            });
+        });
+    });
 </script>
-<div id='admin' class='span-18 colborder'>
+<div id='admin-menu' class='span-4 colborder'>
+    <ul>
+        <li id='new'><a href='/admin/new/'>New</a></li>
+        <li id='manage'><a href='/admin/manage/'>Manage</a></li>
+        <li id='meta'><a href='/admin/meta/'>Meta</a></li>
+        <li id='system'><a href='/admin/system/'>system</a></li>
+        <li id='languages'><a href='/admin/languages/'>languages</a></li>
+    </ul>
+</div>
+<div id='admin' class='span-18 last'>
     <ul>
         <li><a href='#add-content'>Add Content</a></li>
-        <li><a href='/admin/manage#manage'>Manage Content</a></li>
+        <li><a href='/admin/manage' id='manage'>Manage Content</a></li>
         <li><a href='#manage-meta'>Manage Meta</a></li>
     </ul>
     <div id='add-content'>
@@ -44,25 +53,25 @@
               <p><input class='submit_button' type='submit' value='save' /></p>
             </form>
         </fieldset>
-    <div class="image_fieldsets">
-        <div id='image_msg'>
+        <div class="image_fieldsets">
+            <div id='image_msg'>
+            </div>
+            <div class='image_form'>
+            </div>
+            <a class='add_image'>Add new image</a>
         </div>
-        <div class='image_form'>
-        </div>
-    <a class='add_image'>Add new image</a>
-    </div>
     </div>
     <div id='manage-meta'>
         <fieldset><legend>Adjust Site</legend>
         <form method="POST" action="/admin/add/site" enctype="multipart/form-data">
-            <dl>
-                {{ site_post_form.hidden_tag() }}
-                {{ render_field(site_post_form.title) }}
-                {{ render_field(site_post_form.motto) }}
-                {{ render_field(site_post_form.domain) }}
-                {{ render_field(site_post_form.logo) }}
-            </dl>
-          <p><input class='submit_button' type='submit' value='save' /></p>
+        <dl>
+            {{ site_post_form.hidden_tag() }}
+            {{ render_field(site_post_form.title) }}
+            {{ render_field(site_post_form.motto) }}
+            {{ render_field(site_post_form.domain) }}
+            {{ render_field(site_post_form.logo) }}
+        </dl>
+        <p><input class='submit_button' type='submit' value='save' /></p>
         </form>
         </fieldset>
         <fieldset><legend>Add a User</legend>
@@ -77,7 +86,7 @@
             </dl>
           <p><input class='submit_button' type='submit' value='Add User' /></p>
         </form>
-      </fieldset>
-    </div>
+        </fieldset>
+        </div>
 </div>
 {% endblock %}
