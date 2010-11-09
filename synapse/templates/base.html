@@ -1,4 +1,8 @@
 {% from "_formhelpers.html" import render_field %}
+<!-- External font from google -->
+<link href='http://fonts.googleapis.com/css?family=Josefin+Sans+Std+Light&subset=latin' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Droid+Sans&subset=latin' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Droid+Serif&subset=latin' rel='stylesheet' type='text/css'>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42,7 +46,7 @@
 	<!--[if lt IE 8]>
         <link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen,projection" />
 	<![endif]-->
-    <script type='text/javascript'>
+<script type='text/javascript'>
             $(document).ready(function () {
                 $(".login_button").button({
 			icons: {
@@ -94,31 +98,32 @@
         {% endfor %}
     {% endblock %}
     {% block header %}
-    <div class="container">
-        <div class="span-24 last">
-            <div class="span-18 colborder" id="header">
-                <div class="site-banner span-11 prepend-1">
-                    <h1><a href="/" title="home">{{ meta.site.title }}</a></h1>
-                    {% if meta.site.motto %}
-                    <h4>
-                        {{ meta.site.motto }}
-                    </h4>
-                    {% endif %}
-                </div>
-                <div class="span-5 site-logo last">
-                    <img src="{{ meta.site.logo }}" />
-                </div>
-                <div class="menu span-18 colborder last">
-                    <ul>
-			    <li><a href="/">home</a></li>
-			    <li><a href="/about">about</a></li>
-			    {% if meta.logged_in %}
-			    <li><a href="/admin">admin</a></li>
-			    {% endif %}
-                    </ul>
-                </div>
-            </div>
-        <div id="userbox" class="span-4 last">
+	<div class="container">
+		<div class="span-24 last" id="header">
+			<div class="span-18 prepend-1" id="banner"><h1><a href="/">{{ meta.site.title }}</a></h1><h2>{{ meta.site.motto }}</h2></div>
+			<!-- end banner -->
+			<div class="span-5 last" id="site-logo"><a href="/"><img src="{{ meta.site.logo }}" /></a></div>
+			<!-- end site-logo -->
+			<div class="clear span-24 last" id="menubar">
+				<div class="span-3 prepend-18" id="about-button"> <a href="/about">about</a></div>
+			{% if meta.logged_in %}
+				<div class="span-3 last" id="admin-button"> <a href="/admin">admin</a></div>
+			{% endif %}
+			</div>
+			<!-- end menubar -->
+		</div>
+    {% endblock %}
+    {% block content %}
+	<div id='content'>
+	    {% if flatpage %}
+	    <h1>{{ flatpage.title }}</h1>
+		    {{ flatpage.html_content|safe }}
+	    {% endif %}
+	</div>
+    {% endblock %}
+    {% block footer %}
+    <div class="span-24" id="footer">
+        <div id="userbox" class="span-6 colborder">
             {% if meta.logged_in %}
             <p id="userbox">Howdy, <a href="/profile/{{ meta.user.username }}">{{
                 meta.user.username}}</a><br /><a class="login_button" href="/logout">logout</a></p>
@@ -134,17 +139,7 @@
             </fieldset>
             {% endif %}
         </div>
-    </div>
-    {% endblock %}
-    {% block content %}
-	    {% if flatpage %}
-	    <h1>{{ flatpage.title }}</h1>
-		    {{ flatpage.html_content|safe }}
-	    {% endif %}
-    {% endblock %}
-    {% block footer %}
-    <div class="span-24" id="footer">
-	    <div class="span-12">
+	    <div class="span-5">
 		    {% if meta.footy.links %}
 		    	<ul>
 			    {% for link in meta.footy.links %}
@@ -161,7 +156,7 @@
 			    {{ meta.footy.copyrightinfo|safe }}
 		    </p>
 	    </div>
-    </div>
+   </div>
     {% endblock %}
 </div>
 </body>

@@ -2,19 +2,27 @@ from flaskext.wtf import Form, BooleanField, TextField, validators,\
 PasswordField, FileField, TextAreaField, DateTimeField, RecaptchaField,\
 HiddenField, DateField
 
+from flaskext.babel import gettext as _
+from flaskext.babel import ngettext as _n
+
 ## still not working. wish it were. TK
 # be careful of a circular import here
 #from form_helper import TagListField
 
 class RegistrationForm(Form):
-    username = TextField('Username', [validators.required(), validators.length(min=4, max=25)])
-    email = TextField('Email', [validators.required(), validators.length(min=6, max=35)])
-    password = PasswordField('New Password', [
+    username_msg = _(u'Username')
+    username = TextField(username_msg, [validators.required(), validators.length(min=4, max=25)])
+    email_msg = _(u'Email')
+    email = TextField(email_msg, [validators.required(), validators.length(min=6, max=35)])
+    password_msg = _(u'Password')
+    password = PasswordField(password_msg, [
         validators.required(),
         validators.equal_to('confirm', message='Passwords must match')
         ])
-    confirm = PasswordField('Repeat password')
-    accept_tos = BooleanField('I accept the TOS', [validators.required()])
+    repeat_password_msg = _(u'Please repeat the password')
+    confirm = PasswordField(repeat_password_msg)
+    accept_msg = _(u"I accept the <a href='/terms'>Terms of Registration</a>")
+    accept_tos = BooleanField(accept_msg, [validators.required()])
 
 class GenericFormAbstract(Form):
     title = TextField('Entitle your work', [validators.required(),\
