@@ -46,14 +46,14 @@ def login(next=None):
         if user is not None:
             flash("%s is logged in" % user.username)
             session['username'] = user.username
-            return redirect(url_for('profile', username=user.username))
+            return redirect(url_for('frontend.profile', username=user.username))
         else:
             flash("Not found")
             return redirect('login')
     if 'username' in session:
         user = User.objects(username=escape(session['username'])).first()
         if user is not None:
-            return redirect(url_for('profile', username=user.username))
+            return redirect(url_for('frontend.profile', username=user.username))
         else:
             abort(500)
     return render_template('login.html', meta=meta, form=form)
@@ -67,7 +67,7 @@ def logout():
     else:
         return "Not logged in"
     flash("logged out: %s" % user)
-    return redirect(url_for('.index'))
+    return redirect(url_for('frontend.index'))
 
 # CRUD: Create Read Update Delete
 # or CRRUMD: Create Read/Relate Update/Manage Delete
@@ -86,7 +86,7 @@ def register_user():
             if not 'username' in session:
                 session['username'] = user.username
             flash("user: %s was added successfully" % user.username)
-            return redirect(url_for('profile', username=user.username))
+            return redirect(url_for('frontend.profile', username=user.username))
         except:
             flash("could not find user after adding")
             return redirect(url_for('login'))
@@ -105,7 +105,7 @@ def manage():
 @admin.route('/admin')
 @login_required
 @template('admin/admin.html')
-def admin():
+def admin_index():
     meta = Meta()
     user_form = RegistrationForm(request.form)
     text_post_form = TextPostForm(request.form)
@@ -118,7 +118,7 @@ def admin():
             image_post_form=image_post_form,\
             site_post_form=site_post_form)
 
-@admin.route('/edit/<slugid>/_title', methods=['POST', 'PUT', 'GET'])
+@admin.route('/admin/edit/<slugid>/_title', methods=['POST', 'PUT', 'GET'])
 @login_required
 def add_text__title(slugid):
     """Ajax event to title"""
@@ -190,7 +190,7 @@ def delete_post(slugid):
         flash("Post '%s'. With slugid '%s' was deleted." % (title, slugid))
     except:
         error(404)
-    return redirect(url_for('admin'))
+    return redirect(url_for('admin_index'))
 
 ## TK Fix this. Use the proper mongo method...
 @login_required
@@ -218,13 +218,13 @@ def add_site():
                 flash("error in file: %s's upload" % filename)
         try:
             site.save()
-            return redirect(url_for('admin'))
+            return redirect(url_for('admin_index'))
         except:
             flash("there was an error saving site %s" % site.title)
-            return redirect(url_for('admin'))
+            return redirect(url_for('admin_index'))
     else:
         flash("There was an error with your submission")
-        return redirect(url_for('admin'))
+        return redirect(url_for('admin_index'))
 
 @admin.route('/admin/add/text', methods=['POST', 'GET'])
 @login_required
@@ -271,7 +271,7 @@ def add_text_post():
             text_post.save()
             flash("%s was successfully saved as slugid %s" % (text_post.title,\
                 text_post.slugid))
-            return redirect(url_for('post_by_slugid', slugid=text_post.slugid))
+            return redirect(url_for('frontend.post_by_slugid', slugid=text_post.slugid))
         except:
             flash("Error: Post was not saved")
             return redirect(url_for('add_text_post', meta=meta, form=form))

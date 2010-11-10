@@ -39,7 +39,7 @@ def atom_feed():
     meta = Meta()
     feed = AtomFeed(u'%s feed' % meta.site,\
             feed_url=request.url, url=request.url_root)
-    posts = Post.objects()
+    posts = Post.live()
     for post in posts:
         feed.add(post.title, unicode(post.html_content),\
                 content_type='html',\

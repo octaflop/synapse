@@ -9,7 +9,7 @@ from synapse.views.admin import admin
 from synapse.views.frontend import frontend
 
 app = Flask(__name__)
-app.register_module(admin, url_prefix="/admin")
+app.register_module(admin, url_prefix="")
 app.register_module(frontend, url_prefix="")
 
 from synapse.settings import SECRET_KEY, UPLOAD_FOLDER
