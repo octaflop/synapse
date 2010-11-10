@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 # strings.py
 # all of the fiddly bits.
-from flask import url_for
+from flask import url_for, request
 from werkzeug.routing import BuildError
 from settings import SALT, ALLOWED_EXTENSIONS
 
@@ -36,7 +36,7 @@ def permalink(function):
 
 def stamp_time():
     """Format a timestamp for display."""
-    return datetime.datetime.now().strftime('%Y-%m-%d @ %H:%M')
+    return datetime.datetime.now().strftime("%Y-%m-%d @ %H:%M")
 
 def hash_it(username, password):
     try:
@@ -54,7 +54,7 @@ def hash_it(username, password):
     except TypeError:
         return False
 
-
 def allowed_file(filename):
     return '.' in filename and \
             filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
