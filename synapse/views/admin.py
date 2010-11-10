@@ -5,6 +5,9 @@ from flask import Module
 
 admin = Module(__name__)
 
+# Meta
+from synapse.views.meta import Meta
+
 from flask import url_for, flash, escape, request, redirect,\
     render_template, session, abort, jsonify
 from werkzeug import SharedDataMiddleware, secure_filename
@@ -18,12 +21,10 @@ from PIL import Image as Picture
 from synapse.settings import *
 from synapse.forms import *
 from synapse.strings import *
-from synapse.decorators import template, login_required
+from synapse.decorators import *
 # Models
 from synapse.models import Site, User, Post, TextPost, Media, FlatPage,\
         Dependency, Image, Wall
-# Meta
-from synapse.views.meta import Meta
 
 # markdown extensions
 #extensions = ['footnotes', 'fenced_code']
@@ -31,7 +32,7 @@ extensions = ['footnotes', 'codehilite']
 
 # Authentication Methods
 
-##@frontend.route('/login/<url:next>', methods=['GET','POST'])
+##@admin.route('/login/<url:next>', methods=['GET','POST'])
 @admin.route('/login', methods=['GET','POST'])
 def login(next=None):
     """Login Function. Upcoming "next" function"""
@@ -66,7 +67,7 @@ def logout():
     else:
         return "Not logged in"
     flash("logged out: %s" % user)
-    return redirect(url_for('index'))
+    return redirect(url_for('.index'))
 
 # CRUD: Create Read Update Delete
 # or CRRUMD: Create Read/Relate Update/Manage Delete
@@ -117,7 +118,7 @@ def admin():
             image_post_form=image_post_form,\
             site_post_form=site_post_form)
 
-@admin.route('/admin/edit/<slugid>/_title', methods=['POST', 'PUT', 'GET'])
+@admin.route('/edit/<slugid>/_title', methods=['POST', 'PUT', 'GET'])
 @login_required
 def add_text__title(slugid):
     """Ajax event to title"""

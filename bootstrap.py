@@ -12,12 +12,15 @@ def after_install(options, home_dir):
     os.mkdir("src")
     os.chdir("src")
     repos = ["https://github.com/jquery/jquery.git",\
-        "https://github.com/jquery/jquery-ui.git"]
+        "https://github.com/jquery/jquery-ui.git",\
+        "https://github.com/tuupola/jquery_jeditable.git",\
+        "https://github.com/aino/galleria.git"]
     for repo in repos
         subprocess.call([join('usr','bin','git'), 'clone', repo])
     import shutil
-    dirs = [('jquery','dist'), ('jquery-ui','ui')]
-    for srcdir,builddir in dirs:
+    dirs = [('jquery','dist'), ('jquery-ui','ui'),\
+            ('jquery_jeditable', 'js'), ('galleria', 'src')]
+    for srcdir, builddir in dirs:
         os.chdir(os.path.join(home_dir, "src", srcdir))
         subprocess.call([join('usr','bin','make')])
         shutil.copy(builddir, os.path.join(home_dir,"static","js"))

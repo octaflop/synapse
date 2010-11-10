@@ -4,14 +4,15 @@
 from flask import Module
 
 frontend = Module(__name__)
-admin = Module(__name__)
+
+# Meta
+from synapse.views.meta import Meta
 
 # external deps
 from flask import url_for, flash, escape, request, redirect,\
     render_template, session, abort, jsonify
 from werkzeug.contrib.atom import AtomFeed
 from urlparse import urljoin
-import hashlib
 import datetime
 import os
 from markdown import markdown as markdown
@@ -22,8 +23,6 @@ from synapse.settings import *
 from synapse.forms import *
 from synapse.strings import *
 from synapse.decorators import template, login_required
-# Meta
-from synapse.views.meta import Meta
 
 from synapse.models import Site, User, Post, TextPost, Media, FlatPage,\
         Dependency, Image, Wall
