@@ -21,7 +21,7 @@
                 </tr>
             {% for post in posts %}
                 <tr>
-                        <td><a href={{ url_for('post_by_slugid',
+                        <td><a href={{ url_for('frontend.post_by_slugid',
                                 slugid=post.slugid) }}><b>{{
                                     post.title }}</a></b>
                         </td>
@@ -43,7 +43,7 @@
                                 <ul>
                                 {% for media in post.media %}
                                     <li><b>{{ media.title }}</b><br />
-                                    <a href='{{ url_for('image_by_slugid',
+                                    <a href='{{ url_for('frontend.image_by_slugid',
                                         slugid=media.slugid) }}'><img src='{{
                                         media.small }}' alt='{{ media.description
                                         }}' /></a></li>
@@ -55,9 +55,9 @@
                             {% endif %}
                         </td>
                         <td>
-                            <p><a href='{{ url_for('delete_post',
+                            <p><a href='{{ url_for('admin.delete_post',
                                 slugid=post.slugid) }}'>delete</a> | 
-                            <a href='{{ url_for('edit_text_ajax',
+                            <a href='{{ url_for('admin.edit_text_ajax',
                                 slugid=post.slugid) }}'>edit</a>
                             </p>
                         </td>
@@ -93,7 +93,7 @@
                              <i>{{ image.created }}</i>
                         </td>
                         <td>
-                            <p><a href='{{ url_for('delete_image',
+                            <p><a href='{{ url_for('admin.delete_image',
                                 slugid=image.slugid) }}'>delete</a>
                             </p>
                         </td>

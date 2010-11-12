@@ -99,7 +99,7 @@
         {% endfor %}
     {% endblock %}
     {% block header %}
-	<div class="container">
+	<div class="container sitebox">
 		<div class="span-24 last" id="header">
 			<div class="span-18 prepend-1" id="banner"><h1><a href="/">{{ meta.site.title }}</a></h1><h2>{{ meta.site.motto }}</h2></div>
 			<!-- end banner -->
@@ -124,7 +124,7 @@
     {% endblock %}
     {% block footer %}
     <div class="span-24" id="footer">
-        <div id="userbox" class="span-6 colborder">
+        <div id="userbox" class="span-7">
             {% if meta.logged_in %}
             <p id="userbox">Howdy, <a href="/profile/{{ meta.user.username }}">{{
                 meta.user.username}}</a><br /><a class="login_button" href="/logout">logout</a></p>

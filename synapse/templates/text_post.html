@@ -31,7 +31,7 @@ $(document).ready(function() {
     </fieldset>
     </div>
 </div>
-<div class="span-4 last">
+<div class="span-4 last sidebar">
     {% if showedit %}
     <b>Hey there {{ meta.user.username|escape }}.</b>
     <p>Care to <a class='edit' href='{{ url_for('post_by_slugid', slugid=text_post.slugid)

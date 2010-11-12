@@ -3,6 +3,19 @@ body {
     background: #000;
     }
 
+.sitebox {
+    -moz-box-shadow: 1px 0px 15px #fff;
+    -webkit-box-shadow: 0px 0px 15px #fff;
+    }
+
+.sidebar {
+    /* for IE */
+    filter:alpha(opacity=60);
+    /* CSS3 standard */
+    opacity:0.6;
+    background-color: #000;
+}
+
 #header {
     background-color: #c02942;
 }
@@ -11,7 +24,7 @@ body {
     color: #fefefe;
 }
 
-#header a,p,h1 {
+#header a, p, h1 {
     color: #fefefe;
     text-decoration: none;
 }
@@ -26,6 +39,10 @@ body {
     font-size: 2.0em;
 }
 
+#post {
+	background-color: #141414;
+}
+
 #post-content p {
     font-family: "Droid Sans", arial, serif;
     font-size: 1.1em;
@@ -34,16 +51,13 @@ body {
 #post-title h3 {
     font-family: "Droid Serif", serif;
     font-size: 4.0em;
+    color: #fef;
 }
 
 #admin-menu a, p, li {
     font-family: "Droid Sans", arial;
 }
 
-#admin-menu li {
-    font-size: 1.5em;
-    list-decoration
-}
 #banner {
     background-image: url('/static/img/bannery.png');
     background-repeat: repeat-x;
@@ -52,6 +66,9 @@ body {
 #menubar {
     background-color: #532336;
     font-size: 1.6em;
+    border-style: solid;
+    border-width: 0px 0px 0.5em;
+    border-color: #53777a;
 }
 
 
@@ -65,22 +82,30 @@ body {
     background-color: #010101;
 }
 
+.post-text h1 a {
+    color: #fef;
+    text-decoration: none;
+}
+
 .posts {
-   background-color: #020202;
+   background-color: #141414;
    font-family: "Droid Sans";
+   color: #fef;
   }
 
 .posts h1 {
-   background-color: #010101;
    font-family: "Droid Serif";
    font-size: 3em;
+   color: #fef;
 }
 .posts div {
-    margin: 0;
-    padding: 0;
     float: left;
+    color: #fef;
     }
 
+.colborder {
+    color: #53777A;
+}
 .posts div h1 h2 h3 a {
         color: #53777A;
     }
@@ -93,22 +118,21 @@ body {
         color: #fff;
     }
 
-.site-banner  {
+.site-banner {
     background-color: #666;
     }
 
 .site-banner h1 a {
     color: #eee;
     text-decoration: none;
+    font-size: 3em;
     }
 
 .site-banner h1 a:hover {
     background-color: #0b75b2;
+    font-size: 3em;
     }
 
-#userbox {
-    background-color: #111;
-}
 
 #userbox p {
     background-color: #111;
@@ -123,4 +147,9 @@ body {
 	margin: 0px;
 	}
 
-
+#footer {
+    background-color: #532336;
+    border-style: solid;
+    border-width: 0.5em 0px 0px;
+    border-color: #53777a;
+    }
