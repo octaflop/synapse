@@ -1,4 +1,5 @@
 from flask import session, escape, request
+from flaskext.themes import Theme, render_theme_template
 # from synapse.strings import *
 from synapse.forms import LoginForm
 from synapse.models import User, Site
@@ -38,4 +39,11 @@ Attribution-ShareAlike 2.5 Canada License</a>
                 'title' : u"github page",
                 'url' : u"http://github.org/octaflop/synapse"
                 }]
+
+def render_theme(template_name, **context):
+    """
+    Overrides the template_loader for theming purposes
+    """
+    theme 
+    return render_theme_template(theme, template_name, **context)
 

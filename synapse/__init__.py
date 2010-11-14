@@ -4,11 +4,14 @@ __AUTHOR__ = 'Faris Chebib'
 
 from flask import Flask
 
+from flaskext.themes import setup_themes
+
 #import synapse.views
 from synapse.views.admin import admin
 from synapse.views.frontend import frontend
 
 app = Flask(__name__)
+setup_themes(app)
 app.register_module(admin, url_prefix="")
 app.register_module(frontend, url_prefix="")
 

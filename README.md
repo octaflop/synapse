@@ -28,8 +28,10 @@ in writing tests and documentation.
 ## Steps
 0. Start mongodb
 
-1. Run  
+1. Run 
         python bootstrap.py
+   **You will likely need to hand-pick missing dependencies as this script does
+   not always work.**
 
 2. Then run
         source bin/activate
@@ -44,3 +46,10 @@ in writing tests and documentation.
         python run.py prod
     be sure to edit usr/conf/gunicorn.conf and change the static routing to your absolute directory location.
 
+## When things go wrong.
+Something will likely go wrong when using the bootstrap. It´s a good idea to
+have a look at the script and download things by hand. Usually this will simply
+involve
+    bin/pip install -U <app>
+
+If you have other issues, I´ll have a look-see at the github page.
