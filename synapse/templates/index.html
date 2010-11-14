@@ -8,7 +8,7 @@
 		    $('#images').galleria();
 		});
 	</script>
-       <div id='posts' class='prepend-1 posts span-18 colborder'>
+       <div id='posts' class='prepend-1 posts span-18'>
               {% for post in posts %}
             <div class="post-text span-11">
             <h1>
@@ -25,7 +25,7 @@
                     </div>
                 </div>
                 {% if post.media %}
-                <div class="post_img span-3 last">
+                <div class="post_img span-4 last">
                     <ul id='galleria'>
                         {% for media in post.media %}
                         <img src="{{ media.medium }}" alt={{
@@ -41,7 +41,7 @@
                 {% endfor %}
             </ul>
         </div>
-        <div class='span-4 last'>
+        <div class='span-4 sidebar last'>
             <h1>Images</h1>
 	    <div id='images'>
 		    <ul>

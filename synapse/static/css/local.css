@@ -40,7 +40,15 @@ body {
 }
 
 #post {
-	background-color: #141414;
+    background-color: #141414;
+}
+
+a {
+    color: #53777A;
+}
+
+#post a {
+    color: #53777A;
 }
 
 #post-content p {
@@ -70,7 +78,6 @@ body {
     border-width: 0px 0px 0.5em;
     border-color: #53777a;
 }
-
 
 #menubar a:hover {
     background-color: #cbb6be;
@@ -103,15 +110,13 @@ body {
     color: #fef;
     }
 
-.colborder {
-    color: #53777A;
-}
-.posts div h1 h2 h3 a {
+
+.posts a {
         color: #53777A;
     }
 
 .posts div h1 a:visited {
-        color: white;
+        color: #fff;
     }
 
 .posts div h1 a:hover {
@@ -153,3 +158,9 @@ body {
     border-width: 0.5em 0px 0px;
     border-color: #53777a;
     }
+#footer a {
+        color: #53777A;
+    }
+#footer ul {
+	list-style-type: none;
+	}

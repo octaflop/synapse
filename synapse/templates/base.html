@@ -126,7 +126,24 @@
     {% endblock %}
     {% block footer %}
     <div class="span-24" id="footer">
-        <div id="userbox" class="span-7">
+	    <div class="span-11 prepend-1">
+		    <p>
+		    <a href="http://octaflop.github.com/synapse"><img src="/static/img/poweredsynapse.png" alt="synapse logo" /></a>
+		    </p>
+		    <p>
+			    {{ meta.footy.copyrightinfo|safe }}
+		    </p>
+	    </div>
+	    <div class="span-5">
+		    {% if meta.footy.links %}
+		    	<ul>
+			    {% for link in meta.footy.links %}
+			    <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+			    {% endfor %}
+			</ul>
+		    {% endif %}
+	    </div>
+	    <div id="userbox" class="span-7 last">
             {% if meta.logged_in %}
             <p id="userbox">Howdy, <a href="/profile/{{ meta.user.username }}">{{
                 meta.user.username}}</a><br /><a class="login_button" href="/logout">logout</a></p>
@@ -142,23 +159,7 @@
             </fieldset>
             {% endif %}
         </div>
-	    <div class="span-5">
-		    {% if meta.footy.links %}
-		    	<ul>
-			    {% for link in meta.footy.links %}
-			    <li><a href="{{ link.url }}">{{ link.title }}</a></li>
-			    {% endfor %}
-			</ul>
-		    {% endif %}
-	    </div>
-	    <div class="span-11 prepend-1 last">
-		    <p>
-		    <a href="http://octaflop.github.com/synapse"><img src="/static/img/poweredsynapse.png" alt="synapse logo" /></a>
-		    </p>
-		    <p>
-			    {{ meta.footy.copyrightinfo|safe }}
-		    </p>
-	    </div>
+
    </div>
     {% endblock %}
 </div>

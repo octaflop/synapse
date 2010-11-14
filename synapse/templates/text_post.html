@@ -32,8 +32,8 @@ $(document).ready(function() {
     </div>
 </div>
 <div class="span-4 last sidebar">
-    {% if showedit %}
-    <b>Hey there {{ meta.user.username|escape }}.</b>
+    {% if meta.logged_in %}
+    <b>Hey there {{ meta.user.username }}.</b>
     <p>Care to <a class='edit' href='{{ url_for('post_by_slugid', slugid=text_post.slugid)
         }}/edit'>edit</a> this page?</p>
     {% endif %}
