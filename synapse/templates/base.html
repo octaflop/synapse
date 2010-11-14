@@ -106,9 +106,11 @@
 			<div class="span-5 last" id="site-logo"><a href="/"><img src="{{ meta.site.logo }}" /></a></div>
 			<!-- end site-logo -->
 			<div class="clear span-24 last" id="menubar">
-				<div class="span-3 prepend-18" id="about-button"> <a href="/about">about</a></div>
 			{% if meta.logged_in %}
-				<div class="span-3 last" id="admin-button"> <a href="/admin">admin</a></div>
+				<div class="span-3 prepend-18" id="admin-button"> <a href="/admin">admin</a></div>
+				<div class="span-3 last" id="about-button"> <a href="/about">about</a></div>
+			{% else %}
+				<div class="span-3 prepend-21" id="about-button"> <a href="/about">about</a></div>
 			{% endif %}
 			</div>
 			<!-- end menubar -->
