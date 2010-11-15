@@ -2,17 +2,49 @@
 __VERSION__ = '0.2'
 __AUTHOR__ = 'Faris Chebib'
 
-from flask import Flask
+try:
+    from simplejson import dumps as dump_json
+except ImportError:
+    from json import dumps as dump_json
 
+from flask import Flask
+from jinja2 import Environment, BaseLoader, TemplateNotFound
+
+from synapse.settings import THEME
 from flaskext.themes import setup_themes
+from flaskext.babel import format_timedelta
+from synapse.filters import format_date, format_datetime
 
 #import synapse.views
 from synapse.views.admin import admin
 from synapse.views.frontend import frontend
+#import synapse.filters
 
 app = Flask(__name__)
+
+class ThemeLoader(BaseLoader):
+    """Forwards theme lookups to currently active theme. Ripped from zine."""
+    def __init__(self, app):
+        BaseLoader.__init__(self)
+        self.app = app
+
+    def get_source(self, environment, name):
+        rv = self.app.theme.get_source(name)
+        if rv is None:
+            raise TemplateNotFound(name)
+        return rv
+
+env = Environment(loader=ThemeLoader(app),
+                  extensions=['jinja2.ext.i18n'])
+env.filters.update(
+        json=dump_json,
+        datetimeformat=format_datetime,
+        dateformat=format_date,
+        timedeltaformat=format_timedelta
+    )
+
 setup_themes(app)
-app.register_module(admin, url_prefix="")
+app.register_module(admin, url_prefix="/admin")
 app.register_module(frontend, url_prefix="")
 
 from synapse.settings import SECRET_KEY, UPLOAD_FOLDER

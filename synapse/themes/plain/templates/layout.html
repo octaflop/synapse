@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block header %}
+    <hgroup>
+	<h1>{{ meta.site.title }}</h1>
+	<h2>{{ meta.site.motto }}</h2>
+    </hgroup>
+    <nav>
+    <ul>
+	{% block navigation %}
+	<li><a href="/about">about</a></li>
+	{% if meta.logged_in %}
+	    <li><a href="/admin">admin</a></li>
+	{% endif %}
+	{% endblock %}
+    </ul>
+    </nav>
+{% endblock %}
+
+{% block footer %}
+<nav>
+<section id="userbox">
+{% if meta.logged_in %}
+    <p id="userbox">Howdy, <a href="/profile/{{ meta.user.username }}">{{
+	meta.user.username}}</a><br /><a class="login_button" href="/logout">logout</a></p>
+    {% else %}
+    <p><button href="#login" class="login_button" id="login_show">login</button></p>
+    <fieldset id="login_hidden" style="display: none">
+	<form action="/login" method="POST">
+	    {{ meta.loginform.hidden_tag() }}
+	    {{ meta.loginform.username.label }} {{ meta.loginform.username(size=20) }}<br />
+	    {{ meta.loginform.password.label }} {{ meta.loginform.password(size=20) }}
+	    <button class="unlock" type='submit'>unlock</button>
+	</form>
+    </fieldset>
+    {% endif %}
+</section>
+</nav>
+{% endblock %}
+{# 
+layout.html is the template to adjust when theming. This is where I'd add
+blueprint css.
+#}

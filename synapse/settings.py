@@ -31,4 +31,5 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'gif'])
 
 TIME_ZONE = 'America/Vancouver' # Doesn't do anything, yet
 
+THEME = 'plain'
 

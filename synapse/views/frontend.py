@@ -27,6 +27,8 @@ from synapse.decorators import template, login_required
 from synapse.models import Site, User, Post, TextPost, Media, FlatPage,\
         Dependency, Image, Wall
 
+from synapse.views.meta import render as render_template
+
 # markdown extensions
 #extensions = ['footnotes', 'fenced_code']
 extensions = ['footnotes', 'codehilite']

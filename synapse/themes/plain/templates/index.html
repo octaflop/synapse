@@ -1,0 +1,21 @@
+{% extends layout.html %}
+{% block main-content %}
+    {% for post in posts %}
+	<article>
+	    <header>
+		<h1><a href="{{ url_for('post_by_slugid', slugid=post.slugid) }}">
+		    {{ post.title }}
+		</a></h1>
+		<time datetime="{{ post.published }}">{{ post.published }}</time>
+	    </header>
+	    <section id="post-content">
+		{{ post.html_content }}
+	    </section>
+	</article>
+    {% endfor %}
+{% endblock %}
+{% block sidebar %}
+{% endblock %}
+{# 
+index.html builds the main index. 
+#}

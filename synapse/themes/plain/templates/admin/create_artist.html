@@ -1,0 +1,16 @@
+<!doctype html>
+{% from "_formhelpers.html" import render_field %}
+<title>Upload new file</title>
+<h1>Upload a new file</h1>
+<form method="post" action="/admin/add/artist">
+  <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+  <dl>
+    {{ render_field(form.unique_name) }}
+    {{ render_field(form.first_name) }}
+    {{ render_field(form.last_name) }}
+    {{ render_field(form.bio_en) }}
+    {{ render_field(form.bio_fr) }}
+  </dl>
+  <p><input type=submit value=Register></p>
+</form>
+

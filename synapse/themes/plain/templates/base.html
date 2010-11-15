@@ -1,0 +1,40 @@
+{% from "_formhelpers.html" import render_field %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{% block title %}{% endblock %} | {{ meta.site.title }}</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="static/style.css" />
+    <link rel="alternate" type="application/atom+xml"
+    title="{{ meta.site.title }} feed" href="/feed" />
+    <!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    {% block head %}
+    {% end block %}
+</head>
+<body>
+    <header>
+    {% block header %}
+    {% endblock %}
+    </header>
+    <section id="content">
+    	<section id="main-content">
+	{% block main-content %}
+	{% endblock %}
+	</section>
+	<section id="sidebar">
+	{% block sidebar %}
+	{% endblock %}
+	</section>
+    </section>
+    <footer>
+    {% block footer %}
+    {% endblock %}
+    </footer>
+</body>
+{# 
+base.html aligns and builds the sectioning required for html5 semantics. 
+The referenced javascript is for IE backwards functionality
+#}
+</html>

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}{{ image.title }} - {{ meta.site.title }}{% endblock %}
+{% block content %}
+<div class='prepend-1 span-17 colborder'>
+    <h1 class='title'>{{ image.title }}</h1>
+    <div class='span-7 description'>
+        {{ image.description }}
+    </div>
+    <div class='span-10 last'>
+        <a href='{{ image.orig }}'><img src='{{ image.large }}' alt='{{
+            image.title }}' /></a>
+        <!-- oh hello -->
+    </div>
+</div>
+<div class='span-6 last'>
+    &nbsp;
+</div>
+{% endblock %}

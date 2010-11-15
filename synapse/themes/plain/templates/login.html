@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<div class="span-24 last">
+<fieldset>
+    <h1>login</h1>
+    <form action="/login" method="POST">
+        {{ form.hidden_tag() }}
+        {{ form.username.label }} {{ form.username(size=20) }}<br />
+        {{ form.password.label }} {{ form.password(size=20) }}
+    <input type='submit' value="login" />
+    </form>
+</fieldset>
+</div>
+{% endblock %}
+
+

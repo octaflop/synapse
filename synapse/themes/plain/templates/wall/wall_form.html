@@ -1,0 +1,11 @@
+{% from "_formhelpers.html" import render_field %}
+    <fieldset>
+    <form method='POST' action='/wall/add'>
+    <legend>Add to the wall</legend>
+    {{ render_field(wall_form.content) }}
+    {{ render_field(wall_form.username) }}
+    {{ render_field(wall_form.recaptcha) }}
+    <input type='submit' value='add' />
+    </form>
+    </fieldset>
+

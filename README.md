@@ -1,6 +1,6 @@
 # Synapse
 
-![synapse logo](./synapse/raw/master/synapse.png)
+![synapse logo](./raw/master/synapse.png)
 
 ## Description 
 Synapse is a simple blogging application written in

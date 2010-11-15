@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}{{ text_post.title }} - {{ meta.site.title }}{% endblock %}
+{% block content %}
+<script type="text/javascript" charset="utf-8">
+// <![CDATA[
+$(document).ready(function() {
+        $('.edit').button();
+});
+</script>
+
+<div class="span-18 colborder">
+    <div class="span-16 prepend-1 append-2 last" id='post'>
+        <div id="post-title">
+            <h3>{{ text_post.title|escape }}</h3>
+        </div>
+        <div id='post-content' name="content">
+            {{ text_post.html_content|safe }}
+        </div>
+        <fieldset>
+            <legend>metadata</legend>
+        by: {{ text_post.author.username|escape }}<br />
+        published:{{ text_post.published|escape }}<br />
+        created:{{ text_post.created|escape }}<br />
+        {% if text_post.updated %}
+        updated:
+        {% for update in text_post.updated %} 
+            {{ update|escape }}, 
+        {% endfor %}
+        <br />
+        {% endif %}
+    </fieldset>
+    </div>
+</div>
+<div class="span-4 last sidebar">
+    {% if meta.logged_in %}
+    <b>Hey there {{ meta.user.username }}.</b>
+    <p>Care to <a class='edit' href='{{ url_for('post_by_slugid', slugid=text_post.slugid)
+        }}/edit'>edit</a> this page?</p>
+    {% endif %}
+</div>
+{% endblock %}
