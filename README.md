@@ -4,7 +4,7 @@
 
 ## Description 
 Synapse is a simple blogging application written in
-[Flask](http://flask.pocoo.com/) and supported by
+[Flask](http://flask.pocoo.org/) and supported by
 [MongoDB](http://www.mongodb.org/). As a bonus, it "bootstraps" itself to build
 a [gunicorn](http://gunicorn.org/) server backend for speedy production!
 
